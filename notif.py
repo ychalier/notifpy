@@ -1,6 +1,7 @@
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import urllib.request
+import sqlite3
 import smtplib
 import json
 import re
@@ -10,8 +11,10 @@ class API:
 
     def __init__(self):
         self.settings = {}
-        self.server = None
         self.read_settings()
+        self.server = None
+        self.conn = sqlite3.connect('videos.db')
+        self.init_database()
 
     def read_settings(self):
         settings = {}
@@ -26,6 +29,14 @@ class API:
                 exit()
         file_object.close()
         self.settings = settings
+
+    def init_database(self):
+        c = self.conn.cursor()
+        try:
+            c.execute('CREATE TABLE videos (channel TEXT, video TEXT)')
+            self.conn.commit()
+        except sqlite3.OperationalError:
+            pass
 
     def retrieve_video_list(self, channel_id):
         href = "https://www.googleapis.com/youtube/v3/search?order=date" \
@@ -65,7 +76,14 @@ class API:
                              msg.as_string())
 
     def is_new(self, channel_id, video_id):
-        return True
+        c = self.conn.cursor()
+        c.execute('SELECT * FROM videos WHERE video=?', (video_id,))
+        if c.fetchone() is None:
+            c.execute('INSERT INTO videos VALUES (?, ?)',
+                      (channel_id, video_id))
+            self.conn.commit()
+            return True
+        return False
 
     def check_for_news(self, channel_id, pattern):
         vids = self.retrieve_matching_videos(channel_id, pattern)
@@ -73,6 +91,10 @@ class API:
             if self.is_new(channel_id, vid['id']['videoId']):
                 self.notify_video(vid)
 
+    def close(self):
+        self.conn.close()
+        if self.server is not None:
+            self.server.close()
 
 def apply_mask(videos, pattern):
     prog = re.compile(pattern)
@@ -87,4 +109,5 @@ def apply_mask(videos, pattern):
 if __name__ == "__main__":
     api = API()
     api.check_for_news("UCOLBuf1DXEfdIccvGczNUzg", "Yu-Gi-Oh!")
-    api.server.close()
+    api.close()
+
