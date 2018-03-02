@@ -1,11 +1,13 @@
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import urllib.request
+import threading
 import datetime
 import sqlite3
 import smtplib
 import json
 import time
+import sys
 import re
 
 
@@ -106,9 +108,16 @@ class API:
         c = self.conn.cursor()
         c.execute('INSERT INTO channels VALUES (?, ?)', (channel_id, pattern))
         self.conn.commit()
+        log("Added channel " + channel_id)
 
     def inspect_username(self, username, pattern):
         self.inspect_channel(self.retrieve_channel_id(username), pattern)
+
+    def list_channels(self):
+        c = self.conn.cursor()
+        c.execute('SELECT * FROM channels')
+        for channel_id, pattern in c.fetchall():
+            print(channel_id + "\t" + pattern)
 
     def check_for_news(self, channel_id, pattern):
         vids = self.retrieve_matching_videos(channel_id, pattern)
@@ -147,7 +156,57 @@ def log(text):
     print(timestamp + "\t" + text)
 
 
+class Timer(threading.Thread):
+
+    def __init__(self, refresh_rate):
+        super(Timer, self).__init__()
+        self.refresh_rate = refresh_rate
+        self._stop_event = threading.Event()
+
+    def run(self):
+        time.sleep(1)
+        while not self.stopped():
+            print("\n-----BEGIN SCHEDULED UPDATE-----")
+            api = API()
+            api.update()
+            api.close()
+            print("-----END SCHEDULED UPDATE-----\nnotif.py>", end='')
+            self._stop_event.wait(self.refresh_rate)
+
+    def stop(self):
+        self._stop_event.set()
+
+    def stopped(self):
+        return self._stop_event.is_set()
+
+
 if __name__ == "__main__":
-    api = API()
-    api.update()
-    api.close()
+    update_thread = Timer(1800)
+    update_thread.start()
+    while True:
+        cmd = input("notif.py>").split(" ")
+        if len(cmd) > 0 and cmd[0] == "quit":
+            break
+        elif len(cmd) > 0 and cmd[0] == "list":
+            api = API()
+            print("-----BEGIN CHANNEL LIST-----\n"\
+                + "channel id              \tpattern")
+            api.list_channels()
+            print("-----END CHANNEL LIST-----")
+            api.close()
+        elif len(cmd) > 0 and cmd[0] == "update":
+            print("-----BEGIN FORCED UPDATE-----")
+            api = API()
+            api.update()
+            api.close()
+            print("-----END FORCED UPDATE-----")
+        elif len(cmd) > 3 and cmd[0] == "add":
+            api = API()
+            if cmd[1] == "username":
+                api.inspect_username(cmd[2], " ".join(cmd[3:]))
+            elif cmd[1] == "channel":
+                api.inspect_channel(cmd[2], " ".join(cmd[3:]))
+            api.close()
+        else:
+            print("'" + " ".join(cmd) + "' not recognized as a command.")
+    update_thread.stop()
