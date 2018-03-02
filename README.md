@@ -34,10 +34,18 @@ Here is a list of available commands:
  - `update`: force update
  - `add`: see below
 
-**Add a new videos series to check:**
-
-The command syntax is the following:
+**Add a new videos series to check:** the command syntax is the following:
 
     notif.py>add TYPE IDENTIFIER PATTERN
 
-To know the type and the identifier to put in, go check on YouTube the list of all videos from the channel you want to analyze. If the URL is something like `www.youtube.com/channel/UC2Qw1dzXDBAZPwS7zm37g8g/videos`, then the type is `channel` and the identifier is the channel id, in this case `UC2Qw1dzXDBAZPwS7zm37g8g`.
+To know the type and the identifier to put in, go check on YouTube the list of all videos from the channel you want to analyze:
+ - if the URL is like `youtube.com/channel/UC2Qw1dzXDBAZPwS7zm37g8g/videos`, then the type is `channel` and the identifier is the channel id, in this case `UC2Qw1dzXDBAZPwS7zm37g8g`.
+ - if the URL is like `youtube.com/user/username/videos`, the the type is `username` and the identifier is the given username. *Caution: the displayed username does not work, use the one in the URL*.
+
+**Automatic start:** if you want for the script to be executed at startup silently so the update thread always runs in the background, be sure to use the command `pythonw notif.py`.
+
+For example, on Windows, create a batch file in `%AppData%\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` and write:
+
+    @echo off
+    cd C:\Path\To\The\Folder\notif.py\
+    start /B pythonw notif.py
