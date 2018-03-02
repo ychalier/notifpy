@@ -40,7 +40,11 @@ Here is a list of available commands:
 
 To know the type and the identifier to put in, go check on YouTube the list of all videos from the channel you want to analyze:
  - if the URL is like `youtube.com/channel/UC2Qw1dzXDBAZPwS7zm37g8g/videos`, then the type is `channel` and the identifier is the channel id, in this case `UC2Qw1dzXDBAZPwS7zm37g8g`.
- - if the URL is like `youtube.com/user/username/videos`, the the type is `username` and the identifier is the given username. *Caution: the displayed username does not work, use the one in the URL*.
+ - if the URL is like `youtube.com/user/username/videos`, the type is `username` and the identifier is the given username. *Caution: the displayed username does not work, use the one in the URL*.
+
+Then the *pattern* is a regular expression to match the videos from this channel that you want to extract. It can be a single string matching or you can use regular expression characters. See [re documentation](https://docs.python.org/3.5/library/re.html) for more information.
+
+## tips
 
 **Automatic start:** if you want for the script to be executed at startup silently so the update thread always runs in the background, be sure to use the command `pythonw notif.py`.
 
