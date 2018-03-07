@@ -144,8 +144,8 @@ def apply_mask(videos, pattern):
     prog = re.compile(pattern)
     filtered_videos = []
     for vid in videos:
-        result = prog.match(vid['snippet']['title'])
-        if result is not None or  pattern in vid['snippet']['title']:
+        result = prog.search(vid['snippet']['title'])
+        if result is not None:
             filtered_videos.append(vid)
     return filtered_videos
 
