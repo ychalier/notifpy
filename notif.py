@@ -145,10 +145,19 @@ def apply_mask(videos, pattern):
     filtered_videos = []
     for vid in videos:
         result = prog.match(vid['snippet']['title'])
-        if result is not None:
+        if result is not None or  pattern in vid['snippet']['title']:
             filtered_videos.append(vid)
     return filtered_videos
 
+
+def clean(string):
+    new_string = ""
+    for c in string:
+        try:
+            new_string += c
+        except UnicodeEncodeError:
+            pass
+    return new_string
 
 def log(text):
     timestamp = datetime.datetime.fromtimestamp(
