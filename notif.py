@@ -10,29 +10,22 @@ import time
 import sys
 import re
 
+from youtube import *
 
-class API:
+
+class Notifier:
+
+    CLIENT_SECRETS_FILE = 'client_secret.json'
 
     def __init__(self):
-        self.settings = {}
-        self.read_settings()
         self.server = None
         self.conn = sqlite3.connect('videos.db')
         self.init_database()
 
-    def read_settings(self):
-        settings = {}
-        file_object = open('.credentials', 'r')
-        for line in file_object.readlines():
-            line = line.replace('\n', '')
-            settings[line.split('=')[0]] = line.split('=')[1]
-        for ts in ["google_api_key", "smtp_host", "smtp_username",
-                   "smtp_password", "smtp_address"]:
-            if ts not in settings.keys():
-                print("[ERROR] Setting not found: " + ts)
-                exit()
-        file_object.close()
-        self.settings = settings
+        with open(self.CLIENT_SECRETS_FILE, 'r+') as f:
+            client_secret = json.load(f)
+            self.smtp = client_secret["smtp"]
+            self.api = YoutubeAPI(client_secret["app"])
 
     def init_database(self):
         c = self.conn.cursor()
@@ -47,52 +40,13 @@ class API:
         except sqlite3.OperationalError:
             pass
 
-    def retrieve_channel_id(self, username):
-        href = "https://www.googleapis.com/youtube/v3/channels?part=snippet" \
-               + "&forUsername=" + username\
-               + "&key=" + self.settings["google_api_key"]
-        response = urllib.request.urlopen(href)
-        return json.loads(response.read().decode('utf-8'))['items'][0]['id']
-
-    def retrieve_video_list(self, channel_id):
-        href = "https://www.googleapis.com/youtube/v3/search?order=date" \
-               + "&part=snippet&channelId=" + channel_id \
-               + "&maxResults=25&key=" + self.settings["google_api_key"]
-        response = urllib.request.urlopen(href)
-        return json.loads(response.read().decode('utf-8'))['items']
+    def close(self):
+        self.conn.close()
+        if self.server is not None:
+            self.server.close()
 
     def retrieve_matching_videos(self, channel_id, pattern):
-        return apply_mask(self.retrieve_video_list(channel_id), pattern)
-
-    def notify_video(self, vid):
-        subject = "[notif.py] New video from " + vid['snippet']['channelTitle']
-        body = open('mail-template.html', 'r').read()\
-            .replace("%CHANNEL_TITLE%", vid['snippet']['channelTitle'])\
-            .replace("%VIDEO_ID%", vid['id']['videoId'])\
-            .replace("%THUMBNAIL_URL%",
-                     vid['snippet']['thumbnails']['medium']['url'])\
-            .replace("%VIDEO_TITLE%", vid['snippet']['title'])
-        self.send_mail(subject, body)
-        log("Sending mail " + subject + " to " + self.settings["smtp_address"])
-
-    def send_mail(self, subject, body):
-        msg = MIMEMultipart()
-        msg['From'] = self.settings["smtp_address"]
-        msg['To'] = self.settings["smtp_address"]
-        msg['Subject'] = subject
-        msg.attach(MIMEText(body, 'html'))
-        if self.server is None:
-            log("Connecting to SMTP server")
-            self.server = smtplib.SMTP("smtp.gmail.com", 587)
-            self.server.ehlo()
-            self.server.starttls()
-            self.server.ehlo()
-            self.server.login(self.settings["smtp_username"],
-                              self.settings["smtp_password"])
-            log("Connected to SMTP server")
-        self.server.sendmail(self.settings["smtp_address"],
-                             self.settings["smtp_address"],
-                             msg.as_string())
+        return apply_mask( self.api.search_list(channel_id)["items"], pattern)
 
     def is_new(self, channel_id, video_id):
         c = self.conn.cursor()
@@ -111,7 +65,10 @@ class API:
         log("Added channel " + channel_id)
 
     def inspect_username(self, username, pattern):
-        self.inspect_channel(self.retrieve_channel_id(username), pattern)
+        self.inspect_channel(
+            self.api.channels_list(username)["items"][0]["id"],
+            pattern
+        )
 
     def list_channels(self):
         c = self.conn.cursor()
@@ -123,8 +80,8 @@ class API:
         vids = self.retrieve_matching_videos(channel_id, pattern)
         for vid in vids:
             if self.is_new(channel_id, vid['id']['videoId']):
-                log("New video from " + channel_id
-                    + ": " + vid['id']['videoId'])
+                log("New video from " + vid['snippet']['channelTitle']
+                    + ": " + vid['snippet']['title'])
                 self.notify_video(vid)
 
     def update(self):
@@ -134,10 +91,36 @@ class API:
             log("Checking channel " + channel_id)
             self.check_for_news(channel_id, pattern)
 
-    def close(self):
-        self.conn.close()
-        if self.server is not None:
-            self.server.close()
+    def notify_video(self, vid):
+        self.send_mail(vid)
+        self.api.playlist_item_insert(vid['id']['videoId'])
+
+    def send_mail(self, vid):
+        subject = "[notif.py] New video from " + vid['snippet']['channelTitle']
+        body = open('mail-template.html', 'r').read()\
+            .replace("%CHANNEL_TITLE%", vid['snippet']['channelTitle'])\
+            .replace("%VIDEO_ID%", vid['id']['videoId'])\
+            .replace("%THUMBNAIL_URL%",
+                     vid['snippet']['thumbnails']['medium']['url'])\
+            .replace("%VIDEO_TITLE%", vid['snippet']['title'])
+        log("Sending mail " + subject + " to " + self.smtp["address"])
+        msg = MIMEMultipart()
+        msg['From'] = self.smtp["address"]
+        msg['To'] = self.smtp["address"]
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'html'))
+        if self.server is None:
+            log("Connecting to SMTP server")
+            self.server = smtplib.SMTP("smtp.gmail.com", 587)
+            self.server.ehlo()
+            self.server.starttls()
+            self.server.ehlo()
+            self.server.login(self.smtp["username"],
+                              self.smtp["password"])
+            log("Connected to SMTP server")
+        self.server.sendmail(self.smtp["address"],
+                             self.smtp["address"],
+                             msg.as_string())
 
 
 def apply_mask(videos, pattern):
@@ -176,9 +159,9 @@ class Timer(threading.Thread):
         time.sleep(1)
         while not self.stopped():
             print("\n-----BEGIN SCHEDULED UPDATE-----")
-            api = API()
-            api.update()
-            api.close()
+            notifier = Notifier()
+            notifier.update()
+            notifier.close()
             print("-----END SCHEDULED UPDATE-----\nnotif.py>", end='')
             self._stop_event.wait(self.refresh_rate)
 
@@ -190,32 +173,33 @@ class Timer(threading.Thread):
 
 
 if __name__ == "__main__":
-    update_thread = Timer(1800)
+
+    update_thread = Timer(180)
     update_thread.start()
     while True:
         cmd = input("notif.py>").split(" ")
         if len(cmd) > 0 and cmd[0] == "quit":
             break
         elif len(cmd) > 0 and cmd[0] == "list":
-            api = API()
+            notifier = Notifier()
             print("-----BEGIN CHANNEL LIST-----\n"\
                 + "channel id              \tpattern")
-            api.list_channels()
+            notifier.list_channels()
             print("-----END CHANNEL LIST-----")
-            api.close()
+            notifier.close()
         elif len(cmd) > 0 and cmd[0] == "update":
             print("-----BEGIN FORCED UPDATE-----")
-            api = API()
-            api.update()
-            api.close()
+            notifier = Notifier()
+            notifier.update()
+            notifier.close()
             print("-----END FORCED UPDATE-----")
         elif len(cmd) > 3 and cmd[0] == "add":
-            api = API()
+            notifier = Notifier()
             if cmd[1] == "username":
-                api.inspect_username(cmd[2], " ".join(cmd[3:]))
+                notifier.inspect_username(cmd[2], " ".join(cmd[3:]))
             elif cmd[1] == "channel":
-                api.inspect_channel(cmd[2], " ".join(cmd[3:]))
-            api.close()
+                notifier.inspect_channel(cmd[2], " ".join(cmd[3:]))
+            notifier.close()
         else:
             print("'" + " ".join(cmd) + "' not recognized as a command.")
     update_thread.stop()
