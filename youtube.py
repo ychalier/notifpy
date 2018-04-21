@@ -23,12 +23,10 @@ class YoutubeAPI:
     def __init__(self, secret):
         self.secret = secret
         self.retrieve_token()
-        if "playlist_id" not in self.secret.keys():
+        self.playlist_id = self.playlist_check()
+        if self.playlist_id is None:
             playlist = self.create_playlist()
-            self.secret["playlist_id"] = playlist["id"]
-            with open(self.CLIENT_SECRETS_FILE, 'w') as outfile:
-                json.dump(self.secret, outfile)
-        self.playlist_id = self.secret["playlist_id"]
+            self.playlist_id = playlist["id"]
 
     def auth(self):
         auth_params = {
@@ -131,6 +129,17 @@ class YoutubeAPI:
         }
         return header
 
+    def playlist_list(self):
+        params = {
+            "part": "snippet",
+            "mine": "true",
+            "maxResults": 50
+        }
+        req = requests.get(self.PLAYLIST_URI,
+                           params=params,
+                           headers=self.headers())
+        return req.json()
+
     def playlist_insert(self):
         params = {
             "part": "snippet, status"
@@ -148,6 +157,12 @@ class YoutubeAPI:
                             params=params, json=body,
                             headers=self.headers())
         return req.json()
+
+    def playlist_check(self):
+        for playlist in self.playlist_list()["items"]:
+            if playlist["snippet"]["title"] == self.PLAYLIST_TITLE:
+                return playlist["id"]
+        return None
 
     def playlist_item_insert(self, video_id):
         params = {
