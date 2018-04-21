@@ -9,7 +9,7 @@ First clone the repository:
     git clone https://github.com/ychalier/notif.py.git
     cd notif.py/
 
-In order to use YouTube Data API v3, the script requires an API client, which you can create at https://console.developers.google.com.
+In order to use YouTube Data API v3, the script requires an API client, which you can create at https://console.developers.google.com/apis/credentials. For more information you can check the [documentation](https://developers.google.com/youtube/registering_an_application).
 
 You will also need an SMTP server to be able to send mails to yourself when a new video comes out. If you use GMail, you can use the host `smtp.gmail.com:587`. The script will then need your username and password to connect to this host, and finally a mail address to receive the message.
 
@@ -89,9 +89,10 @@ I personally use it with `python` in a regular command window, so I can check th
 
 ### todo
 
- - [ ] handle YouTube API errors
- - [ ] detect when a refreshing is necessary
+ - [x] handle YouTube API errors
+ - [x] detect when a refreshing is necessary
  - [x] send a mail when a new video comes out
  - [x] add new videos to a playlist
  - [ ] remove old videos from database
  - [ ] let user configure notification method(s)
+ - [ ] help message

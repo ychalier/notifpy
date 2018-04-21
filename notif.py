@@ -56,8 +56,9 @@ class Timer(threading.Thread):
 
     def run(self):
         time.sleep(1)
-        notifier = Notifier()
+        notifier = Notifier(wait=True)
         while not self.stopped():
+            print("")
             print_begin("SCHEDULED UPDATE")
             notifier.update()
             print_end("SCHEDULED UPDATE", mode=1)

@@ -12,12 +12,11 @@ import re
 
 from youtube import *
 
-
 class Notifier:
 
     CLIENT_SECRETS_FILE = 'client_secret.json'
 
-    def __init__(self):
+    def __init__(self, wait=False):
         self.server = None
         self.conn = sqlite3.connect('videos.db')
         self.init_database()
@@ -25,12 +24,12 @@ class Notifier:
         with open(self.CLIENT_SECRETS_FILE, 'r+') as f:
             client_secret = json.load(f)
             self.smtp = client_secret["smtp"]
-            self.api = YoutubeAPI(client_secret["app"])
+            self.api = YoutubeAPI(client_secret["app"], wait=wait)
 
     def init_database(self):
         c = self.conn.cursor()
         try:
-            c.execute('CREATE TABLE videos (timestamp DATETIME, '\
+            c.execute('CREATE TABLE videos (t TIMESTAMP DEFAULT CURRENT_TIMESTAMP, '\
                       + 'channelId TEXT, videoId TEXT, videoTitle TEXT)')
             self.conn.commit()
         except sqlite3.OperationalError:
@@ -56,8 +55,8 @@ class Notifier:
         c = self.conn.cursor()
         c.execute('SELECT * FROM videos WHERE videoId=?', (video_id,))
         if c.fetchone() is None:
-            c.execute('INSERT INTO videos VALUES (?, ?, ?, ?)',
-                      ('now', channel_id, video_id, video_title))
+            c.execute('INSERT INTO videos (channelId, videoId, videoTitle)'\
+                      + ' VALUES (?, ?, ?)', (channel_id, video_id, video_title))
             self.conn.commit()
             return True
         return False
@@ -148,8 +147,3 @@ def clean(string):
         except UnicodeEncodeError:
             pass
     return new_string
-
-def log(text):
-    timestamp = datetime.datetime.fromtimestamp(
-        time.time()).strftime('%Y-%m-%d %H:%M:%S')
-    print(timestamp + "\t" + text)
