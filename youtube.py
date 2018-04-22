@@ -216,7 +216,7 @@ class YoutubeAPI:
                            headers=self.headers())
         if req.status_code == 401 and not retry:
             self.refresh()
-            return self.channels_list(retry=True)
+            return self.channels_list(username, retry=True)
         return req.json()
 
     def search_list(self, channel_id, retry=False):

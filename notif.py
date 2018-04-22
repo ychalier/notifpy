@@ -35,10 +35,11 @@ def cmd_add(notifier, args):
         regexp = re.compile("youtube.com\/(\w+)\/(\w+)\/?")
         match = regexp.search(args[0])
         mode, channel, pattern = match.group(1), match.group(1), args[1:]
-    elif len(args) == 3:
+    elif len(args) >= 3:
         mode, channel, pattern = args[0], args[1], args[2:]
     else:
-        return 1
+        print("Wrong arguments")
+        return 0
 
     if mode in ["id", "channel"]:
         notifier.inspect_channel(channel, " ".join(pattern))
