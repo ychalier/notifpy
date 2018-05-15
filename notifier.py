@@ -23,7 +23,10 @@ class Notifier:
 
         with open(self.CLIENT_SECRETS_FILE, 'r+') as f:
             client_secret = json.load(f)
-            self.smtp = client_secret["smtp"]
+            if "smtp" in client_secret.keys():
+                self.smtp = client_secret["smtp"]
+            else:
+                self.smtp = {}
             self.api = YoutubeAPI(client_secret["app"], wait=wait)
 
     def init_database(self):
@@ -98,7 +101,8 @@ class Notifier:
             self.check_for_news(channel_id, pattern)
 
     def notify_video(self, vid):
-        self.send_mail(vid)
+        if len(self.smtp.keys()) == 4:
+            self.send_mail(vid)
         self.api.playlist_item_insert(vid['id']['videoId'])
 
     def send_mail(self, vid):

@@ -28,6 +28,8 @@ Those information goes into a JSON file `client_secret.json` located next to the
       }
     }
 
+**If you do not want to use mails as a notification mean**, do not put the `"smtp"` node in the settings. Mailing will then just be ignored.
+
 ## setup and permissions
 
 At first launch, the script will ask you to grant access to your YouTube account. This is needed to retrieve the token that will be used to managed the playlist _notif.py_ on your account, create it and insert new videos into it.
