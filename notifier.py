@@ -53,6 +53,11 @@ class Notifier:
         return apply_mask(self.api.search_list(channel_id)["items"], pattern)
 
     def is_new(self, channel_id, vid):
+
+        if "videoId" not in vid["id"].keys():
+            # ie. this is a playlist
+            return False
+
         video_id = vid["id"]["videoId"]
         video_title = vid["snippet"]["title"]
         c = self.conn.cursor()
