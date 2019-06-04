@@ -29,6 +29,7 @@ Arguments:
 
     html
         videos <PARAMETERS>     print HTML of a cluster of videos to stdout
+        body <PARAMETERS>       only print HTML body of `videos`
         channels <PARAMETERS>   print HTML of videos grouped by channel to
                                   stdout
 

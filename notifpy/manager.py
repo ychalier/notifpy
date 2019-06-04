@@ -102,7 +102,7 @@ class Manager:
             channel["ids"] = ",".join([v["id"] for v in videos])
         return renderer.render({"channels": channels})
 
-    def html_videos(self, args):
+    def html_videos(self, args, template="videos.html"):
         parameters = {
             "offset": 0,
             "limit": 50,
@@ -119,7 +119,7 @@ class Manager:
             parameters[key] = value
         channel_model = Channel(self.db)
         video_model = Video(self.db)
-        renderer = Renderer("videos.html")
+        renderer = Renderer(template)
         conditions = []
         if parameters["channel"] is not None:
             conditions.append(("channelId", parameters["channel"]))
@@ -143,11 +143,16 @@ class Manager:
             ).strftime("%d %b. %H:%M")
         return renderer.render({"videos": videos})
 
+    def html_body(self, args):
+        return self.html_videos(args, "body.html")
+
     def html(self, mode, args=[]):
         if mode == "channels":
             html = self.html_channels(args)
         elif mode == "videos":
             html = self.html_videos(args)
+        elif mode == "body":
+            html = self.html_body(args)
         else:
             html = "<h1>404 Not Found</h1>"
         sys.stdout.buffer.write(html.encode("utf8"))

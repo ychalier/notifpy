@@ -1,0 +1,16 @@
+
+{% for video in videos %}
+<div class="video">
+    <a href="https://www.youtube.com/watch?v={{ video.id }}">
+        <img src="{{ video.thumbnail }}" width=160 height=90 />
+    </a>
+    <p class="video__title">
+        <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title }}</a>
+    </p>
+    <p class="video__description">
+        <a href="https://www.youtube.com/channel/{{ video.channelId }}/videos">{{ video.channel }}</a>
+        &middot;
+        {{ video.time }}
+    </p>
+</div>
+{% endfor %}
