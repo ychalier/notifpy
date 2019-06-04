@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>notif.py</title>
+    <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://s.ytimg.com/yts/img/favicon_32-vflOogEID.png" sizes="32x32">
+    <link rel="icon" href="https://s.ytimg.com/yts/img/favicon_48-vflVjB_Qk.png" sizes="48x48">
+    <link rel="icon" href="https://s.ytimg.com/yts/img/favicon_96-vflW9Ec0w.png" sizes="96x96">
+    <link rel="icon" href="https://s.ytimg.com/yts/img/favicon_144-vfliLAfaB.png" sizes="144x144">
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: Roboto;
+        }
+        body {
+            background-color: #F6F6F6;
+        }
+        body h1{
+            text-align: center;
+        }
+        section {
+            margin: auto;
+            max-width: 876px;
+        }
+        article {
+
+        }
+        a {
+            color: black;
+            text-decoration: none;
+        }
+        .videos {
+            overflow-x: scroll;
+            max-width: 876px;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+        }
+        .video {
+            width: 213px;
+            margin: 0 4px 0 4px;
+        }
+        .video:first-child {
+            margin-left: 0;
+        }
+        .video:last-child {
+            margin-right: 0;
+        }
+        .video__title {
+            margin-top: 2px;
+            margin-bottom: 0;
+            font-size: 90%;
+        }
+        .video__description {
+            margin: 2px 0 8px 0;
+            font-size: 80%;
+            color: grey;
+        }
+        .list {
+            max-width: 876px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .list .video {
+            margin: 0 0 6px 0;
+        }
+        img {
+            box-shadow: 1px 1px 4px rgba(0, 0, 0, .2);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>notif.py</h1>
+    <section>
+        {% for channel in channels %}
+        <article>
+            <a href="https://www.youtube.com/watch_videos?video_ids={{ channel.ids }}">
+                <h2>{{ channel.title }}</h2>
+            </a>
+            <div class="videos">
+                {% for video in channel.videos %}
+                <div class="video">
+                    <a href="https://www.youtube.com/watch?v={{ video.id }}">
+                        <img src="{{ video.thumbnail }}" width=213 height=120 />
+                    </a>
+                    <p class="video__title">
+                        <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title }}</a>
+                    </p>
+                    <p class="video__description">
+                        {{ video.time }}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+</body>
+
+</html>

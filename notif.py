@@ -1,112 +1,63 @@
-import re
+"""Notifpy 1.0, a custom YouTube subscription system.
+Usage: python notif.py [FLAGS] <ACTION> <ARGUMENTS>
 
-from notifier import *
+Flags:
+    --help      display this message
+    --version   display current program version
 
+Actions:
+    create      add a new channel or pattern to the database
+    delete      remove a channel or a pattern from the database
+    html        generate an HTML page with recent videos
+    list        list all channels and patterns in the database
+    update      check for new videos using YouTube API
 
-def print_begin(msg):
-    print("----- BEGIN {0} -----".format(msg))
+Arguments:
+    create
+        channel <ID> <PRIORITY> add a new channel to the database, ID is either
+                                  the channel id (24 characters starting with
+                                  'UC') or the username, both are found in the
+                                  channel URL, and PRIORITY is the update
+                                  priority for this channel
+        pattern <ID> <REGEX>    add a new pattern th the database, ID is the
+                                  channel id and REGEX is the matching pattern
 
+    delete
+        channel <ID>            remove the channel with id ID from the database
+        pattern <ID>            remove the pattern with id ID from the database
 
-def print_end(msg, mode=0):
-    if mode == 0:
-        print("----- END {0} -----".format(msg))
-    elif mode == 1:
-        print("----- END {0} -----\nnotif.py>".format(msg), end='')
+    html
+        videos                  print HTML of a cluster of videos to stdout
+        channels                print HTML of videos grouped by channel to
+                                  stdout
 
+    update:
+                                force update of all channels
+        schedule                let the program decide which channels to update
+        priority <PRIORITY>     force update of channels of a given PRIORITY
+        channel <ID>            force update of a channel, given by its ID
 
-def cmd_list(notifier):
-    print_begin("CHANNEL LIST")
-    print("channel id              \tchannel title\tpattern")
-    notifier.list_channels()
-    print_end("CHANNEL LIST")
-    return 0
+The automatic schedule should be setup using cron tasks. The `update schedule`
+rule should be called every hour of the day. If more than that, API's quotas can
+be exceeded. Channels with priority 0 are updated on Saturdays at midnight.
+Channels with priority 1 are updated every day at 7pm. Channels with priority 2
+are updated every day at 8am, 12am, 4pm, 6pm, 8pm and 10pm."""
 
+from notifpy.db import Database
+from notifpy.yt import Endpoint
+from notifpy import Manager
+import sys
 
-def cmd_update(notifier):
-    print_begin("FORCED UPDATE")
-    notifier.update()
-    print_end("FORCED UPDATE")
-    return 0
-
-
-def cmd_add(notifier, args):
-
-    if len(args) == 2:
-        regexp = re.compile("youtube.com\/(\w+)\/(\w+)\/?")
-        match = regexp.search(args[0])
-        mode, channel, pattern = match.group(1), match.group(1), args[1:]
-    elif len(args) >= 3:
-        mode, channel, pattern = args[0], args[1], args[2:]
-    else:
-        print("Wrong arguments")
-        return 0
-
-    if mode in ["id", "channel"]:
-        notifier.inspect_channel(channel, " ".join(pattern))
-    elif mode in ["user", "username"]:
-        notifier.inspect_username(channel, " ".join(pattern))
-    return 0
-
-
-class Timer(threading.Thread):
-
-    def __init__(self, refresh_rate):
-        super(Timer, self).__init__()
-        self.refresh_rate = refresh_rate
-        self._stop_event = threading.Event()
-
-    def run(self):
-        time.sleep(1)
-        notifier = Notifier(wait=True)
-        while not self.stopped():
-            print("")
-            print_begin("SCHEDULED UPDATE")
-            notifier.update()
-            print_end("SCHEDULED UPDATE", mode=1)
-            self._stop_event.wait(self.refresh_rate)
-        notifier.close()
-
-    def stop(self):
-        self._stop_event.set()
-
-    def stopped(self):
-        return self._stop_event.is_set()
-
-
-class UserInput(threading.Thread):
-
-    def __init__(self):
-        super(UserInput, self).__init__()
-        self._stop_event = threading.Event()
-        self.notifier = None
-        self.commands = {
-            "exit": (lambda *args: 1),
-            "list": (lambda *args: cmd_list(self.notifier)),
-            "update": (lambda *args: cmd_update(self.notifier)),
-            "add": (lambda *args: cmd_add(self.notifier, args[0])),
-        }
-
-    def run(self):
-        self.notifier = Notifier()
-        while not self.stopped():
-            cmd = input("notif.py>").split(" ")
-            if len(cmd) > 0 and cmd[0] in self.commands.keys():
-                status = self.commands[cmd[0]](cmd[1:])
-                if status == 1:
-                    break
-            else:
-                print("'" + " ".join(cmd) + "' not recognized as a command.")
-        self.notifier.close()
-
-    def stop(self):
-        self._stop_event.set()
-
-    def stopped(self):
-        return self._stop_event.is_set()
 
 if __name__ == "__main__":
-    timer, user = Timer(180), UserInput()
-    timer.start()
-    user.start()
-    user.join()
-    timer.stop()
+    if "--help" in sys.argv:
+        print(__doc__)
+        exit()
+    elif "--version" in sys.argv:
+        print("Notifpy 1.0")
+        exit()
+    db = Database("db.sqlite3")
+    endpoint = Endpoint("secret.json")
+    if not Manager(db, endpoint).process(sys.argv[1:]):
+        print(__doc__.split("\n")[1] + "\nTry 'python notif.py --help' for more information.")
+    db.close()

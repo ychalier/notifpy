@@ -1,100 +1,99 @@
-# notif.py
+# Notifpy
 
-Some crazy productive YouTube channels (like stream replay or TV/Radio channels) publish tons a video a day, which would flood your subscription list. However, there is one series they have that particularly have you interested. Install *notif.py*, and it will notify you whenever a new video comes out!
+**Notifpy** is a custom YouTube subscription system. The original goal was to
+get rid of a Google account. However, querying YouTube API requires an API key
+and therefore you still need an account. The good thing is that it wont be able
+to see what or when you are watching anything.
 
-## install
+## 1. Setup
 
-First clone the repository:
+### 1.1. Install
 
-    git clone https://github.com/ychalier/notif.py.git
-    cd notif.py/
+```bash
+git clone https://github.com/ychalier/notifpy.git
+cd notifpy/
+pip3 install -r requirements.txt
+```
 
-In order to use YouTube Data API v3, the script requires an API client, which you can create at https://console.developers.google.com/apis/credentials. For more information you can check the [documentation](https://developers.google.com/youtube/registering_an_application).
+### 1.2. Youtube API
 
-You will also need an SMTP server to be able to send mails to yourself when a new video comes out. If you use GMail, you can use the host `smtp.gmail.com:587`. The script will then need your username and password to connect to this host, and finally a mail address to receive the message.
-
-Those information goes into a JSON file `client_secret.json` located next to the other script files. Here's the format of this file:
-
-    {
-      "app": {
-        "client_id": "PASTE YOUR CLIENT ID HERE",
-        "client_secret": "PASTE YOUR CLIENT SECRET HERE"
-      },
-      "smtp": {
-        "host": "smtp.gmail.com:587",
-        "username": "alex.delarge@gmail.com",
-        "password": "hereisasecurepassword",
-        "address": "alex.delarge@gmail.com"
-      }
+In order to use YouTube Data API v3, you need an [API key](https://console.developers.google.com/apis/credentials).
+For more information you can check the [documentation](https://developers.google.com/youtube/registering_an_application).
+Save your API key in a JSON file `secret.json` with the following schema:
+```json
+{
+    "app": {
+        "client_id": "...",
+        "redirect_uri": "...",
+        "client_secret": "..."
     }
+}
+```
 
-**If you do not want to use mails as a notification mean**, do not put the `"smtp"` node in the settings. Mailing will then just be ignored.
+You are now ready to perform the first start of the program. Try it with
+```bash
+python3 notif.py list
+```
 
-## setup and permissions
+Since this is your first run, the program will have to retrieve a token from the
+API. To do so, copy and paste the URL prompted in the terminal to your web
+browser and allow access rights. You will get redirected to the `redirect_uri`
+setting of the app. The URL will contain the GET parameter `code`. Copy it and
+paste it in the terminal.
 
-At first launch, the script will ask you to grant access to your YouTube account. This is needed to retrieve the token that will be used to managed the playlist _notif.py_ on your account, create it and insert new videos into it.
+## 2. Usage
 
-#### revocation
+### 2.1. Channels
 
-You can revoke this permission at any moment from your Google account. Go to your Application preferences and revoke the token to be fully sure. Or simply delete the `token.json` local file. No copy is made online.
+Subscribe to a channel with:
 
-## usage
+```bash
+python3 notif.py create channel <CHANNEL ID> <PRIORITY>
+```
 
-When started, the script starts a thread that runs in the background to check for new videos. Meanwhile, you can type in commands in the command prompt:
+The **channel id** is a 24 characters long string starting with `UC`. To get it,
+go on the YouTube channel homepage. The URI is of the following form:
+```
+https://www.youtube.com/channel/CHANNEL-ID/
+```
 
-    notif.py>
+The **priority** is used for automated updates. Channels with priority `0` are
+updated on Saturdays at midnight. Channels with priority `1` are updated every
+day at 7pm. Channels with priority `2` are updated every day at 8am, 12am, 4pm,
+6pm, 8pm and 10pm.
 
-Here is a list of available commands:
+### 2.2. Patterns
 
- - `quit`: stop the program (also closes the update thread)
- - `list`: list all currently checked channels
- - `update`: force update
- - `add`: see below
+You can apply filters to channels. If a channel has at least one pattern, then
+you will only see videos whose title matches one of the patterns. You can use
+regular expressions if they follow [Python's syntax](https://docs.python.org/3/library/re.html).
 
-**Add a new videos series to check**
+Add a pattern with:
+```bash
+python3 notif.py create pattern <CHANNEL ID> <REGEX>
+```
+The `REGEX` field can contain spaces.
 
-The command syntax is the following:
+### 2.3. Views
 
-    notif.py>add TYPE IDENTIFIER PATTERN
+You can generate an HTML page that displays the lastly published videos. It gets
+printed to the standard output, therefore you can pipe it to a file.
 
-To know the type and the identifier to put in, go check on YouTube the list of all videos from the channel you want to analyze:
- - if the URL is like `youtube.com/channel/UC2Qw1dzXDBAZPwS7zm37g8g/videos`, then the type is `channel` and the identifier is the channel id, in this case `UC2Qw1dzXDBAZPwS7zm37g8g`.
- - if the URL is like `youtube.com/user/username/videos`, the type is `username` and the identifier is the given username. *Caution: the displayed username (aka the Channel Title) does not work, use the one in the URL*.
+```bash
+python3 notif.py html videos > /var/www/html/videos.html
+```
 
-Then the *pattern* is a regular expression to match the videos from this channel that you want to extract. It can be a single string matching or you can use regular expression characters. See [re documentation](https://docs.python.org/3.5/library/re.html) for more information.
+### 2.4. Manual Usage
 
-If you don't know whether you should write `channel` or `username`, use the following syntax:
+Run the program with flag `--help` for an inventory of possible commands.
 
-    notif.py>add URL PATTERN
+### 2.5. Automation
 
-Just paste the URL you get when going on the desired channel's page.
+Run the script every hour with the following cron task (use `crontab -e` append
+it). The program will adapt updates based on the given priorities.
 
-**Now just wait for a video to be published, and you'll get a notification on your email address and the video will be added to the playlist _notif.py_ created on your YouTube account.**
+```
+0 * * * * cd /PATH/notifpy && python3 notif.py update schedule
+```
 
-## tips
-
-**Automatic start**
-
-If you want for the script to be executed at startup silently so the update thread always runs in the background, be sure to use the command `pythonw notif.py`.
-
-For example, on Windows, create a batch file in `%AppData%\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` and write:
-
-    @echo off
-    cd C:\Path\To\The\Folder\notif.py\
-    start /B pythonw notif.py
-
-**Notification area**
-
-I personally use it with `python` in a regular command window, so I can check the log so that everything's fine. But I did not want to see the command window always in my desktop or even my taskbar, so I found this little program [RBTray](http://rbtray.sourceforge.net) that allows you to minimize any window into the notification area. Pretty neat.
-
-## development notes
-
-### todo
-
- - [x] handle YouTube API errors
- - [x] detect when a refreshing is necessary
- - [x] send a mail when a new video comes out
- - [x] add new videos to a playlist
- - [ ] remove old videos from database
- - [ ] let user configure notification method(s)
- - [ ] help message
+Change `PATH` to your actual path.
