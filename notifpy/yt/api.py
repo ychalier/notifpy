@@ -41,12 +41,14 @@ class Api:
         if os.path.isfile(Api.TOKEN_FILE):
             with open(Api.TOKEN_FILE) as file:
                 self.auth_token = json.load(file)
+                self.refresh_token = self.auth_token
+            return self.refresh_token
         else:
             token = self.auth()
             with open(Api.TOKEN_FILE, "w") as file:
                 json.dump(token, file)
             self.auth_token = token
-        return self.refresh()
+            return self.refresh()
 
     def refresh(self):
         token_params = {
