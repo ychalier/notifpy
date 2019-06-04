@@ -12,22 +12,23 @@ class Model:
             for i, field in enumerate(self.fields)
         }
 
-    def list(self, conditions=[], order=None):
-        order_string = ""
+    def list(self, conditions=[], search=[], order=None, limit=None, offset=None):
+        sql = "SELECT * FROM {table}".format(table=self.table)
+        if len(conditions) + len(search) > 0:
+            sql += " WHERE "
+        if len(conditions) > 0:
+            sql += " AND ".join([c[0]+"=?" for c in conditions])
+            if len(search) > 0:
+                sql += " AND "
+        if len(search) > 0:
+            sql += " AND ".join([c[0]+" LIKE ?" for c in search])
         if order is not None:
-            order_string = " ORDER BY " + order
-        if len(conditions) == 0:
-            rows = self.db.execute(
-                "SELECT * FROM {table}".format(table=self.table) + order_string,
-            ).fetchall()
-        else:
-            rows = self.db.execute(
-                "SELECT * FROM {table} WHERE {ands}".format(
-                    table=self.table,
-                    ands=" AND ".join([c[0]+"=?" for c in conditions])
-                    ) + order_string,
-                [c[1] for c in conditions]
-            ).fetchall()
+            sql += " ORDER BY {order}".format(order=order)
+        if limit is not None:
+            sql += " LIMIT {limit}".format(limit=limit)
+        if offset is not None:
+            sql += " OFFSET {offset}".format(offset=offset)
+        rows = self.db.execute(sql, [c[1] for c in conditions + search])
         return [self.parse(row) for row in rows]
 
     def create(self, *values):

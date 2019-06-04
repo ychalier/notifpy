@@ -73,37 +73,81 @@ class Manager:
             if len(patterns[channel["id"]]) == 0:
                 print("\tNo patterns for this channel.")
 
-    def html(self, mode):
+    def html_channels(self, args):
+        parameters = {
+            "limit": 10,
+            "order": "publishedAt DESC",
+        }
+        for arg in args:
+            key, value = arg.split("=")
+            if key in ["offset", "limit"]:
+                value = int(value)
+            parameters[key] = value
         channel_model = Channel(self.db)
         video_model = Video(self.db)
-        if mode == "channels":
-            renderer = Renderer("channels.html")
-            channels = channel_model.list(order="title")
-            for channel in channels:
-                videos = video_model.list(
-                    [("channelId", channel["id"])],
-                    order="publishedAt DESC"
-                )[:10]
-                for video in videos:
-                    video["time"] = datetime.datetime.strptime(
-                                        video["publishedAt"],
-                                        "%Y-%m-%dT%H:%M:%S.%fZ"
-                                    ).strftime("%d %b. %H:%M")
-                channel["videos"] = videos
-                channel["ids"] = ",".join([v["id"] for v in videos])
-            html = renderer.render({"channels": channels})
-        elif mode == "videos":
-            renderer = Renderer("videos.html")
-            videos = video_model.list(order="publishedAt DESC")[:50]
+        renderer = Renderer("channels.html")
+        channels = channel_model.list(order="title")
+        for channel in channels:
+            videos = video_model.list(
+                conditions=[("channelId", channel["id"])],
+                order=parameters["order"],
+                limit=parameters["limit"]
+            )
             for video in videos:
-                video["channel"] = channel_model.list(
-                    conditions=[("id", video["channelId"])]
-                )[0]["title"]
                 video["time"] = datetime.datetime.strptime(
-                    video["publishedAt"],
-                    "%Y-%m-%dT%H:%M:%S.%fZ"
-                ).strftime("%d %b. %H:%M")
-            html = renderer.render({"videos": videos})
+                                    video["publishedAt"],
+                                    "%Y-%m-%dT%H:%M:%S.%fZ"
+                                ).strftime("%d %b. %H:%M")
+            channel["videos"] = videos
+            channel["ids"] = ",".join([v["id"] for v in videos])
+        return renderer.render({"channels": channels})
+
+    def html_videos(self, args):
+        parameters = {
+            "offset": 0,
+            "limit": 50,
+            "order": "publishedAt DESC",
+            "channel": None,
+            "query": None
+        }
+        for arg in args:
+            key, value = arg.split("=")
+            if key in ["offset", "limit"]:
+                value = int(value)
+            elif key in ["channel", "query"] and value == "None":
+                value = None
+            parameters[key] = value
+        channel_model = Channel(self.db)
+        video_model = Video(self.db)
+        renderer = Renderer("videos.html")
+        conditions = []
+        if parameters["channel"] is not None:
+            conditions.append(("channelId", parameters["channel"]))
+        search = []
+        if parameters["query"] is not None:
+            search.append(("title", "%{query}%".format(query=parameters["query"])))
+        videos = video_model.list(
+            conditions=conditions,
+            search=search,
+            order=parameters["order"],
+            limit=parameters["limit"],
+            offset=parameters["offset"]
+        )
+        for video in videos:
+            video["channel"] = channel_model.list(
+                conditions=[("id", video["channelId"])]
+            )[0]["title"]
+            video["time"] = datetime.datetime.strptime(
+                video["publishedAt"],
+                "%Y-%m-%dT%H:%M:%S.%fZ"
+            ).strftime("%d %b. %H:%M")
+        return renderer.render({"videos": videos})
+
+    def html(self, mode, args=[]):
+        if mode == "channels":
+            html = self.html_channels(args)
+        elif mode == "videos":
+            html = self.html_videos(args)
         else:
             html = "<h1>404 Not Found</h1>"
         sys.stdout.buffer.write(html.encode("utf8"))
@@ -180,9 +224,9 @@ class Manager:
             self.list()
             return True
         elif args[0] == "html":
-            if len(args) != 2:
+            if len(args) < 2:
                 return False
-            self.html(args[1])
+            self.html(args[1], args[2:])
             return True
         elif args[0] == "create":
             if len(args) != 4:

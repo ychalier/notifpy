@@ -16,7 +16,7 @@ Actions:
 Arguments:
     create
         channel <ID> <PRIORITY> add a new channel to the database, ID is either
-                                  the channel id (24 characters starting with
+                                  the channel id (24 characters starting with":
                                   'UC') or the username, both are found in the
                                   channel URL, and PRIORITY is the update
                                   priority for this channel
@@ -28,8 +28,8 @@ Arguments:
         pattern <ID>            remove the pattern with id ID from the database
 
     html
-        videos                  print HTML of a cluster of videos to stdout
-        channels                print HTML of videos grouped by channel to
+        videos <PARAMETERS>     print HTML of a cluster of videos to stdout
+        channels <PARAMETERS>   print HTML of videos grouped by channel to
                                   stdout
 
     update:
@@ -37,6 +37,17 @@ Arguments:
         schedule                let the program decide which channels to update
         priority <PRIORITY>     force update of channels of a given PRIORITY
         channel <ID>            force update of a channel, given by its ID
+
+Parameters:
+    Pass parameters with the format `key=value`, by quoting it if there is a
+    space inside it. Default values are the following:
+
+    limit=50                pagination size
+    offset=0                pagination offset
+    order=publishedAt\ DESC videos ordering field (`creation` might be another
+                              field worth of interest)
+    channel=None            channel id to filter out the results
+    query=None              query to filter out video titles
 
 The automatic schedule should be setup using cron tasks. The `update schedule`
 rule should be called every hour of the day. If more than that, API's quotas can
