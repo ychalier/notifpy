@@ -4,12 +4,20 @@ import sqlite3
 class Database:
 
     INIT_SCRIPT_FILE = "notifpy/db/init.sql"
+    CLEAN_SCRIPT_FILE = "notifpy/db/clean.sql"
 
     def __init__(self, path):
         self.path = path
         self.connection = sqlite3.connect(path)
         cursor = self.connection.cursor()
         with open(Database.INIT_SCRIPT_FILE) as file:
+            for statement in file.read().split(";"):
+                cursor.execute(statement)
+        self.connection.commit()
+
+    def clean(self):
+        cursor = self.connection.cursor()
+        with open(Database.CLEAN_SCRIPT_FILE) as file:
             for statement in file.read().split(";"):
                 cursor.execute(statement)
         self.connection.commit()

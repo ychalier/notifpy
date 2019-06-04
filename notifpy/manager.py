@@ -11,6 +11,9 @@ class Manager:
         self.db = db
         self.endpoint = endpoint
 
+    def clean_database(self):
+        self.db.clean()
+
     def create_channel(self, args):
         candidates = self.endpoint.list_channel_username(args[0])
         if len(args[0]) == 24:
@@ -147,6 +150,9 @@ class Manager:
     def process(self, args):
         if len(args) == 0:
             return False
+        elif args[0] == "clean":
+            self.clean_database()
+            return True
         elif args[0] == "update":
             if len(args) > 1:
                 if args[1] == "schedule":

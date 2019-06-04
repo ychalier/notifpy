@@ -6,6 +6,7 @@ Flags:
     --version   display current program version
 
 Actions:
+    clean       remove old videos from the database
     create      add a new channel or pattern to the database
     delete      remove a channel or a pattern from the database
     html        generate an HTML page with recent videos
