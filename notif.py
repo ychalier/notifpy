@@ -48,7 +48,7 @@ Parameters:
     order=publishedAt\ DESC videos ordering field (`creation` might be another
                               field worth of interest)
     channel=None            channel id to filter out the results
-    query=None              query to filter out video titles
+    query=None              query to filter out video titles or channel titles
 
 The automatic schedule should be setup using cron tasks. The `update schedule`
 rule should be called every hour of the day. If more than that, API's quotas can

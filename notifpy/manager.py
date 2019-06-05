@@ -125,8 +125,9 @@ class Manager:
             conditions.append(("channelId", parameters["channel"]))
         search = []
         if parameters["query"] is not None:
-            search.append(("title", "%{query}%".format(query=parameters["query"])))
-        videos = video_model.list(
+            search.append(("videos.title", "%{query}%".format(query=parameters["query"])))
+            search.append(("channels.title", "%{query}%".format(query=parameters["query"])))
+        videos = video_model.advanced_list(
             conditions=conditions,
             search=search,
             order=parameters["order"],
