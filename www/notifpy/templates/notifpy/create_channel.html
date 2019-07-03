@@ -1,0 +1,30 @@
+{% extends 'notifpy/base.html' %}
+{% load static from staticfiles %}
+
+{% block body %}
+    <h1>Create a channel</h1>
+    <form class="form--block">
+        <input id="input" class="" type="text" placeholder="Channel ID or username"/>
+        <input id="submit" type="submit" value="Search" />
+    </form>
+    <div id="results"></div>
+    <template id="template">
+        <form class="form--inline" method="post" action="">
+            {% csrf_token %}
+            <img class="channel__thumbnail" />
+            <span></span>
+            <select name="priority">
+                <option value="-1">None</option>
+                <option value="0">Low</option>
+                <option value="1" selected="">Medium</option>
+                <option value="2">High</option>
+            </select>
+            <input hidden type="text" name="title">
+            <input hidden type="text" name="id">
+            <input hidden type="url" name="thumbnail">
+            <input type="submit" value="Add" />
+        </form>
+    </template>
+{% csrf_token %}
+<script src="{% static 'notifpy/channel.js' %}"></script>
+{% endblock %}
