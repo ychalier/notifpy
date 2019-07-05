@@ -2,61 +2,61 @@
 {% load static from staticfiles %}
 
 {% block body %}
-    <div class="icon-title">
-        <img class="channel__thumbnail" src="{{channel.thumbnail}}" />
-        <h1>{{channel.title}}</h1>
+<div class="icon-title">
+    <img class="channel__thumbnail" src="{{channel.thumbnail}}" />
+    <h1>{{channel.title}}</h1>
+</div>
+<table>
+    <tr>
+        <td><b>Channel ID</b></td>
+        <td><a href="https://www.youtube.com/channel/{{channel.id}}/videos">{{channel.id}}</a></td>
+    </tr>
+    <tr>
+        <td><b>Priority</b></td>
+        <td>{{channel.priority_label}}</td>
+    </tr>
+    <tr>
+        <td><b>Filters</b></td>
+        <td>
+            {% if channel.filter_set.all %}
+            {% for filter in channel.filter_set.all %}
+            <span class="monospace">{{filter.regex}}</span>
+            {% endfor %}
+            {% else %}
+            None
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td><b>Last update</b></td>
+        <td>{{channel.last_update}}</td>
+    </tr>
+</table>
+<div class="command-panel">
+    <a class="command__button" href="{% url 'edit_channel' slug=channel.slug %}">Edit</a>
+    <a class="command__button" href="{% url 'delete_channel' slug=channel.slug %}">Delete</a>
+    <a class="command__button" href="{% url 'update_channel' slug=channel.slug %}">Update</a>
+</div>
+<h3>Last videos</h3>
+{% if videos %}
+<div class="gallery">
+    {% for video in videos %}
+    <div class="video">
+        <a href="https://www.youtube.com/watch?v={{ video.id }}">
+            <img class="video__thumbnail" src="{{ video.thumbnail }}" width=160 height=90 />
+        </a>
+        <p class="video__title">
+            <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title | safe }}</a>
+        </p>
+        <p class="video__description">
+            <a href="{% url 'channel' slug=channel.slug %}">{{ channel.title | safe }}</a>
+            &middot;
+            {{ video.time }}
+        </p>
     </div>
-    <table>
-            <tr>
-                <td><b>Channel ID</b></td>
-                <td><a href="https://www.youtube.com/channel/{{channel.id}}/videos">{{channel.id}}</a></td>
-            </tr>
-            <tr>
-                <td><b>Priority</b></td>
-                <td>{{channel.priority_label}}</td>
-            </tr>
-            <tr>
-                <td><b>Filters</b></td>
-                <td>
-                    {% if channel.filter_set.all %}
-                        {% for filter in channel.filter_set.all %}
-                            <span class="monospace">{{filter.regex}}</span>
-                        {% endfor %}
-                    {% else %}
-                        None
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <td><b>Last update</b></td>
-                <td>{{channel.last_update}}</td>
-            </tr>
-    </table>
-    <div class="command-panel">
-        <a class="command__button" href="{% url 'edit_channel' slug=channel.slug %}">Edit</a>
-        <a class="command__button" href="{% url 'delete_channel' slug=channel.slug %}">Delete</a>
-        <a class="command__button" href="{% url 'update_channel' slug=channel.slug %}">Update</a>
-    </div>
-    <h3>Last videos</h3>
-    {% if videos %}
-        <div class="gallery">
-        {% for video in videos %}
-            <div class="video">
-                <a href="https://www.youtube.com/watch?v={{ video.id }}">
-                    <img class="video__thumbnail" src="{{ video.thumbnail }}" width=160 height=90 />
-                </a>
-                <p class="video__title">
-                    <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title | safe }}</a>
-                </p>
-                <p class="video__description">
-                    <a href="{% url 'channel' slug=channel.slug %}">{{ channel.title | safe }}</a>
-                    &middot;
-                    {{ video.time }}
-                </p>
-            </div>
-        {% endfor %}
-        </div>
-    {% else %}
-        <p>No video found for this channel.</p>
-    {% endif %}
+    {% endfor %}
+</div>
+{% else %}
+<p>No video found for this channel.</p>
+{% endif %}
 {% endblock %}

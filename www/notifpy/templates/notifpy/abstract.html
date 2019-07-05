@@ -1,0 +1,23 @@
+{% extends 'notifpy/base.html' %}
+{% load static from staticfiles %}
+
+{% block body %}
+
+<h1>About: notif.py</h1>
+
+<p>
+    <b>Notifpy</b> is a web application developped for the <a class="emph" href="https://www.djangoproject.com/">Django</a> framework. It mimics the features of a <a class="emph" href="https://www.youtube.com/">YouTube</a> account in terms of
+    subscriptions and playlists management.
+</p>
+<p>
+    Its purpose is the preservation of privacy. In order to maintain anonymity for a desktop browser, remember to clear the cache and session cookies, or YouTube will store your history in those and still make recommandations.
+</p>
+<p>
+    On Android, apps such as <a class="emph" href="https://vanced.app/">YoutTube Vanced</a> can be helpful, but also remember to clear application's user data to get rid of history and recommandations.
+</p>
+
+<p>
+    The project is available on GitHub at <a class="emph" href="https://github.com/ychalier/notifpy">https://github.com/ychalier/notifpy</a>.
+</p>
+
+{% endblock %}

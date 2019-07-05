@@ -2,12 +2,12 @@
 {% load static from staticfiles %}
 
 {% block body %}
-    <h1>Create Playlist</h1>
-    <form method="post" action="" class="form--table">
-        <table>
-            {% csrf_token %}
-            {{ form.as_table }}
-        </table>
-        <input type="submit" value="Add" />
-    </form>
+<h1>Create Playlist</h1>
+<form method="post" action="" class="form--table">
+    <table>
+        {% csrf_token %}
+        {{ form.as_table }}
+    </table>
+    <input type="submit" value="Add" />
+</form>
 {% endblock %}

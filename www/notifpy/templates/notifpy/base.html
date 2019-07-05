@@ -13,35 +13,56 @@
     <link rel="icon" href="https://s.ytimg.com/yts/img/favicon_96-vflW9Ec0w.png" sizes="96x96">
     <link rel="icon" href="https://s.ytimg.com/yts/img/favicon_144-vfliLAfaB.png" sizes="144x144">
     <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'notifpy/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'notifpy/css/layout.css' %}" />
+    <link rel="stylesheet" href="{% static 'notifpy/css/utils.css' %}" />
+    <link rel="stylesheet" href="{% static 'notifpy/css/video.css' %}" />
+    <link rel="stylesheet" href="{% static 'notifpy/css/forms.css' %}" />
+    <link rel="stylesheet" href="{% static 'notifpy/css/playlist.css' %}" />
+    <link rel="stylesheet" href="{% static 'notifpy/css/responsive.css' %}" />
 </head>
 
 <body>
+    <script>
+        var token = "{{csrf_token}}";
+    </script>
+    <script src="{% static 'notifpy/js/request.js' %}"></script>
     <div class="sidebar">
         <div class="menu">
-            <div class="icon-title">
-                <img src="https://s.ytimg.com/yts/img/favicon_32-vflOogEID.png" />
-                <h3>Notif.py</h3>
+            <a href="{% url 'abstract' %}">
+                <div class="icon-title">
+                    <img src="https://s.ytimg.com/yts/img/favicon_32-vflOogEID.png" />
+                    <h3>notif.py</h3>
+                </div>
+            </a>
+            <div class="menu__category">
+                <p class="menu__category__title">
+                    View
+                </p>
+                <a class="menu__link" href="{% url 'home' %}">
+                    Home
+                </a>
+                <a class="menu__link" href="{% url 'library' %}">
+                    Library
+                </a>
             </div>
-            <a class="menu__link" href="{% url 'home' %}">
-                &rsaquo;Home
-            </a>
-            <a class="menu__link" href="{% url 'library' %}">
-                &rsaquo;Library
-            </a>
-            <br>
-            <a class="menu__link" href="{% url 'create_channel' %}">
-                &rsaquo;Add channel
-            </a>
-            <a class="menu__link" href="{% url 'admin:index' %}">
-                &rsaquo;Admin
-            </a>
+            <div class="menu__category">
+                <p class="menu__category__title">
+                    Settings
+                </p>
+                <a class="menu__link" href="{% url 'create_channel' %}">
+                    Subscribe
+                </a>
+                <a class="menu__link" href="{% url 'quotas' %}">
+                    Quotas
+                </a>
+            </div>
         </div>
     </div>
     <div class="wrapper">
-    {% block body %}
-    {% endblock %}
+        {% block body %}
+        {% endblock %}
     </div>
+    <script src="{% static 'notifpy/js/thumbnails.js' %}"></script>
 </body>
 
 </html>

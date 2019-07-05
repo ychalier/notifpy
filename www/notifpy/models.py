@@ -2,6 +2,7 @@ from django.utils.text import slugify
 from django.db import models
 import random
 
+
 class Video(models.Model):
 
     id = models.CharField(max_length=11, primary_key=True)
@@ -17,6 +18,7 @@ class Video(models.Model):
     def time(self):
         return self.publication.strftime("%d %b. %H:%M")
 
+
 class Channel(models.Model):
 
     PRIORITY_NONE = -1
@@ -31,7 +33,6 @@ class Channel(models.Model):
         (PRIORITY_HIGH, "High")
     ]
 
-    # TODO: Add last_update field
     id = models.CharField(max_length=24, primary_key=True)
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True, max_length=255)
@@ -40,7 +41,8 @@ class Channel(models.Model):
         default=PRIORITY_MEDIUM
     )
     thumbnail = models.URLField()
-    last_update = models.DateTimeField(auto_now_add=False, auto_now=False, blank=True, null=True)
+    last_update = models.DateTimeField(
+        auto_now_add=False, auto_now=False, blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -57,10 +59,12 @@ class Channel(models.Model):
         self.slug = slugify(self.title)
         models.Model.save(self, *args, **kwargs)
 
+
 class Filter(models.Model):
 
     channel = models.ForeignKey("Channel", on_delete=models.CASCADE)
     regex = models.CharField(max_length=255, default=".*")
+
 
 class Playlist(models.Model):
 
@@ -88,6 +92,7 @@ class Playlist(models.Model):
         ids = [video.id for video in self.videos.all()[:50]]
         random.shuffle(ids)
         return "https://www.youtube.com/watch_videos?video_ids=" + ",".join(ids)
+
 
 class PlaylistMembership(models.Model):
 

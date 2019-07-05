@@ -1,57 +1,54 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.utils.encoding import smart_str
 from django.http import HttpResponse
-from .core.endpoint import Endpoint
 import datetime
 import json
+import time
 import re
 
 from . import core
-
 from . import models
 from . import forms
 
+manager = core.Manager("secret.json")
+
+
+@login_required
 def home(request):
     page_size = 48
     page = int(request.GET.get("page", 0))
     order = request.GET.get("order", "publication")
-    channels = models.Channel.objects.order_by("title")
-    videos = models.Video.objects.order_by("-" + order)[page_size*page:page_size*(page+1)]
+    channels = models.Channel.objects\
+        .exclude(priority=models.Channel.PRIORITY_NONE)\
+        .order_by("title")
+    videos = models.Video.objects\
+        .exclude(channel__priority=models.Channel.PRIORITY_NONE)\
+        .order_by("-" + order)[page_size * page:page_size * (page + 1)]
     return render(request, "notifpy/home.html", {
         "channels": channels,
         "videos": videos,
-        "next": page+1,
-        "prev": page-1,
+        "next": page + 1,
+        "prev": page - 1,
     })
 
-def update(request):
-    return HttpResponse("update")
 
+@login_required
+def update(request):
+    manager.update()
+    return redirect("home")
+
+
+@login_required
 def update_channel(request, slug):
     if not models.Channel.objects.filter(slug=slug).exists():
         return redirect("home")
     channel = models.Channel.objects.get(slug=slug)
-    channel.last_update = datetime.datetime.now()
-    channel.save()
-    endpoint = Endpoint("secret.json")
-    for item in endpoint.videos_from_channel(channel.id):
-        if "videoId" not in item["id"] or models.Video.objects.filter(id=item["id"]["videoId"]).exists():
-            continue
-        valid = len(channel.filter_set.all()) == 0
-        for filter in channel.filter_set.all():
-            if re.search(filter.regex, item["snippet"]["title"]) is not None:
-                valid = True
-                break
-        if valid:
-            video = models.Video.objects.create(
-                id=item["id"]["videoId"],
-                channel=channel,
-                title=item["snippet"]["title"],
-                publication=item["snippet"]["publishedAt"],
-                thumbnail=item["snippet"]["thumbnails"]["medium"]["url"]
-            )
-            video.save()
+    manager.update_channel(channel)
     return redirect("channel", slug=channel.slug)
 
+
+@login_required
 def channel(request, slug):
     if not models.Channel.objects.filter(slug=slug).exists():
         return redirect("home")
@@ -62,8 +59,12 @@ def channel(request, slug):
         "videos": videos,
     })
 
+
+@login_required
 def create_channel(request):
     if request.method == "POST":
+        if models.Channel.objects.filter(id=request.POST["id"]).exists():
+            return redirect("channel", slug=models.Channel.objects.get(id=request.POST["id"]).slug)
         channel = models.Channel.objects.create(
             id=request.POST["id"],
             title=request.POST["title"],
@@ -75,6 +76,8 @@ def create_channel(request):
     else:
         return render(request, "notifpy/create_channel.html", {})
 
+
+@login_required
 def edit_channel(request, slug):
     if not models.Channel.objects.filter(slug=slug).exists():
         return redirect("home")
@@ -87,12 +90,24 @@ def edit_channel(request, slug):
     form = forms.ChannelForm(instance=channel)
     return render(request, "notifpy/edit_channel.html", locals())
 
+
+@login_required
 def delete_channel(request, slug):
     if models.Channel.objects.filter(slug=slug).exists():
         channel = models.Channel.objects.get(slug=slug)
         channel.delete()
     return redirect("home")
 
+
+@login_required
+def find_channel(request):
+    return HttpResponse(
+        json.dumps(manager.find_channel(request.body.decode("utf8"))),
+        content_type="application/json"
+    )
+
+
+@login_required
 def create_filter(request):
     if request.method == "POST":
         channel = models.Channel.objects.get(id=request.POST["channel"])
@@ -105,6 +120,8 @@ def create_filter(request):
         return redirect("edit_channel", slug=channel.slug)
     return redirect("home")
 
+
+@login_required
 def delete_filter(request):
     if request.method == "POST":
         filter = models.Filter.objects.get(id=request.POST["id"])
@@ -113,6 +130,8 @@ def delete_filter(request):
         return redirect("edit_channel", slug=slug)
     return redirect("home")
 
+
+@login_required
 def playlist(request, slug):
     if not models.Playlist.objects.filter(slug=slug).exists():
         return redirect("library")
@@ -121,6 +140,8 @@ def playlist(request, slug):
         "playlist": playlist
     })
 
+
+@login_required
 def create_playlist(request):
     if request.method == "POST":
         form = forms.PlaylistForm(request.POST)
@@ -130,6 +151,8 @@ def create_playlist(request):
     form = forms.PlaylistForm()
     return render(request, "notifpy/create_playlist.html", locals())
 
+
+@login_required
 def edit_playlist(request, slug):
     if not models.Playlist.objects.filter(slug=slug).exists():
         return redirect("library")
@@ -142,55 +165,18 @@ def edit_playlist(request, slug):
     form = forms.PlaylistForm(instance=playlist)
     return render(request, "notifpy/edit_playlist.html", locals())
 
+
+@login_required
 def add_playlist(request, slug):
     if not models.Playlist.objects.filter(slug=slug).exists():
         return redirect("library")
     playlist = models.Playlist.objects.get(slug=slug)
     if request.method == "POST":
-        link = request.POST["video"]
-        video_id = re.search("v?=(.{11})", link)
-        if video_id is None:
-            video_id = re.search("youtu.be/(.{11})", link)
-        if video_id is None:
-            video_id = link
-        else:
-            video_id = video_id.group(1)
-        video = None
-        if models.Video.objects.filter(id=video_id).exists():
-            video = models.Video.objects.get(id=video_id)
-        else:
-            endpoint = Endpoint("secret.json")
-            v_items = endpoint.find_video(video_id)
-            if len(v_items) > 0:
-                v = v_items[0]
-                channel = None
-                if models.Channel.objects.filter(id=v["snippet"]["channelId"]).exists():
-                    channel = models.Channel.objects.get(id=v["snippet"]["channelId"])
-                else:
-                    c_items = endpoint.list_channel_id(v["snippet"]["channelId"])
-                    if len(c_items) > 0:
-                        c = c_items[0]
-                        channel = models.Channel.objects.create(
-                            id=c["id"],
-                            title=c["snippet"]["title"],
-                            thumbnail=c["snippet"]["thumbnails"]["medium"]["url"],
-                            priority=models.Channel.PRIORITY_NONE,
-                        )
-                        channel.save()
-                if channel is not None:
-                    video = models.Video.objects.create(
-                        id=v["id"],
-                        channel=channel,
-                        title=v["snippet"]["title"],
-                        publication=v["snippet"]["publishedAt"],
-                        thumbnail=v["snippet"]["thumbnails"]["medium"]["url"]
-                    )
-                    video.save()
-        if video is not None:
-            playlist.videos.add(video)
-            playlist.save()
+        manager.add_video_to_playlist(playlist, request.POST.get("video", ""))
     return redirect("library")
 
+
+@login_required
 def remove_playlist(request, slug):
     if not models.Playlist.objects.filter(slug=slug).exists():
         return redirect("library")
@@ -201,6 +187,8 @@ def remove_playlist(request, slug):
         playlist.save()
     return redirect("edit_playlist", slug=slug)
 
+
+@login_required
 def delete_playlist(request, slug):
     if not models.Playlist.objects.filter(slug=slug).exists():
         return redirect("library")
@@ -208,23 +196,57 @@ def delete_playlist(request, slug):
     playlist.delete()
     return redirect("library")
 
+
+@login_required
 def library(request):
     playlists = models.Playlist.objects.all()
     return render(request, "notifpy/library.html", {
         "playlists": playlists,
     })
 
-def api_find_channel(request):
-    query = request.body.decode("utf8")
-    endpoint = Endpoint("secret.json")
-    candidates = endpoint.list_channel_username(query)
-    if len(query) == 24:
-        candidates += endpoint.list_channel_id(query)
-    results = [{
-            "id": candidate["id"],
-            "title": candidate["snippet"]["title"],
-            "thumbnail": candidate["snippet"]["thumbnails"]["medium"]["url"],
-        }
-        for candidate in candidates
+
+def abstract(request):
+    return render(request, "notifpy/abstract.html", {})
+
+
+@login_required
+def quotas(request):
+    with open(core.Endpoint.LOG_PATH) as file:
+        lines = file.readlines()[1:]
+    now = time.time()
+    data = [{
+        "timestamp": float(t),
+        "url": url.replace("https://www.googleapis.com/youtube/v3/", ""),
+        "params": json.loads(params),
+        "cost": int(cost),
+        "date": datetime.datetime.fromtimestamp(float(t))
+    }
+        for t, url, params, cost in map(lambda s: s.strip().split("\t"), lines)
     ]
-    return HttpResponse(json.dumps(results), content_type="application/json")
+    daily = sum([
+        row["cost"]
+        for row in data
+        if row["timestamp"] > now - 24 * 3600
+    ])
+    return render(request, "notifpy/quotas.html", {
+        "daily": daily,
+        "data": data,
+    })
+
+
+@login_required
+def reset_quotas(request):
+    with open("log.tsv", "w") as file:
+        file.write("timestamp\turl\tparameters\tcost\n")
+    return redirect("quotas")
+
+
+@login_required
+def download_quotas(request):
+    with open("log.tsv") as file:
+        text = file.read()
+    response = HttpResponse(text, content_type="application/force-download")
+    response["Content-Disposition"] = "attachment; filename=%s" % smart_str(
+        "log.tsv")
+    response["X-Sendfile"] = smart_str("log.tsv")
+    return response

@@ -2,33 +2,33 @@
 {% load static from staticfiles %}
 
 {% block body %}
-    <div class="channel-banner">
-        {% for channel in channels %}
-        <a class="image-link" href="{% url 'channel' slug=channel.slug %}">
-            <img class="channel__thumbnail" src="{{channel.thumbnail}}" alt={{channel.title}} />
+<div class="channel-banner">
+    {% for channel in channels %}
+    <a class="image-link" href="{% url 'channel' slug=channel.slug %}">
+        <img class="channel__thumbnail" src="{{channel.thumbnail}}" alt={{channel.title}} />
+    </a>
+    {% endfor %}
+</div>
+<div class="gallery">
+    {% for video in videos %}
+    <div class="video">
+        <a href="https://www.youtube.com/watch?v={{ video.id }}">
+            <img class="video__thumbnail" src="{{ video.thumbnail }}" width=160 height=90 />
         </a>
-        {% endfor %}
+        <p class="video__title">
+            <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title | safe }}</a>
+        </p>
+        <p class="video__description">
+            <a href="{% url 'channel' slug=video.channel.slug %}">{{ video.channel.title | safe }}</a>
+            &middot;
+            {{ video.time }}
+        </p>
     </div>
-    <div class="gallery">
-        {% for video in videos %}
-            <div class="video">
-                <a href="https://www.youtube.com/watch?v={{ video.id }}">
-                    <img class="video__thumbnail" src="{{ video.thumbnail }}" width=160 height=90 />
-                </a>
-                <p class="video__title">
-                    <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title | safe }}</a>
-                </p>
-                <p class="video__description">
-                    <a href="{% url 'channel' slug=video.channel.slug %}">{{ video.channel.title | safe }}</a>
-                    &middot;
-                    {{ video.time }}
-                </p>
-            </div>
-        {% endfor %}
-    </div>
-    <nav class="pagination">
-        <a href="{% url 'home' %}?page={{prev}}">&laquo;</a>
-        
-        <a href="{% url 'home' %}?page={{next}}">&raquo;</a>
-    </nav>
+    {% endfor %}
+</div>
+<nav class="pagination">
+    <a href="{% url 'home' %}?page={{prev}}">&laquo;</a>
+
+    <a href="{% url 'home' %}?page={{next}}">&raquo;</a>
+</nav>
 {% endblock %}

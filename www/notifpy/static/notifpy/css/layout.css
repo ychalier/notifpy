@@ -1,0 +1,132 @@
+* {
+    font-family: Roboto;
+    color: white;
+}
+
+body {
+    background-color: #2F2F2F;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.wrapper {
+    margin-top: 16px;
+    width: 657px;
+}
+
+.sidebar {
+    width: 150px;
+}
+
+.menu {
+    position: fixed;
+}
+
+.menu__category__title {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.menu__link {
+    display: block;
+    color: lightgrey;
+    margin-bottom: 4px;
+    transition: .1s ease;
+}
+
+.menu__link:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.channel__thumbnail {
+    width: 32px;
+    height: 32px;
+    border-radius: 50% 50%;
+}
+
+a {
+    text-decoration: None;
+}
+
+a.emph {
+    text-decoration: underline;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a.emph:hover {
+    font-weight: bold;
+}
+
+a.image-link:hover {
+    text-decoration: none;
+}
+
+.icon-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.icon-title>h1 {
+    margin-left: 12px;
+}
+
+.icon-title>h2 {
+    margin-left: 6px;
+}
+
+.icon-title>h3 {
+    margin-left: 4px;
+}
+
+.command-panel {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.command-panel>*:last-child {
+    margin-right: 0;
+}
+
+.command__button {
+    background-color: #3F3F3F;
+    border-radius: 4px;
+    color: white;
+    padding: 8px;
+    margin-right: 8px;
+    transition: .2s ease;
+}
+
+.command__button:hover {
+    text-decoration: none;
+    color: black;
+    background-color: white;
+}
+
+.channel-banner {
+    margin-bottom: 16px;
+    overflow-x: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.channel-banner>* {
+    margin-right: 7px;
+}
+
+.pagination {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    font-size: 24px;
+}
