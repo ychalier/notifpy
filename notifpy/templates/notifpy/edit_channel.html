@@ -34,14 +34,10 @@
 </p>
 {% endif %}
 <h4>Add a filter</h4>
-<form method="post" action="{% url 'create_filter' %}" class="form--table">
+<form class="form--textarea" method="post" action="{% url 'create_filter' %}" class="form--table">
     {% csrf_token %}
     <input hidden name="channel" value={{channel.id}} />
-    <table>
-        <tr>
-            <td><textarea name="regexes" rows="8" placeholder="Add one filter per line"></textarea></td>
-        </tr>
-    </table>
+    <textarea name="regexes" rows="8" placeholder="Add one filter per line"></textarea>
     <input type="submit" value="Add" />
 </form>
 {% endblock %}

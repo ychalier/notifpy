@@ -1,12 +1,18 @@
+"""Data models for Notifpy"""
+
+import random
+import json
+import re
 from django.utils.text import slugify
 from django.db import models
-import random
 
 
-class Video(models.Model):
+class YoutubeVideo(models.Model):
+
+    """Represent a YouTube video"""
 
     id = models.CharField(max_length=11, primary_key=True)
-    channel = models.ForeignKey("Channel", on_delete=models.CASCADE)
+    channel = models.ForeignKey("YoutubeChannel", on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     publication = models.DateTimeField(auto_now_add=False, auto_now=False)
     gathering = models.DateTimeField(auto_now_add=True, auto_now=False)
@@ -16,10 +22,13 @@ class Video(models.Model):
         return "[{id}] {title}".format(id=self.id, title=self.title)
 
     def time(self):
+        """Return the publication time in a readable format"""
         return self.publication.strftime("%d %b. %H:%M")
 
 
-class Channel(models.Model):
+class YoutubeChannel(models.Model):
+
+    """Represent a YouTube channel"""
 
     PRIORITY_NONE = -1
     PRIORITY_LOW = 0
@@ -43,39 +52,54 @@ class Channel(models.Model):
     thumbnail = models.URLField()
     last_update = models.DateTimeField(
         auto_now_add=False, auto_now=False, blank=True, null=True)
+    playlist_id = models.CharField(max_length=255)
 
     def __str__(self):
         return self.title
-
-    def priority_label(self):
-        return {
-            Channel.PRIORITY_NONE: "None",
-            Channel.PRIORITY_LOW: "Low",
-            Channel.PRIORITY_MEDIUM: "Medium",
-            Channel.PRIORITY_HIGH: "High"
-        }[self.priority]
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
         models.Model.save(self, *args, **kwargs)
 
+    def priority_label(self):
+        """Return the label of the priority level of the channel"""
+        return {
+            YoutubeChannel.PRIORITY_NONE: "None",
+            YoutubeChannel.PRIORITY_LOW: "Low",
+            YoutubeChannel.PRIORITY_MEDIUM: "Medium",
+            YoutubeChannel.PRIORITY_HIGH: "High"
+        }[self.priority]
+
+    def video_is_valid(self, title):
+        """Check if a video is valid regarding filters"""
+        if len(self.filter_set.all()) == 0:
+            return True
+        for filters in self.filter_set.all():
+            if re.search(filters.regex, title) is not None:
+                return True
+        return False
+
 
 class Filter(models.Model):
 
-    channel = models.ForeignKey("Channel", on_delete=models.CASCADE)
+    """Represent a regex filter for the videos of a channel"""
+
+    channel = models.ForeignKey("YoutubeChannel", on_delete=models.CASCADE)
     regex = models.CharField(max_length=255, default=".*")
 
 
 class Playlist(models.Model):
 
+    """Represent an ordered list of videos"""
+
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True, max_length=255)
     videos = models.ManyToManyField(
-        "Video",
+        "YoutubeVideo",
         blank=True,
         through="PlaylistMembership"
     )
-    rules = models.ManyToManyField("Channel", blank=True)
+    rules = models.ManyToManyField("YoutubeChannel", blank=True)
 
     def __str__(self):
         return self.title
@@ -84,19 +108,74 @@ class Playlist(models.Model):
         self.slug = slugify(self.title)
         models.Model.save(self, *args, **kwargs)
 
+    def get_videos(self):
+        """Return all memberships of the playlist, ranked"""
+        return self.playlistmembership_set.all().order_by("order")
+
+    def shift_orders(self):
+        """Reset ordering so the first item is at 0 and increment is always 1"""
+        for i, membership in enumerate(self.get_videos()):
+            membership.order = i
+            membership.save()
+
     def url_ranked(self):
-        ids = [video.id for video in self.videos.order_by("-publication")[:50]]
+        """Return a url with the first 50 videos in the playlist"""
+        ids = [entry.video.id for entry in self.get_videos()[:50]]
         return "https://www.youtube.com/watch_videos?video_ids=" + ",".join(ids)
 
     def url_shuffled(self):
-        ids = [video.id for video in self.videos.all()[:50]]
+        """Return a url with the first 50 videos in the playlist, shuffled"""
+        ids = [entry.video.id for entry in self.get_videos()]
         random.shuffle(ids)
-        return "https://www.youtube.com/watch_videos?video_ids=" + ",".join(ids)
+        return "https://www.youtube.com/watch_videos?video_ids=" + ",".join(ids[:50])
 
 
 class PlaylistMembership(models.Model):
 
+    """Represent membership of a video to a playlist"""
+
     playlist = models.ForeignKey("Playlist", on_delete=models.CASCADE)
-    video = models.ForeignKey("Video", on_delete=models.CASCADE)
+    video = models.ForeignKey("YoutubeVideo", on_delete=models.CASCADE)
     addition = models.DateTimeField(auto_now_add=True, auto_now=False)
-    order = models.IntegerField(default=0)
+    order = models.IntegerField(default=-1)
+
+    def __str__(self):
+        return "PlaylistMembership<'%s' to '%s' (rk. %d)>" % (
+            self.video,
+            self.playlist,
+            self.order
+        )
+
+    def save(self, *args, **kwargs):
+        if self.order == -1:
+            self.order = len(self.playlist.videos.all())
+        models.Model.save(self, *args, **kwargs)
+
+
+class TwitchUser(models.Model):
+
+    """Represent a Twitch user"""
+
+    id = models.CharField(max_length=24, primary_key=True)
+    login = models.CharField(max_length=255, unique=True)
+    display_name = models.CharField(max_length=255)
+    profile_image_url = models.URLField()
+    offline_image_url = models.URLField()
+
+    def __str__(self):
+        return "TwitchUser<%s (%s)>" % (self.display_name, self.id)
+
+    def link(self):
+        """Return the link to the Twitch channel of this user"""
+        return "https://www.twitch.tv/%s" % self.login
+
+
+class UpdateSchedule(models.Model):
+
+    """Store the update schedule as JSON format"""
+
+    text = models.TextField()
+
+    def to_json(self):
+        """Return a JSON object from stored text"""
+        return json.loads(self.text)

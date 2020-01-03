@@ -2,10 +2,10 @@ from django import forms
 from . import models
 
 
-class ChannelForm(forms.ModelForm):
+class YoutubeChannelForm(forms.ModelForm):
 
     class Meta:
-        model = models.Channel
+        model = models.YoutubeChannel
         fields = ["thumbnail", "priority"]
 
 
@@ -16,10 +16,10 @@ class FilterForm(forms.ModelForm):
         fields = ["channel", "regex"]
 
 
-class VideoForm(forms.ModelForm):
+class YoutubeVideoForm(forms.ModelForm):
 
     class Meta:
-        model = models.Video
+        model = models.YoutubeVideo
         fields = ["id", "channel", "title", "publication", "thumbnail"]
 
 

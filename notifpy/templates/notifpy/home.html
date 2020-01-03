@@ -3,12 +3,18 @@
 
 {% block body %}
 <div class="channel-banner">
-    {% for channel in channels %}
-    <a class="image-link" href="{% url 'channel' slug=channel.slug %}">
-        <img class="channel__thumbnail" src="{{channel.thumbnail}}" alt={{channel.title}} />
+    {% if streams %}
+    {% for stream in streams %}
+    <a class="image-link" href="{{stream.user.link}}">
+        <img class="channel__thumbnail" src="{{stream.user.profile_image_url}}" alt={{stream.user_name}} />
     </a>
     {% endfor %}
+    {% else %}
+    <p>No Twitch live on.</p>
+    {% endif %}
 </div>
+
+{% if videos %}
 <div class="gallery">
     {% for video in videos %}
     <div class="video">
@@ -26,9 +32,32 @@
     </div>
     {% endfor %}
 </div>
+<!--
 <nav class="pagination">
     <a href="{% url 'home' %}?page={{prev}}">&laquo;</a>
 
     <a href="{% url 'home' %}?page={{next}}">&raquo;</a>
 </nav>
+-->
+<div class="pagination">
+    <span class="step-links">
+        {% if videos.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ videos.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ videos.number }} of {{ videos.paginator.num_pages }}.
+        </span>
+
+        {% if videos.has_next %}
+            <a href="?page={{ videos.next_page_number }}">next</a>
+            <a href="?page={{ videos.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% else %}
+<p>No videos to show.</p>
+{% endif %}
+
 {% endblock %}

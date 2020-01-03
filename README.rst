@@ -1,11 +1,11 @@
 Notifpy
 =======
 
-**Notifpy** is a custom YouTube subscription system. The original goal
-was to get rid of a Google account. However, querying YouTube API
+**Notifpy** is a custom YouTube and Twitch subscription system. The original
+goal was to get rid of a Google account. However, querying YouTube API
 requires an API key and therefore you still need an account. The good
 thing is that it wont be able to see what or when you are watching
-anything.
+anything. Now it also includes Twitch streams.
 
 1. Setup
 --------
@@ -32,92 +32,60 @@ schema:
 .. code:: json
 
     {
-        "app": {
+        "youtube": {
             "client_id": "...",
             "redirect_uri": "...",
-            "client_secret": "..."
+            "client_secret": "...",
+            "scope": "https://www.googleapis.com/auth/youtube.force-ssl"
         }
     }
 
-You are now ready to perform the first start of the program. Try it with
+1.3. Twitch API
+~~~~~~~~~~~~~~~
 
-.. code:: bash
+The use of Twitch API requires an app key that you may create
+`here <https://dev.twitch.tv/dashboard/apps/create>`__. You may find the
+documentation `here <https://dev.twitch.tv/docs/authentication#registration>`__.
+Save your API key in the JSON file ``secret.json`` with the following
+schema:
 
-    python3 notif.py list
+.. code:: json
 
-Since this is your first run, the program will have to retrieve a token
-from the API. To do so, copy and paste the URL prompted in the terminal
-to your web browser and allow access rights. You will get redirected to
-the ``redirect_uri`` setting of the app. The URL will contain the GET
-parameter ``code``. Copy it and paste it in the terminal.
+    {
+        "twitch": {
+            "client_id": "...",
+            "client_secret": "...",
+            "redirect_uri": "...",
+            "scope": "openid"
+        }
+    }
+
+
+1.4. Redirect URIs
+~~~~~~~~~~~~~~~~~~
+
+Please note that the ``redirect_uri`` in both cases should be of the form:
+
+.. code::
+
+    http(s)://<domain.including.port>/<path-to-notifpy-app>/oauth/youtube
+    http(s)://<domain.including.port>/<path-to-notifpy-app>/oauth/twitch
+
+OAuth authentication flow uses those routes to catch the redirection when
+the app is granted an authorization code.
 
 2. Usage
 --------
 
-2.1. Channels
-~~~~~~~~~~~~~
+Here are some notes about the use of Notifpy:
 
-Subscribe to a channel with:
-
-.. code:: bash
-
-    python3 notif.py create channel <CHANNEL ID> <PRIORITY>
-
-The **channel id** is a 24 characters long string starting with ``UC``.
-To get it, go on the YouTube channel homepage. The URI is of the
-following form:
+- Manual updates can be triggered with a ``manage.py`` command ``update``.
+- Filter regexes for YouTube channels uses regular expressions following `Python's syntax <https://docs.python.org/3/library/re.html>`__.
+- Automation on a server of channel updates can be done by running the script every hour with the following cron task (use ``crontab -e`` append it). The program will adapt updates based on the given priorities:
 
 ::
 
-    https://www.youtube.com/channel/CHANNEL-ID/
-
-The **priority** is used for automated updates. Channels with priority
-``0`` are updated on Saturdays at midnight. Channels with priority ``1``
-are updated every day at 7pm. Channels with priority ``2`` are updated
-every day at 8am, 12am, 4pm, 6pm, 8pm and 10pm.
-
-2.2. Patterns
-~~~~~~~~~~~~~
-
-You can apply filters to channels. If a channel has at least one
-pattern, then you will only see videos whose title matches one of the
-patterns. You can use regular expressions if they follow `Python's
-syntax <https://docs.python.org/3/library/re.html>`__.
-
-Add a pattern with:
-
-.. code:: bash
-
-    python3 notif.py create pattern <CHANNEL ID> <REGEX>
-
-The ``REGEX`` field can contain spaces.
-
-2.3. Views
-~~~~~~~~~~
-
-You can generate an HTML page that displays the lastly published videos.
-It gets printed to the standard output, therefore you can pipe it to a
-file.
-
-.. code:: bash
-
-    python3 notif.py html videos > /var/www/html/videos.html
-
-2.4. Manual Usage
-~~~~~~~~~~~~~~~~~
-
-Run the program with flag ``--help`` for an inventory of possible
-commands.
-
-2.5. Automation
-~~~~~~~~~~~~~~~
-
-Run the script every hour with the following cron task (use
-``crontab -e`` append it). The program will adapt updates based on the
-given priorities.
-
-::
-
-    0 * * * * cd /PATH/notifpy && python3 notif.py update schedule
+    SHELL=/bin/bash
+    0 * * * * cd /PATH/TO/SERVER && source venv/bin/activate && python manage.py update
 
 Change ``PATH`` to your actual path.

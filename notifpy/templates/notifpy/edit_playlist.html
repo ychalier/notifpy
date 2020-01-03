@@ -6,6 +6,45 @@
 <div class="command-panel">
     <a class="command__button" href="{% url 'delete_playlist' slug=playlist.slug %}">Delete</a>
 </div>
+<h3>Edit videos</h3>
+<div class="gallery--list">
+    {% if playlist.videos.all %}
+    {% for entry in playlist.get_videos %}
+    <div class="video relative">
+        <img class="video__thumbnail" src="{{ entry.video.thumbnail }}" width=160 height=90 />
+        <div class="video__info">
+            <p class="video__title">{{ entry.video.title | safe }}</p>
+            <p class="video__description">
+                {{ entry.video.channel.title | safe }}
+                &middot;
+                {{ entry.video.time }}
+            </p>
+        </div>
+        <div class="vertical_command_pannel">
+            {% if not forloop.first %}
+                <form method="get" action="{% url 'move_playlist' slug=playlist.slug order=entry.order direction="up"%}">
+                    {% csrf_token %}
+                    <input class="command__button" type="submit" value="&#8679;" />
+                </form>
+            {% endif %}
+            <form method="post" action="{% url 'remove_playlist' slug=playlist.slug %}">
+                <input hidden name="id" value="{{entry.video.id}}" />
+                {% csrf_token %}
+                <input class="command__button" type="submit" value="Delete" />
+            </form>
+            {% if not forloop.last %}
+            <form method="get" action="{% url 'move_playlist' slug=playlist.slug order=entry.order direction="down"%}">
+                {% csrf_token %}
+                <input class="command__button" type="submit" value="&#8681;" />
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>No video in this playlist.</p>
+    {% endif %}
+</div>
 <h3>Edit playlist properties</h3>
 <form method="post" action="" class="form--table">
     <table>
@@ -14,35 +53,10 @@
     </table>
     <input type="submit" value="Save" />
 </form>
-<h3>Add a video</h3>
-<form method="post" action="{% url 'add_playlist' slug=playlist.slug %}" class="form--block">
-    <input type="text" name="video" placeholder="Video link or ID" />
+<h3>Add Videos</h3>
+<form method="post" action="{% url 'add_playlist' slug=playlist.slug %}" class="form--textarea">
     {% csrf_token %}
+    <textarea name="video" rows="8" placeholder="Video link or ID (one per line)"></textarea>
     <input type="submit" value="Add" />
 </form>
-<h3>Edit videos</h3>
-<div class="gallery--list">
-    {% if playlist.videos.all %}
-    {% for video in playlist.videos.all %}
-    <div class="video relative">
-        <img class="video__thumbnail" src="{{ video.thumbnail }}" width=160 height=90 />
-        <div class="video__info">
-            <p class="video__title">{{ video.title | safe }}</p>
-            <p class="video__description">
-                {{ video.channel.title | safe }}
-                &middot;
-                {{ video.time }}
-            </p>
-        </div>
-        <form method="post" class="form--float" action="{% url 'remove_playlist' slug=playlist.slug %}">
-            <input hidden name="id" value="{{video.id}}" />
-            {% csrf_token %}
-            <input type="submit" value="Delete" />
-        </form>
-    </div>
-    {% endfor %}
-    {% else %}
-    <p>No video in this playlist.</p>
-    {% endif %}
-</div>
 {% endblock %}

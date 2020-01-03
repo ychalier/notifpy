@@ -85,6 +85,37 @@ a.image-link:hover {
     margin-left: 4px;
 }
 
+.icon-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.icon-item > * {
+    display: block;
+    margin-right: 8px;
+}
+
+.vertical_command_pannel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.vertical_command_pannel>*{
+    margin-bottom: 4px;
+}
+
+.vertical_command_pannel>*:last-child{
+    margin-bottom: 0;
+}
+
+.vertical_command_pannel input {
+    width: 100%;
+}
+
 .command-panel {
     display: flex;
     flex-direction: row;
@@ -114,19 +145,19 @@ a.image-link:hover {
 
 .channel-banner {
     margin-bottom: 16px;
-    overflow-x: auto;
+    flex-wrap: wrap;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
 }
 
 .channel-banner>* {
-    margin-right: 7px;
+    margin-right: 9px;
 }
 
 .pagination {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    font-size: 24px;
+    /* font-size: 24px; */
 }

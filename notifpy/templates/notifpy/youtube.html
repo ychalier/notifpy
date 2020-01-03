@@ -2,7 +2,10 @@
 {% load static from staticfiles %}
 
 {% block body %}
-<h1>Library</h1>
+<h1>YouTube</h1>
+
+<h3>Playlists</h3>
+
 <div class="command-panel">
     <a class="command__button" href="{% url 'create_playlist' %}">Add Playlist</a>
 </div>
@@ -43,4 +46,19 @@
 {% else %}
 <p>No playlist found.</p>
 {% endif %}
+
+<h3>Channels</h3>
+
+{% if channels %}
+{% for channel in channels %}
+<div class="icon-item">
+    <img class="channel__thumbnail" src="{{channel.thumbnail}}" alt={{channel.title}} />
+    <a href="{% url 'channel' slug=channel.slug %}">{{channel.title}}</a>
+    <a class="command__button" href="{% url 'delete_channel' slug=channel.slug %}">Unsubscribe</a>
+</div>
+{% endfor %}
+{% else %}
+<p>You are not subscribed to any channel.</p>
+{% endif %}
+
 {% endblock %}

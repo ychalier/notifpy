@@ -1,0 +1,143 @@
+{% extends 'notifpy/base.html' %}
+{% load static from staticfiles %}
+
+{% block body %}
+
+<h1>Manage API Endpoints</h1>
+
+<p>Here you may handle tokens and quotas from used APIs.</p>
+
+<h2>YouTube</h2>
+
+<h3>Token</h3>
+
+<table>
+    <tr>
+        <td><b>Client Id</b></td>
+        <td>{{operator.youtube.oauth_flow.credentials.client_id|truncatechars:50}}</td>
+    </tr>
+    <tr>
+        <td><b>Redirect URI</b></td>
+        <td>{{operator.youtube.oauth_flow.credentials.redirect_uri|truncatechars:50}}</td>
+    </tr>
+    <tr>
+        <td><b>Scope</b></td>
+        <td>{{operator.youtube.oauth_flow.credentials.scope|truncatechars:50}}</td>
+    </tr>
+    <tr>
+        <td><b>Access token</b></td>
+        <td>{{operator.youtube.oauth_flow.token.access_token|truncatechars:50}}</td>
+    </tr>
+    <tr>
+        <td><b>Refresh token</b></td>
+        <td>{{operator.youtube.oauth_flow.token.refresh_token|truncatechars:50}}</td>
+    </tr>
+    <tr>
+        <td><b>Expires in</b></td>
+        <td>{{operator.youtube.oauth_flow.token.expires_in}}</td>
+    </tr>
+    <tr>
+        <td><b>Delivered at</b></td>
+        <td>{{operator.youtube.oauth_flow.token.delivery_datetime|date:"Y-m-d H:i:s"}}</td>
+    </tr>
+    <tr>
+        <td><b>Expires at</b></td>
+        <td>{{operator.youtube.oauth_flow.token.expiration_datetime|date:"Y-m-d H:i:s"}}</td>
+    </tr>
+    <tr>
+        <td><b>Has expired</b></td>
+        <td>{{operator.youtube.oauth_flow.token.has_expired}}</td>
+    </tr>
+
+</table>
+
+<p>
+    <a class="command__button" href="{{operator.youtube.oauth_flow.get_authorize_url}}">Retrieve Token</a>
+    <a class="command__button" href="{% url 'refresh_token' source='youtube' %}">Refresh Token</a>
+    <a class="command__button" href="{% url 'revoke_token' source='youtube' %}">Revoke Token</a>
+</p>
+
+<h3>Quotas</h3>
+
+<table>
+    <tr>
+        <td><b>Bucket size</b></td>
+        <td>{{operator.youtube.quota_bucket.size}}</td>
+    </tr>
+    <tr>
+        <td><b>Refill rate</b></td>
+        <td>{{operator.youtube.quota_bucket.rate|floatformat:5}}/s</td>
+    </tr>
+    <tr>
+        <td><b>Bucket content</b></td>
+        <td>{{operator.youtube.quota_bucket.get|floatformat:5}} ({{operator.youtube.quota_bucket.content}})</td>
+    </tr>
+</table>
+
+<h2>Twitch</h2>
+
+<h3>Token</h3>
+
+<table>
+    <tr>
+        <td><b>Client Id</b></td>
+        <td>{{operator.twitch.oauth_flow.credentials.client_id}}</td>
+    </tr>
+    <tr>
+        <td><b>Redirect URI</b></td>
+        <td>{{operator.twitch.oauth_flow.credentials.redirect_uri}}</td>
+    </tr>
+    <tr>
+        <td><b>Scope</b></td>
+        <td>{{operator.twitch.oauth_flow.credentials.scope}}</td>
+    </tr>
+    <tr>
+        <td><b>Access token</b></td>
+        <td>{{operator.twitch.oauth_flow.token.access_token}}</td>
+    </tr>
+    <tr>
+        <td><b>Refresh token</b></td>
+        <td>{{operator.twitch.oauth_flow.token.refresh_token}}</td>
+    </tr>
+    <tr>
+        <td><b>Expires in</b></td>
+        <td>{{operator.twitch.oauth_flow.token.expires_in}}</td>
+    </tr>
+    <tr>
+        <td><b>Delivered at</b></td>
+        <td>{{operator.twitch.oauth_flow.token.delivery_datetime|date:"Y-m-d H:i:s"}}</td>
+    </tr>
+    <tr>
+        <td><b>Expires at</b></td>
+        <td>{{operator.twitch.oauth_flow.token.expiration_datetime|date:"Y-m-d H:i:s"}}</td>
+    </tr>
+    <tr>
+        <td><b>Has expired</b></td>
+        <td>{{operator.twitch.oauth_flow.token.has_expired}}</td>
+    </tr>
+</table>
+
+<p>
+    <a class="command__button" href="{{operator.twitch.oauth_flow.get_authorize_url}}">Retrieve Token</a>
+    <a class="command__button" href="{% url 'refresh_token' source='twitch' %}">Refresh Token</a>
+    <a class="command__button" href="{% url 'revoke_token' source='twitch' %}">Revoke Token</a>
+</p>
+
+<h3>Quotas</h3>
+
+<table>
+    <tr>
+        <td><b>Bucket size</b></td>
+        <td>{{operator.twitch.quota_bucket.size}}</td>
+    </tr>
+    <tr>
+        <td><b>Refill rate</b></td>
+        <td>{{operator.twitch.quota_bucket.rate|floatformat:5}}/s</td>
+    </tr>
+    <tr>
+        <td><b>Bucket content</b></td>
+        <td>{{operator.twitch.quota_bucket.get|floatformat:5}} ({{operator.twitch.quota_bucket.content}})</td>
+    </tr>
+</table>
+
+{% endblock body %}

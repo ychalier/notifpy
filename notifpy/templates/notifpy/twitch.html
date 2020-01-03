@@ -1,0 +1,46 @@
+{% extends 'notifpy/base.html' %}
+{% load static from staticfiles %}
+
+{% block body %}
+
+<h1>Twitch</h1>
+
+<h3>Live</h3>
+
+{% if streams %}
+<div class="gallery">
+{% for stream in streams %}
+    <div class="video">
+        <a href="{{stream.user.link}}">
+            <img class="video__thumbnail" src="{{ stream.thumbnail }}" width=160 height=90 />
+        </a>
+        <p class="video__title">
+            <a href="{{stream.user.link}}">{{ stream.title | safe }}</a>
+        </p>
+        <p class="video__description">
+            <a href="{{stream.user.link}}">{{ stream.user_name | safe }}</a>
+            &middot;
+            {{ stream.viewer_count }}
+        </p>
+    </div>
+{% endfor %}
+</div>
+{% else %}
+<p>No user is currently live.</p>
+{% endif %}
+
+<h3>Followed</h3>
+
+{% if users %}
+{% for user in users %}
+<div class="icon-item">
+    <img class="channel__thumbnail" src="{{user.profile_image_url}}" alt={{channel.title}} />
+    <a href="{{user.link}}">{{user.display_name}}</a>
+    <a class="command__button" href="{% url 'delete_twitch_user' login=user.login%}">Unfollow</a>
+</div>
+{% endfor %}
+{% else %}
+<p>You are not following any user.</p>
+{% endif %}
+
+{% endblock body %}

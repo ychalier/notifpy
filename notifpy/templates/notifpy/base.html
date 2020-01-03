@@ -41,19 +41,22 @@
                 <a class="menu__link" href="{% url 'home' %}">
                     Home
                 </a>
-                <a class="menu__link" href="{% url 'library' %}">
-                    Library
+                <a class="menu__link" href="{% url 'youtube' %}">
+                    YouTube
+                </a>
+                <a class="menu__link" href="{% url 'twitch' %}">
+                    Twitch
                 </a>
             </div>
             <div class="menu__category">
                 <p class="menu__category__title">
                     Settings
                 </p>
-                <a class="menu__link" href="{% url 'create_channel' %}">
-                    Subscribe
+                <a class="menu__link" href="{% url 'settings' %}">
+                    General
                 </a>
-                <a class="menu__link" href="{% url 'quotas' %}">
-                    Quotas
+                <a class="menu__link" href="{% url 'manage_endpoints' %}">
+                    Endpoints
                 </a>
             </div>
         </div>
