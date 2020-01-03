@@ -74,6 +74,18 @@ Please note that the ``redirect_uri`` in both cases should be of the form:
 OAuth authentication flow uses those routes to catch the redirection when
 the app is granted an authorization code.
 
+1.5. Django settings
+~~~~~~~~~~~~~~~~~~~~
+
+Add the following variables in your project ``settings.py`` file, and make sure
+to provide absolute paths to avoid any issue:
+
+.. code:: python
+
+    NOTIFPY_SECRET = "/path/to/secret.json"
+    NOTIFPY_TOKEN_YOUTUBE = "/path/to/token-youtube.json"
+    NOTIFPY_TOKEN_TWITCH = "/path/to/token-twitch.json"
+
 2. Usage
 --------
 

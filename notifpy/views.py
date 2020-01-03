@@ -1,6 +1,7 @@
 """This module contains all views from the application"""
 
 import json
+from django.conf import settings as django_settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
@@ -9,7 +10,7 @@ from . import models
 from . import forms
 
 
-OPERATOR = operator.Operator("secret.json")
+OPERATOR = operator.Operator(django_settings.NOTIFPY_SECRET)
 
 
 def abstract(request):
@@ -30,9 +31,10 @@ def home(request):
     videos = paginator.get_page(page)
     twitch_users = models.TwitchUser.objects.all()
     streams = OPERATOR.get_streams()
-    for stream in streams:
-        user = twitch_users.get(id=stream["user_id"])
-        stream["user"] = user
+    if streams is not None:
+        for stream in streams:
+            user = twitch_users.get(id=stream["user_id"])
+            stream["user"] = user
     return render(request, "notifpy/home.html", {
         "videos": videos,
         "streams": streams,

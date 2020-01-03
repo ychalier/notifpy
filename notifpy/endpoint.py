@@ -8,6 +8,7 @@ import random
 import logging
 import datetime
 import requests
+from django.conf import settings
 
 
 def generate_random_state(length=24):
@@ -274,8 +275,7 @@ class YoutubeEndpoint(Endpoint):
                     "token": "https://www.googleapis.com/oauth2/v4/token",
                     "revoke": "https://accounts.google.com/o/oauth2/revoke",
                 },
-
-                "token-youtube.json"
+                settings.NOTIFPY_TOKEN_YOUTUBE,
             ),
             QuotaBucket(
                 10000,
@@ -361,7 +361,7 @@ class TwitchEndpoint(Endpoint):
                     "token": "https://id.twitch.tv/oauth2/token",
                     "revoke": "https://id.twitch.tv/oauth2/revoke",
                 },
-                "token-twitch.json"
+                settings.NOTIFPY_TOKEN_TWITCH,
             ),
             QuotaBucket(
                 800,

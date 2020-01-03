@@ -41,13 +41,16 @@ class Operator:
             credentials = json.load(file)
         self.youtube = YoutubeEndpoint(credentials)
         self.twitch = TwitchEndpoint(credentials)
-        if not models.UpdateSchedule.objects.all().exists():
-            schedule = models.UpdateSchedule.objects.create(text=json.dumps({
-                models.YoutubeChannel.PRIORITY_LOW: [3],
-                models.YoutubeChannel.PRIORITY_MEDIUM: [9, 19],
-                models.YoutubeChannel.PRIORITY_HIGH: [9, 12, 19],
-            }))
-            schedule.save()
+        try:
+            if not models.UpdateSchedule.objects.all().exists():
+                schedule = models.UpdateSchedule.objects.create(text=json.dumps({
+                    models.YoutubeChannel.PRIORITY_LOW: [3],
+                    models.YoutubeChannel.PRIORITY_MEDIUM: [9, 19],
+                    models.YoutubeChannel.PRIORITY_HIGH: [9, 12, 19],
+                }))
+                schedule.save()
+        except:
+            pass
 
     def follow_users(self, query):
         """Follow a set of Twitch users"""
@@ -70,6 +73,8 @@ class Operator:
 
     def get_streams(self):
         """Get currently live streams"""
+        if len(models.TwitchUser.objects.all()) == 0:
+            return []
         response = self.twitch.streams(
             logins=[user.login for user in models.TwitchUser.objects.all()]
         )
@@ -87,10 +92,11 @@ class Operator:
     def subscribe_to_channels(self, main_query):
         """Subscribe to a set of YouTube channels"""
         queries = [s.strip() for s in main_query.strip().split("\n")]
-        url_channel_pattern = re.compile(r"\/channel\/(.{24})")
-        url_username_pattern = re.compile(r"\/user\/([a-zA-Z0-9-]+)")
+        url_channel_pattern = re.compile(r"channel\/(.{24})")
+        url_username_pattern = re.compile(r"user\/([a-zA-Z0-9-]+)")
         for query in queries:
             channel_id = None
+            snippet = None
             if url_username_pattern.search(query) is not None:
                 username = url_username_pattern.search(query).group(1)
                 response = self.youtube.channels_list(for_username=username)

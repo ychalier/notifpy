@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.conf import settings
 from notifpy.operator import Operator
 
 
@@ -15,5 +16,5 @@ class Command(BaseCommand):
             priorities = None
         else:
             priorities = [priority]
-        operator = Operator("secret.json")
+        operator = Operator(settings.NOTIFPY_SECRET)
         operator.update_channels(priorities, verbose=True)
