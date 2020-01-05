@@ -101,3 +101,8 @@ Here are some notes about the use of Notifpy:
     0 * * * * cd /PATH/TO/SERVER && source venv/bin/activate && python manage.py update
 
 Change ``PATH`` to your actual path.
+
+3. Packaging
+------------
+
+Follow this `documentation <https://docs.djangoproject.com/en/3.0/intro/reusable-apps/>`__.
