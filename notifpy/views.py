@@ -55,7 +55,7 @@ def oauth_redirect(request, source):
         OPERATOR.youtube.oauth_flow.handle_redirect(request)
     elif source == "twitch":
         OPERATOR.twitch.oauth_flow.handle_redirect(request)
-    return redirect("manage_endpoints")
+    return redirect("notifpy:manage_endpoints")
 
 
 @login_required
@@ -65,7 +65,7 @@ def refresh_token(_, source):
         OPERATOR.youtube.oauth_flow.refresh()
     elif source == "twitch":
         OPERATOR.twitch.oauth_flow.refresh()
-    return redirect("manage_endpoints")
+    return redirect("notifpy:manage_endpoints")
 
 
 @login_required
@@ -75,7 +75,7 @@ def revoke_token(_, source):
         OPERATOR.youtube.oauth_flow.revoke()
     elif source == "twitch":
         OPERATOR.twitch.oauth_flow.revoke()
-    return redirect("manage_endpoints")
+    return redirect("notifpy:manage_endpoints")
 
 
 @login_required
@@ -97,7 +97,7 @@ def clear_old_videos(request):
     """Remove old videos from database"""
     if request.method == "POST":
         operator.clear_old_videos(older_than=int(request.POST["older"]))
-    return redirect("settings")
+    return redirect("notifpy:settings")
 
 
 @login_required
@@ -105,14 +105,14 @@ def create_channel(request):
     """Subscribe to a YouTube channel"""
     if request.method == "POST" and "query" in request.POST:
         OPERATOR.subscribe_to_channels(request.POST["query"])
-    return redirect("youtube")
+    return redirect("notifpy:youtube")
 
 
 @login_required
 def view_channel(request, slug):
     """View all information about a YouTube channel"""
     if not models.YoutubeChannel.objects.filter(slug=slug).exists():
-        return redirect("home")
+        return redirect("notifpy:home")
     channel = models.YoutubeChannel.objects.get(slug=slug)
     videos = channel.youtubevideo_set.order_by("-publication")[:15]
     return render(request, "notifpy/channel.html", {
@@ -125,13 +125,13 @@ def view_channel(request, slug):
 def edit_channel(request, slug):
     """Edit a YouTube channel information"""
     if not models.YoutubeChannel.objects.filter(slug=slug).exists():
-        return redirect("home")
+        return redirect("notifpy:home")
     channel = models.YoutubeChannel.objects.get(slug=slug)
     if request.method == "POST":
         form = forms.YoutubeChannelForm(request.POST, instance=channel)
         if form.is_valid():
             channel = form.save()
-            return redirect("channel", slug=slug)
+            return redirect("notifpy:channel", slug=slug)
     form = forms.YoutubeChannelForm(instance=channel)
     return render(request, "notifpy/edit_channel.html", locals())
 
@@ -142,7 +142,7 @@ def delete_channel(_, slug):
     if models.YoutubeChannel.objects.filter(slug=slug).exists():
         channel = models.YoutubeChannel.objects.get(slug=slug)
         channel.delete()
-    return redirect("home")
+    return redirect("notifpy:home")
 
 
 @login_required
@@ -156,8 +156,8 @@ def create_filter(request):
                 regex=regex
             )
             filters.save()
-        return redirect("edit_channel", slug=channel.slug)
-    return redirect("home")
+        return redirect("notifpy:edit_channel", slug=channel.slug)
+    return redirect("notifpy:home")
 
 
 @login_required
@@ -167,18 +167,18 @@ def delete_filter(request):
         filters = models.Filter.objects.get(id=request.POST["id"])
         slug = filters.channel.slug
         filters.delete()
-        return redirect("edit_channel", slug=slug)
-    return redirect("home")
+        return redirect("notifpy:edit_channel", slug=slug)
+    return redirect("notifpy:home")
 
 
 @login_required
 def update_channel(_, slug):
     """Update a YouTube channel videos"""
     if not models.YoutubeChannel.objects.filter(slug=slug).exists():
-        return redirect("home")
+        return redirect("notifpy:home")
     channel = models.YoutubeChannel.objects.get(slug=slug)
     OPERATOR.update_channel(channel)
-    return redirect("channel", slug=channel.slug)
+    return redirect("notifpy:channel", slug=channel.slug)
 
 
 @login_required
@@ -186,7 +186,7 @@ def update_channels(request):
     """Update all YouTube channel videos"""
     if request.method == "POST":
         OPERATOR.update_channels(list(map(int, request.POST["priority"])))
-    return redirect("home")
+    return redirect("notifpy:home")
 
 
 @login_required
@@ -205,7 +205,7 @@ def create_playlist(request):
 def view_playlist(request, slug):
     """View a playlist"""
     if not models.Playlist.objects.filter(slug=slug).exists():
-        return redirect("youtube")
+        return redirect("notifpy:youtube")
     playlist = models.Playlist.objects.get(slug=slug)
     return render(request, "notifpy/playlist.html", {
         "playlist": playlist
@@ -216,13 +216,13 @@ def view_playlist(request, slug):
 def edit_playlist(request, slug):
     """Edit playlist properties"""
     if not models.Playlist.objects.filter(slug=slug).exists():
-        return redirect("youtube")
+        return redirect("notifpy:youtube")
     playlist = models.Playlist.objects.get(slug=slug)
     if request.method == "POST":
         form = forms.PlaylistForm(request.POST, instance=playlist)
         if form.is_valid():
             playlist = form.save()
-            return redirect("youtube")
+            return redirect("notifpy:youtube")
     form = forms.PlaylistForm(instance=playlist)
     return render(request, "notifpy/edit_playlist.html", locals())
 
@@ -231,42 +231,42 @@ def edit_playlist(request, slug):
 def add_playlist(request, slug):
     """Add a video (or more) to a playlist"""
     if not models.Playlist.objects.filter(slug=slug).exists():
-        return redirect("youtube")
+        return redirect("notifpy:youtube")
     playlist = models.Playlist.objects.get(slug=slug)
     if request.method == "POST":
         OPERATOR.add_video_to_playlist(playlist, request.POST.get("video", ""))
-    return redirect("edit_playlist", slug=slug)
+    return redirect("notifpy:edit_playlist", slug=slug)
 
 
 @login_required
 def remove_playlist(request, slug):
     """Remove a video from a playlist"""
     if not models.Playlist.objects.filter(slug=slug).exists():
-        return redirect("youtube")
+        return redirect("notifpy:youtube")
     playlist = models.Playlist.objects.get(slug=slug)
     if request.method == "POST":
         video = models.YoutubeVideo.objects.get(id=request.POST["id"])
         playlist.videos.remove(video)
         playlist.save()
         playlist.shift_orders()
-    return redirect("edit_playlist", slug=slug)
+    return redirect("notifpy:edit_playlist", slug=slug)
 
 
 @login_required
 def delete_playlist(_, slug):
     """Delete a playlist"""
     if not models.Playlist.objects.filter(slug=slug).exists():
-        return redirect("youtube")
+        return redirect("notifpy:youtube")
     playlist = models.Playlist.objects.get(slug=slug)
     playlist.delete()
-    return redirect("youtube")
+    return redirect("notifpy:youtube")
 
 
 @login_required
 def move_playlist(_, slug, order, direction):
     """Edit the video odering within a playlist"""
     if not models.Playlist.objects.filter(slug=slug).exists():
-        return redirect("youtube")
+        return redirect("notifpy:youtube")
     playlist = models.Playlist.objects.get(slug=slug)
     ref = models.PlaylistMembership.objects.get(
         playlist=playlist, order=int(order))
@@ -280,7 +280,7 @@ def move_playlist(_, slug, order, direction):
     ref.save()
     new.order = int(order)
     new.save()
-    return redirect("edit_playlist", slug=slug)
+    return redirect("notifpy:edit_playlist", slug=slug)
 
 
 @login_required
@@ -310,7 +310,7 @@ def edit_schedule(request):
             models.YoutubeChannel.PRIORITY_HIGH: fun(request.POST["high"]),
         })
         schedule.save()
-    return redirect("settings")
+    return redirect("notifpy:settings")
 
 
 @login_required
@@ -332,7 +332,7 @@ def create_twitch_user(request):
     """Follow a Twitch user"""
     if request.method == "POST" and "query" in request.POST:
         OPERATOR.follow_users(request.POST["query"])
-    return redirect("twitch")
+    return redirect("notifpy:twitch")
 
 
 @login_required
@@ -341,4 +341,4 @@ def delete_twitch_user(_, login):
     if models.TwitchUser.objects.filter(login=login).exists():
         user = models.TwitchUser.objects.get(login=login)
         user.delete()
-    return redirect("twitch")
+    return redirect("notifpy:twitch")

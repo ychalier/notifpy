@@ -179,3 +179,16 @@ class UpdateSchedule(models.Model):
     def to_json(self):
         """Return a JSON object from stored text"""
         return json.loads(self.text)
+
+
+class TwitchGame(models.Model):
+
+    id = models.CharField(max_length=24, primary_key=True)
+    name = models.CharField(max_length=255)
+    box_art_url = models.URLField()
+
+    def __str__(self):
+        return "%s (%s)" % (self.name, self.id)
+
+    def thumbnail(self):
+        return self.box_art_url.format(width=144, height=192)

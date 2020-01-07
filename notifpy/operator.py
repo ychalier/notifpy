@@ -71,21 +71,43 @@ class Operator:
             )
             twitch_user.save()
 
+    def get_twitch_game(self, game_id):
+        """Return a Twitch game from database or fetch it if necessary"""
+        if game_id == "":
+            return None
+        if models.TwitchGame.objects.filter(id=game_id).exists():
+            return models.TwitchGame.objects.get(id=game_id)
+        response = self.twitch.games(ids=[game_id])
+        if response is None or len(response["data"]) == 0:
+            return None
+        game_item = response["data"][0]
+        game = models.TwitchGame.objects.create(
+            id=game_item["id"],
+            name=game_item["name"],
+            box_art_url=game_item["box_art_url"]
+        )
+        return game
+
     def get_streams(self):
         """Get currently live streams"""
         if len(models.TwitchUser.objects.all()) == 0:
             return []
-        response = self.twitch.streams(
-            logins=[user.login for user in models.TwitchUser.objects.all()]
-        )
-        if response is None:
-            return None
+        logins = [user.login for user in models.TwitchUser.objects.all()]
+        batch_size = 99
+        aggregated = list()
+        for i in range(0, len(logins), batch_size):
+            batch = logins[i:i+batch_size]
+            response = self.twitch.streams(logins=batch)
+            if response is None:
+                continue
+            aggregated += response["data"]
         results = list()
-        for stream in response["data"]:
+        for stream in aggregated:
             stream["user"] = models.TwitchUser.objects.get(
                 id=stream["user_id"])
             stream["thumbnail"] = stream["thumbnail_url"].format(
                 width=1600, height=900)
+            stream["game"] = self.get_twitch_game(stream["game_id"])
             results.append(stream)
         return results
 

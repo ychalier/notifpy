@@ -5,13 +5,13 @@
 <html>
 
 <head>
-    <title>notif.py</title>
+    <title>{% block title %}notif.py{% endblock %}</title>
     <meta name="viewport" content="width=device-width" />
     <meta charset="utf-8" />
-    <link rel="icon" href="https://s.ytimg.com/yts/img/favicon_32-vflOogEID.png" sizes="32x32">
-    <link rel="icon" href="https://s.ytimg.com/yts/img/favicon_48-vflVjB_Qk.png" sizes="48x48">
-    <link rel="icon" href="https://s.ytimg.com/yts/img/favicon_96-vflW9Ec0w.png" sizes="96x96">
-    <link rel="icon" href="https://s.ytimg.com/yts/img/favicon_144-vfliLAfaB.png" sizes="144x144">
+    <link rel="icon" href="{% static 'notifpy/logo/32.png' %}" sizes="32x32">
+    <link rel="icon" href="{% static 'notifpy/logo/48.png' %}" sizes="48x48">
+    <link rel="icon" href="{% static 'notifpy/logo/96.png' %}" sizes="96x96">
+    <link rel="icon" href="{% static 'notifpy/logo/144.png' %}" sizes="144x144">
     <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'notifpy/css/layout.css' %}" />
     <link rel="stylesheet" href="{% static 'notifpy/css/utils.css' %}" />
@@ -22,15 +22,11 @@
 </head>
 
 <body>
-    <script>
-        var token = "{{csrf_token}}";
-    </script>
-    <script src="{% static 'notifpy/js/request.js' %}"></script>
     <div class="sidebar">
         <div class="menu">
-            <a href="{% url 'abstract' %}">
+            <a href="{% url 'notifpy:abstract' %}">
                 <div class="icon-title">
-                    <img src="https://s.ytimg.com/yts/img/favicon_32-vflOogEID.png" />
+                    <img src="{% static 'notifpy/logo/32.png' %}" />
                     <h3>notif.py</h3>
                 </div>
             </a>
@@ -38,13 +34,13 @@
                 <p class="menu__category__title">
                     View
                 </p>
-                <a class="menu__link" href="{% url 'home' %}">
+                <a class="menu__link" href="{% url 'notifpy:home' %}">
                     Home
                 </a>
-                <a class="menu__link" href="{% url 'youtube' %}">
+                <a class="menu__link" href="{% url 'notifpy:youtube' %}">
                     YouTube
                 </a>
-                <a class="menu__link" href="{% url 'twitch' %}">
+                <a class="menu__link" href="{% url 'notifpy:twitch' %}">
                     Twitch
                 </a>
             </div>
@@ -52,10 +48,10 @@
                 <p class="menu__category__title">
                     Settings
                 </p>
-                <a class="menu__link" href="{% url 'settings' %}">
+                <a class="menu__link" href="{% url 'notifpy:settings' %}">
                     General
                 </a>
-                <a class="menu__link" href="{% url 'manage_endpoints' %}">
+                <a class="menu__link" href="{% url 'notifpy:manage_endpoints' %}">
                     Endpoints
                 </a>
             </div>
@@ -65,7 +61,6 @@
         {% block body %}
         {% endblock %}
     </div>
-    <script src="{% static 'notifpy/js/thumbnails.js' %}"></script>
 </body>
 
 </html>

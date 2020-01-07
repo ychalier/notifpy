@@ -5,8 +5,11 @@
 <div class="channel-banner">
     {% if streams %}
     {% for stream in streams %}
-    <a class="image-link" href="{{stream.user.link}}">
+    <a class="image-link tooltip" href="{{stream.user.link}}">
         <img class="channel__thumbnail" src="{{stream.user.profile_image_url}}" alt={{stream.user_name}} />
+        {% if stream.game %}
+        <span class="tooltip__text">{{stream.game.name}}</span>
+        {% endif %}
     </a>
     {% endfor %}
     {% else %}
@@ -25,20 +28,13 @@
             <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title | safe }}</a>
         </p>
         <p class="video__description">
-            <a href="{% url 'channel' slug=video.channel.slug %}">{{ video.channel.title | safe }}</a>
+            <a href="{% url 'notifpy:channel' slug=video.channel.slug %}">{{ video.channel.title | safe }}</a>
             &middot;
             {{ video.time }}
         </p>
     </div>
     {% endfor %}
 </div>
-<!--
-<nav class="pagination">
-    <a href="{% url 'home' %}?page={{prev}}">&laquo;</a>
-
-    <a href="{% url 'home' %}?page={{next}}">&raquo;</a>
-</nav>
--->
 <div class="pagination">
     <span class="step-links">
         {% if videos.has_previous %}

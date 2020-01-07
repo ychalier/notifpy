@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+app_name = "notifpy"
 
 urlpatterns = [
     path("", views.abstract, name="abstract"),

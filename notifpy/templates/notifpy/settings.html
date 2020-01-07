@@ -1,6 +1,8 @@
 {% extends 'notifpy/base.html' %}
 {% load static from staticfiles %}
 
+{% block title %}Settings | notif.py{% endblock%}
+
 {% block body %}
 
 <h1>General Settings</h1>
@@ -10,7 +12,7 @@
 <h3>Subscribe to a YouTube channel</h3>
 
 <p>
-    <form class="form--textarea" action="{% url 'create_channel' %}" method="POST">
+    <form class="form--textarea" action="{% url 'notifpy:create_channel' %}" method="POST">
         {% csrf_token %}
         <textarea rows="5" name="query" placeholder="Channel ids (you may put one per line)"></textarea>
         <input type="submit" value="Subscribe" />
@@ -22,7 +24,7 @@
 <h3>Follow a Twitch user</h3>
 
 <p>
-    <form class="form--textarea" action="{% url 'create_twitch_user' %}" method="POST">
+    <form class="form--textarea" action="{% url 'notifpy:create_twitch_user' %}" method="POST">
         {% csrf_token %}
         <textarea rows="5" name="query" placeholder="User logins (you may put one per line)"></textarea>
         <input type="submit" value="Follow" />
@@ -37,7 +39,7 @@
     Write space separated update hours for each priority level.
 </p>
 
-<form class="form--table" action="{% url 'edit_schedule' %}" method="post">
+<form class="form--table" action="{% url 'notifpy:edit_schedule' %}" method="post">
     {%csrf_token%}
     <table>
         <tr>
@@ -65,7 +67,7 @@
 </p>
 
 <p>
-    <form class="form--textarea" action="{% url 'update' %}" method="POST">
+    <form class="form--textarea" action="{% url 'notifpy:update' %}" method="POST">
         {%csrf_token%}
         <select name="priority" multiple="">
             <option value="0">Low</option>
@@ -82,7 +84,7 @@
 
 <p>Delete videos older than:</p>
 
-<form class="form--textarea" action="{% url 'clear_old_videos' %}" method="post">
+<form class="form--textarea" action="{% url 'notifpy:clear_old_videos' %}" method="post">
     {%csrf_token%}
     <select name="older">
         <option value="3600">1 hour</option>

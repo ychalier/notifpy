@@ -1,6 +1,8 @@
 {% extends 'notifpy/base.html' %}
 {% load static from staticfiles %}
 
+{% block title %}Endpoints | notif.py{% endblock%}
+
 {% block body %}
 
 <h1>Manage API Endpoints</h1>
@@ -53,8 +55,8 @@
 
 <p>
     <a class="command__button" href="{{operator.youtube.oauth_flow.get_authorize_url}}">Retrieve Token</a>
-    <a class="command__button" href="{% url 'refresh_token' source='youtube' %}">Refresh Token</a>
-    <a class="command__button" href="{% url 'revoke_token' source='youtube' %}">Revoke Token</a>
+    <a class="command__button" href="{% url 'notifpy:refresh_token' source='youtube' %}">Refresh Token</a>
+    <a class="command__button" href="{% url 'notifpy:revoke_token' source='youtube' %}">Revoke Token</a>
 </p>
 
 <h3>Quotas</h3>
@@ -119,8 +121,8 @@
 
 <p>
     <a class="command__button" href="{{operator.twitch.oauth_flow.get_authorize_url}}">Retrieve Token</a>
-    <a class="command__button" href="{% url 'refresh_token' source='twitch' %}">Refresh Token</a>
-    <a class="command__button" href="{% url 'revoke_token' source='twitch' %}">Revoke Token</a>
+    <a class="command__button" href="{% url 'notifpy:refresh_token' source='twitch' %}">Refresh Token</a>
+    <a class="command__button" href="{% url 'notifpy:revoke_token' source='twitch' %}">Revoke Token</a>
 </p>
 
 <h3>Quotas</h3>

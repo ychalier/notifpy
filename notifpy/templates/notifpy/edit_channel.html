@@ -1,8 +1,10 @@
 {% extends 'notifpy/base.html' %}
 {% load static from staticfiles %}
 
+{% block title %}{{channel.title}} | notif.py{% endblock%}
+
 {% block body %}
-<a href="{% url 'channel' slug=channel.slug %}">
+<a href="{% url 'notifpy:channel' slug=channel.slug %}">
     <div class="icon-title">
         <img class="channel__thumbnail" src="{{channel.thumbnail}}" />
         <h1>{{channel.title}}</h1>
@@ -20,7 +22,7 @@
 <h4>Current filters</h4>
 {% if channel.filter_set.all %}
 {% for filter in channel.filter_set.all %}
-<form method="post" action="{% url 'delete_filter' %}" class="form--block">
+<form method="post" action="{% url 'notifpy:delete_filter' %}" class="form--block">
     <input disabled type="text" value="{{filter.regex}}" />
     {% csrf_token %}
     <input hidden name="id" value="{{filter.id}}" />
@@ -34,7 +36,7 @@
 </p>
 {% endif %}
 <h4>Add a filter</h4>
-<form class="form--textarea" method="post" action="{% url 'create_filter' %}" class="form--table">
+<form class="form--textarea" method="post" action="{% url 'notifpy:create_filter' %}" class="form--table">
     {% csrf_token %}
     <input hidden name="channel" value={{channel.id}} />
     <textarea name="regexes" rows="8" placeholder="Add one filter per line"></textarea>

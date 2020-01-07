@@ -93,7 +93,7 @@ a.image-link:hover {
     margin-bottom: 2px;
 }
 
-.icon-item > * {
+.icon-item>* {
     display: block;
     margin-right: 8px;
 }
@@ -104,11 +104,11 @@ a.image-link:hover {
     justify-content: center;
 }
 
-.vertical_command_pannel>*{
+.vertical_command_pannel>* {
     margin-bottom: 4px;
 }
 
-.vertical_command_pannel>*:last-child{
+.vertical_command_pannel>*:last-child {
     margin-bottom: 0;
 }
 
@@ -159,5 +159,40 @@ a.image-link:hover {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    /* font-size: 24px; */
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltip__text {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 1;
+    top: 110%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.tooltip .tooltip__image {
+    visibility: hidden;
+    width: 144px;
+    padding: 5px 0;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 1;
+    top: 102%;
+    left: 50%;
+    margin-left: -72px;
+}
+
+.tooltip:hover .tooltip__text, .tooltip:hover .tooltip__image {
+    visibility: visible;
 }

@@ -1,6 +1,8 @@
 {% extends 'notifpy/base.html' %}
 {% load static from staticfiles %}
 
+{% block title %}{{channel.title}} | notif.py{% endblock%}
+
 {% block body %}
 <div class="icon-title">
     <img class="channel__thumbnail" src="{{channel.thumbnail}}" />
@@ -37,9 +39,9 @@
     </tr>
 </table>
 <div class="command-panel">
-    <a class="command__button" href="{% url 'edit_channel' slug=channel.slug %}">Edit</a>
-    <a class="command__button" href="{% url 'delete_channel' slug=channel.slug %}">Delete</a>
-    <a class="command__button" href="{% url 'update_channel' slug=channel.slug %}">Update</a>
+    <a class="command__button" href="{% url 'notifpy:edit_channel' slug=channel.slug %}">Edit</a>
+    <a class="command__button" href="{% url 'notifpy:delete_channel' slug=channel.slug %}">Delete</a>
+    <a class="command__button" href="{% url 'notifpy:update_channel' slug=channel.slug %}">Update</a>
 </div>
 <h3>Last videos</h3>
 {% if videos %}
@@ -53,7 +55,7 @@
             <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title | safe }}</a>
         </p>
         <p class="video__description">
-            <a href="{% url 'channel' slug=channel.slug %}">{{ channel.title | safe }}</a>
+            <a href="{% url 'notifpy:channel' slug=channel.slug %}">{{ channel.title | safe }}</a>
             &middot;
             {{ video.time }}
         </p>

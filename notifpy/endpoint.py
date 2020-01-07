@@ -385,3 +385,10 @@ class TwitchEndpoint(Endpoint):
             "first": 100,
         }
         return self.get("https://api.twitch.tv/helix/streams", params, 1)
+
+    def games(self, ids):
+        """https://dev.twitch.tv/docs/api/reference#get-games"""
+        params = {
+            "id": ids,
+        }
+        return self.get("https://api.twitch.tv/helix/games", params, 1)
