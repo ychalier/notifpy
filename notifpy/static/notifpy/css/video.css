@@ -50,3 +50,20 @@
     height: 120px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, .2);
 }
+
+.stream {
+    position: relative;
+}
+
+.stream__game {
+    height: 120px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: .2s ease;
+}
+
+.stream:hover .stream__game {
+    opacity: 1;
+}

@@ -12,14 +12,15 @@
 {% if streams %}
 <div class="gallery">
 {% for stream in streams %}
-    <div class="video tooltip">
+    <div class="video stream tooltip">
         {% if stream.game %}
-            <div class="tooltip__image">
+            <!--<div class="tooltip__image">
                 <img class="twitch_thumbnail" src="{{stream.game.thumbnail}}" alt="{{stream.game.name}}" />
-            </div>
+            </div>-->
         {% endif %}
         <a href="{{stream.user.link}}">
             <img class="video__thumbnail" src="{{ stream.thumbnail }}" width=160 height=90 />
+            <img class="stream__game" src="{{stream.game.thumbnail}}" alt={{stream.game.name}} />
         </a>
         <p class="video__title">
             <a href="{{stream.user.link}}">
