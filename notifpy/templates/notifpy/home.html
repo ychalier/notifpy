@@ -6,7 +6,7 @@
     {% if streams %}
     {% for stream in streams %}
     <a class="image-link tooltip" href="{{stream.user.link}}">
-        <img class="channel__thumbnail" src="{{stream.user.profile_image_url}}" alt={{stream.user_name}} />
+        <img class="channel__thumbnail" src="{{stream.user.thumbnail}}" alt={{stream.user_name}} />
         {% if stream.game %}
         <span class="tooltip__text">{{stream.game.name}}</span>
         {% endif %}

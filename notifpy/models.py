@@ -87,6 +87,12 @@ class Filter(models.Model):
     channel = models.ForeignKey("YoutubeChannel", on_delete=models.CASCADE)
     regex = models.CharField(max_length=255, default=".*")
 
+    def __str__(self):
+        return "Filter<Channel: %s; Regex: %s>" % (
+            self.channel,
+            self.regex.encode("utf8")
+        )
+
 
 class Playlist(models.Model):
 
@@ -168,6 +174,9 @@ class TwitchUser(models.Model):
     def link(self):
         """Return the link to the Twitch channel of this user"""
         return "https://www.twitch.tv/%s" % self.login
+
+    def thumbnail(self):
+        return self.profile_image_url.replace("300x300", "70x70")
 
 
 class UpdateSchedule(models.Model):

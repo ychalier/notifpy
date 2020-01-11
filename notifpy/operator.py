@@ -57,10 +57,15 @@ class Operator:
         response = self.twitch.users(
             logins=[s.strip() for s in query.strip().split("\n")]
         )
+        statistics = {
+            "created": 0,
+            "existing": 0,
+        }
         if response is None:
-            return
+            return statistics
         for twitch_user_item in response["data"]:
             if models.TwitchUser.objects.filter(id=twitch_user_item["id"]).exists():
+                statistics["existing"] += 1
                 continue
             twitch_user = models.TwitchUser.objects.create(
                 id=twitch_user_item["id"],
@@ -70,6 +75,8 @@ class Operator:
                 offline_image_url=twitch_user_item["offline_image_url"],
             )
             twitch_user.save()
+            statistics["created"] += 1
+        return statistics
 
     def get_twitch_game(self, game_id):
         """Return a Twitch game from database or fetch it if necessary"""
@@ -106,7 +113,9 @@ class Operator:
             stream["user"] = models.TwitchUser.objects.get(
                 id=stream["user_id"])
             stream["thumbnail"] = stream["thumbnail_url"].format(
-                width=1600, height=900)
+                width=800,
+                height=450
+            )
             stream["game"] = self.get_twitch_game(stream["game_id"])
             results.append(stream)
         return results
@@ -116,6 +125,11 @@ class Operator:
         queries = [s.strip() for s in main_query.strip().split("\n")]
         url_channel_pattern = re.compile(r"channel\/(.{24})")
         url_username_pattern = re.compile(r"user\/([a-zA-Z0-9-]+)")
+        statistics = {
+            "created": 0,
+            "existing": 0,
+            "ignored": 0,
+        }
         for query in queries:
             channel_id = None
             snippet = None
@@ -133,6 +147,7 @@ class Operator:
                 snippet = response["items"][0]
             if snippet is not None:
                 if models.YoutubeChannel.objects.filter(id=snippet["id"]).exists():
+                    statistics["existing"] += 1
                     continue
                 thumbnail = ""
                 if "high" in snippet["snippet"]["thumbnails"]:
@@ -149,9 +164,14 @@ class Operator:
                     playlist_id=snippet["contentDetails"]["relatedPlaylists"]["uploads"],
                 )
                 channel.save()
+                statistics["created"] += 1
+            else:
+                statistics["ignored"] += 1
+        return statistics
 
     def update_channel(self, channel):
         """Update videos of a YouTube channel"""
+        print("Updating", channel)
         channel.last_update = timezone.now()
         channel.save()
         response = self.youtube.playlist_items_list(channel.playlist_id)

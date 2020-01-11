@@ -1,16 +1,29 @@
 """This module contains all views from the application"""
 
+import re
 import json
 from django.conf import settings as django_settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
+from django.urls import reverse
 from . import operator
 from . import models
 from . import forms
 
 
 OPERATOR = operator.Operator(django_settings.NOTIFPY_SECRET)
+
+
+def inform(request, title=None, input_msg=None, output_msg=None, next_page=None):
+    if next_page is not None:
+        next_page = reverse(next_page)
+    return render(request, "notifpy/inform.html", {
+        "title": title,
+        "input": input_msg,
+        "output": output_msg,
+        "next": next_page,
+    })
 
 
 def abstract(request):
@@ -104,7 +117,14 @@ def clear_old_videos(request):
 def create_channel(request):
     """Subscribe to a YouTube channel"""
     if request.method == "POST" and "query" in request.POST:
-        OPERATOR.subscribe_to_channels(request.POST["query"])
+        result = OPERATOR.subscribe_to_channels(request.POST["query"])
+        return inform(
+            request,
+            "create YouTube channel",
+            request.POST["query"],
+            result,
+            "notifpy:youtube"
+        )
     return redirect("notifpy:youtube")
 
 
@@ -147,13 +167,13 @@ def delete_channel(_, slug):
 
 @login_required
 def create_filter(request):
-    """Append a filter to a channell"""
+    """Append a filter to a channel"""
     if request.method == "POST":
         channel = models.YoutubeChannel.objects.get(id=request.POST["channel"])
         for regex in request.POST["regexes"].split("\n"):
             filters = models.Filter.objects.create(
                 channel=channel,
-                regex=regex
+                regex=re.sub("\r", "", regex)
             )
             filters.save()
         return redirect("notifpy:edit_channel", slug=channel.slug)
@@ -331,7 +351,14 @@ def twitch(request):
 def create_twitch_user(request):
     """Follow a Twitch user"""
     if request.method == "POST" and "query" in request.POST:
-        OPERATOR.follow_users(request.POST["query"])
+        result = OPERATOR.follow_users(request.POST["query"])
+        return inform(
+            request,
+            "create Twitch user",
+            request.POST["query"],
+            result,
+            "notifpy:twitch"
+        )
     return redirect("notifpy:twitch")
 
 

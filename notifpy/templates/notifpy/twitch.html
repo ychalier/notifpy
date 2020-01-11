@@ -51,7 +51,7 @@
 {% if users %}
 {% for user in users %}
 <div class="icon-item">
-    <img class="channel__thumbnail" src="{{user.profile_image_url}}" alt={{channel.title}} />
+    <img class="channel__thumbnail" src="{{user.thumbnail}}" alt={{user.display_name}} />
     <a href="{{user.link}}">{{user.display_name}}</a>
     <a class="command__button" href="{% url 'notifpy:delete_twitch_user' login=user.login%}">Unfollow</a>
 </div>
