@@ -1,10 +1,15 @@
-input, select, textarea, select option {
-    color: black;
+input, textarea, select {
+    font-size: inherit;
+    font-family: inherit;
+    padding: 8px;
     border: none;
+    background: #202020;
+    color: white;
+    min-width: 0;
 }
 
-input, select, textarea {
-    padding: 4px;
+textarea {
+    resize: vertical;
 }
 
 input[type="submit"] {
@@ -93,7 +98,6 @@ input[type="submit"]:hover {
 .form--textarea {
     display: flex;
     flex-direction: column;
-
 }
 
 .form--textarea>textarea, .form--textarea>select {

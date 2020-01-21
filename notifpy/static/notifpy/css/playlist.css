@@ -27,6 +27,7 @@
 
 .playlist__gallery .video {
     margin-right: 8px;
+    min-width: 261px;
 }
 
 .playlist__gallery .video:last-of-type {

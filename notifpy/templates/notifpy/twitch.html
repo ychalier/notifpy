@@ -1,25 +1,20 @@
 {% extends 'notifpy/base.html' %}
 {% load static from staticfiles %}
 
-{% block title %}Twitch | notif.py{% endblock%}
+{% block title %}Twitch | Notifpy{% endblock%}
 
 {% block body %}
 
 <h1>Twitch</h1>
 
-<h3>Live</h3>
+<h2>Live</h2>
 
 {% if streams %}
 <div class="gallery">
-{% for stream in streams %}
+    {% for stream in streams %}
     <div class="video stream tooltip">
-        {% if stream.game %}
-            <!--<div class="tooltip__image">
-                <img class="twitch_thumbnail" src="{{stream.game.thumbnail}}" alt="{{stream.game.name}}" />
-            </div>-->
-        {% endif %}
         <a href="{{stream.user.link}}">
-            <img class="video__thumbnail" src="{{ stream.thumbnail }}" width=160 height=90 />
+            <img class="video__thumbnail" src="{{ stream.thumbnail }}" />
             <img class="stream__game" src="{{stream.game.thumbnail}}" alt={{stream.game.name}} />
         </a>
         <p class="video__title">
@@ -27,10 +22,10 @@
                 {{ stream.user_name | safe }}
             </a>
             {% if stream.game %}
-                &middot;
-                <a href="https://www.twitch.tv/directory/game/{{stream.game.name}}">
-                    {{ stream.game.name | safe }}
-                </a>
+            &middot;
+            <a href="https://www.twitch.tv/directory/game/{{stream.game.name}}">
+                {{ stream.game.name | safe }}
+            </a>
             {% endif %}
         </p>
         <p class="video__description">
@@ -41,22 +36,24 @@
             {{ stream.viewer_count }}
         </p>
     </div>
-{% endfor %}
+    {% endfor %}
 </div>
 {% else %}
 <p>No user is currently live.</p>
 {% endif %}
 
-<h3>Followed</h3>
+<h2>Followed</h2>
 
 {% if users %}
-{% for user in users %}
-<div class="icon-item">
-    <img class="channel__thumbnail" src="{{user.thumbnail}}" alt={{user.display_name}} />
-    <a href="{{user.link}}">{{user.display_name}}</a>
-    <a class="command__button" href="{% url 'notifpy:delete_twitch_user' login=user.login%}">Unfollow</a>
+<div class="channel_list">
+    {% for user in users %}
+    <div class="icon-item">
+        <img class="channel__thumbnail" src="{{user.thumbnail}}" alt={{user.display_name}} />
+        <a href="{{user.link}}">{{user.display_name}}</a>
+        <a href="{% url 'notifpy:delete_twitch_user' login=user.login%}">✕</a>
+    </div>
+    {% endfor %}
 </div>
-{% endfor %}
 {% else %}
 <p>You are not following any user.</p>
 {% endif %}

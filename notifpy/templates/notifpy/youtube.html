@@ -1,12 +1,12 @@
 {% extends 'notifpy/base.html' %}
 {% load static from staticfiles %}
 
-{% block title %}YouTube | notif.py{% endblock%}
+{% block title %}YouTube | Notifpy{% endblock%}
 
 {% block body %}
 <h1>YouTube</h1>
 
-<h3>Playlists</h3>
+<h2>Playlists</h2>
 
 <div class="command-panel">
     <a class="command__button" href="{% url 'notifpy:create_playlist' %}">Add Playlist</a>
@@ -27,7 +27,7 @@
         {% for video in playlist.videos.all %}
         <div class="video">
             <a href="https://www.youtube.com/watch?v={{ video.id }}">
-                <img class="video__thumbnail" src="{{ video.thumbnail }}" width=160 height=90 />
+                <img class="video__thumbnail" src="{{ video.thumbnail }}" />
             </a>
             <p class="video__title">
                 <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title | safe }}</a>
@@ -49,16 +49,17 @@
 <p>No playlist found.</p>
 {% endif %}
 
-<h3>Channels</h3>
+<h2>Channels</h2>
 
 {% if channels %}
-{% for channel in channels %}
-<div class="icon-item">
-    <img class="channel__thumbnail" src="{{channel.thumbnail}}" alt={{channel.title}} />
-    <a href="{% url 'notifpy:channel' slug=channel.slug %}">{{channel.title}}</a>
-    <a class="command__button" href="{% url 'notifpy:delete_channel' slug=channel.slug %}">Unsubscribe</a>
+<div class="channel_list">
+    {% for channel in channels %}
+    <div class="icon-item">
+        <img class="channel__thumbnail" src="{{channel.thumbnail}}" alt={{channel.title}} />
+        <a href="{% url 'notifpy:channel' slug=channel.slug %}">{{channel.title}}</a>
+    </div>
+    {% endfor %}
 </div>
-{% endfor %}
 {% else %}
 <p>You are not subscribed to any channel.</p>
 {% endif %}

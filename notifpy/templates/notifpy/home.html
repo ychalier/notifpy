@@ -22,7 +22,7 @@
     {% for video in videos %}
     <div class="video">
         <a href="https://www.youtube.com/watch?v={{ video.id }}">
-            <img class="video__thumbnail" src="{{ video.thumbnail }}" width=160 height=90 />
+            <img class="video__thumbnail" src="{{ video.thumbnail }}" />
         </a>
         <p class="video__title">
             <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title | safe }}</a>
@@ -38,8 +38,8 @@
 <div class="pagination">
     <span class="step-links">
         {% if videos.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ videos.previous_page_number }}">previous</a>
+        <a href="?page=1">&laquo; first</a>
+        <a href="?page={{ videos.previous_page_number }}">previous</a>
         {% endif %}
 
         <span class="current">
@@ -47,8 +47,8 @@
         </span>
 
         {% if videos.has_next %}
-            <a href="?page={{ videos.next_page_number }}">next</a>
-            <a href="?page={{ videos.paginator.num_pages }}">last &raquo;</a>
+        <a href="?page={{ videos.next_page_number }}">next</a>
+        <a href="?page={{ videos.paginator.num_pages }}">last &raquo;</a>
         {% endif %}
     </span>
 </div>

@@ -1,7 +1,7 @@
 {% extends 'notifpy/base.html' %}
 {% load static from staticfiles %}
 
-{% block title %}{{playlist.title}} | notif.py{% endblock%}
+{% block title %}{{playlist.title}} | Notifpy{% endblock%}
 
 {% block body %}
 <h1>{{playlist.title}}</h1>
@@ -17,7 +17,7 @@
     {% for entry in playlist.get_videos %}
     <div class="video">
         <a href="https://www.youtube.com/watch?v={{ entry.video.id }}">
-            <img class="video__thumbnail" src="{{ entry.video.thumbnail }}" width=160 height=90 />
+            <img class="video__thumbnail" src="{{ entry.video.thumbnail }}" />
         </a>
         <div class="video__info">
             <p class="video__title">

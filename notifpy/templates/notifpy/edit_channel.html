@@ -1,7 +1,7 @@
 {% extends 'notifpy/base.html' %}
 {% load static from staticfiles %}
 
-{% block title %}{{channel.title}} | notif.py{% endblock%}
+{% block title %}{{channel.title}} | Notifpy{% endblock%}
 
 {% block body %}
 <a href="{% url 'notifpy:channel' slug=channel.slug %}">

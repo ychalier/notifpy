@@ -34,7 +34,7 @@ def abstract(request):
 @login_required
 def home(request):
     """Main view to display last updates."""
-    page_size = 48
+    page_size = 16
     page = int(request.GET.get("page", 1))
     order = request.GET.get("order", "publication")
     video_list = models.YoutubeVideo.objects\
@@ -216,7 +216,7 @@ def create_playlist(request):
         form = forms.PlaylistForm(request.POST)
         if form.is_valid():
             playlist = form.save()
-            return redirect("playlist", slug=playlist.slug)
+            return redirect("notifpy:playlist", slug=playlist.slug)
     form = forms.PlaylistForm()
     return render(request, "notifpy/create_playlist.html", locals())
 

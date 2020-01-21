@@ -1,7 +1,7 @@
 {% extends 'notifpy/base.html' %}
 {% load static from staticfiles %}
 
-{% block title %}Endpoints | notif.py{% endblock%}
+{% block title %}Endpoints | Notifpy{% endblock%}
 
 {% block body %}
 
@@ -14,26 +14,6 @@
 <h3>Token</h3>
 
 <table>
-    <tr>
-        <td><b>Client Id</b></td>
-        <td>{{operator.youtube.oauth_flow.credentials.client_id|truncatechars:50}}</td>
-    </tr>
-    <tr>
-        <td><b>Redirect URI</b></td>
-        <td>{{operator.youtube.oauth_flow.credentials.redirect_uri|truncatechars:50}}</td>
-    </tr>
-    <tr>
-        <td><b>Scope</b></td>
-        <td>{{operator.youtube.oauth_flow.credentials.scope|truncatechars:50}}</td>
-    </tr>
-    <tr>
-        <td><b>Access token</b></td>
-        <td>{{operator.youtube.oauth_flow.token.access_token|truncatechars:50}}</td>
-    </tr>
-    <tr>
-        <td><b>Refresh token</b></td>
-        <td>{{operator.youtube.oauth_flow.token.refresh_token|truncatechars:50}}</td>
-    </tr>
     <tr>
         <td><b>Expires in</b></td>
         <td>{{operator.youtube.oauth_flow.token.expires_in}}</td>
@@ -81,26 +61,6 @@
 <h3>Token</h3>
 
 <table>
-    <tr>
-        <td><b>Client Id</b></td>
-        <td>{{operator.twitch.oauth_flow.credentials.client_id}}</td>
-    </tr>
-    <tr>
-        <td><b>Redirect URI</b></td>
-        <td>{{operator.twitch.oauth_flow.credentials.redirect_uri}}</td>
-    </tr>
-    <tr>
-        <td><b>Scope</b></td>
-        <td>{{operator.twitch.oauth_flow.credentials.scope}}</td>
-    </tr>
-    <tr>
-        <td><b>Access token</b></td>
-        <td>{{operator.twitch.oauth_flow.token.access_token}}</td>
-    </tr>
-    <tr>
-        <td><b>Refresh token</b></td>
-        <td>{{operator.twitch.oauth_flow.token.refresh_token}}</td>
-    </tr>
     <tr>
         <td><b>Expires in</b></td>
         <td>{{operator.twitch.oauth_flow.token.expires_in}}</td>
