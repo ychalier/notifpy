@@ -36,31 +36,35 @@ def extract_video_id(string):
 class Operator:
     """Operator that uses API endpoints to edit the database."""
 
-    def __init__(self, credentials_file):
-        with open(credentials_file, "r") as file:
-            credentials = json.load(file)
-        self.youtube = YoutubeEndpoint(credentials)
-        self.twitch = TwitchEndpoint(credentials)
-        try:
-            if not models.UpdateSchedule.objects.all().exists():
-                schedule = models.UpdateSchedule.objects.create(text=json.dumps({
-                    models.YoutubeChannel.PRIORITY_LOW: [3],
-                    models.YoutubeChannel.PRIORITY_MEDIUM: [9, 19],
-                    models.YoutubeChannel.PRIORITY_HIGH: [9, 12, 19],
-                }))
-                schedule.save()
-        except:
-            pass
+    def __init__(self):
+        settings = models.Settings.load()
+        self.youtube = None
+        self.twitch = None
+        credentials_youtube = settings.get_youtube()
+        if len(credentials_youtube) > 0:
+            self.youtube = YoutubeEndpoint(credentials_youtube)
+        credentials_twitch = settings.get_twitch()
+        if len(credentials_twitch) > 0:
+            self.twitch = TwitchEndpoint(credentials_twitch)
+        if not models.UpdateSchedule.objects.all().exists():
+            schedule = models.UpdateSchedule.objects.create(text=json.dumps({
+                models.YoutubeChannel.PRIORITY_LOW: [3],
+                models.YoutubeChannel.PRIORITY_MEDIUM: [9, 19],
+                models.YoutubeChannel.PRIORITY_HIGH: [9, 12, 19],
+            }))
+            schedule.save()
 
     def follow_users(self, query):
         """Follow a set of Twitch users"""
-        response = self.twitch.users(
-            logins=[s.strip() for s in query.strip().split("\n")]
-        )
         statistics = {
             "created": 0,
             "existing": 0,
         }
+        if self.twitch is None:
+            return statistics
+        response = self.twitch.users(
+            logins=[s.strip() for s in query.strip().split("\n")]
+        )
         if response is None:
             return statistics
         for twitch_user_item in response["data"]:
@@ -84,6 +88,8 @@ class Operator:
             return None
         if models.TwitchGame.objects.filter(id=game_id).exists():
             return models.TwitchGame.objects.get(id=game_id)
+        if self.twitch is None:
+            return None
         response = self.twitch.games(ids=[game_id])
         if response is None or len(response["data"]) == 0:
             return None
@@ -97,7 +103,7 @@ class Operator:
 
     def get_streams(self):
         """Get currently live streams"""
-        if len(models.TwitchUser.objects.all()) == 0:
+        if len(models.TwitchUser.objects.all()) == 0 or self.twitch is None:
             return []
         logins = [user.login for user in models.TwitchUser.objects.all()]
         batch_size = 99
@@ -130,6 +136,8 @@ class Operator:
             "existing": 0,
             "ignored": 0,
         }
+        if self.youtube is None:
+            return statistics
         for query in queries:
             channel_id = None
             snippet = None
@@ -171,7 +179,8 @@ class Operator:
 
     def update_channel(self, channel):
         """Update videos of a YouTube channel"""
-        print("Updating", channel)
+        if self.youtube is None:
+            return
         channel.last_update = timezone.now()
         channel.save()
         response = self.youtube.playlist_items_list(channel.playlist_id)
@@ -203,6 +212,8 @@ class Operator:
 
     def update_channels(self, priorities=None, verbose=False):
         """Update all channels from the database"""
+        if self.youtube is None:
+            return
         if priorities is None:
             priorities = list()
             now = datetime.datetime.now().hour
@@ -219,6 +230,8 @@ class Operator:
 
     def add_video_to_playlist(self, playlist, query):
         """Add a video to a playlist"""
+        if self.youtube is None:
+            return
         for line in query.strip().split("\n"):
             video_id = extract_video_id(line.strip())
             if video_id is None:

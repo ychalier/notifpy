@@ -2,7 +2,6 @@
 
 import re
 import json
-from django.conf import settings as django_settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
@@ -10,9 +9,6 @@ from django.urls import reverse
 from . import operator
 from . import models
 from . import forms
-
-
-OPERATOR = operator.Operator(django_settings.NOTIFPY_SECRET)
 
 
 def inform(request, title=None, input_msg=None, output_msg=None, next_page=None):
@@ -43,7 +39,7 @@ def home(request):
     paginator = Paginator(video_list, page_size)
     videos = paginator.get_page(page)
     twitch_users = models.TwitchUser.objects.all()
-    streams = OPERATOR.get_streams()
+    streams = operator.Operator().get_streams()
     if streams is not None:
         for stream in streams:
             user = twitch_users.get(id=stream["user_id"])
@@ -58,36 +54,39 @@ def home(request):
 def manage_endpoints(request):
     """View to show information about endpoints"""
     return render(request, "notifpy/manage_endpoints.html", {
-        "operator": OPERATOR
+        "operator": operator.Operator()
     })
 
 
 def oauth_redirect(request, source):
     """Redirection handling during OAuth flow"""
-    if source == "youtube":
-        OPERATOR.youtube.oauth_flow.handle_redirect(request)
-    elif source == "twitch":
-        OPERATOR.twitch.oauth_flow.handle_redirect(request)
+    opr = operator.Operator()
+    if source == "youtube" and opr.youtube is not None:
+        opr.youtube.oauth_flow.handle_redirect(request)
+    elif source == "twitch" and opr.twitch is not None:
+        opr.twitch.oauth_flow.handle_redirect(request)
     return redirect("notifpy:manage_endpoints")
 
 
 @login_required
 def refresh_token(_, source):
     """Request an endpoint token to be refreshed"""
-    if source == "youtube":
-        OPERATOR.youtube.oauth_flow.refresh()
-    elif source == "twitch":
-        OPERATOR.twitch.oauth_flow.refresh()
+    opr = operator.Operator()
+    if source == "youtube" and opr.youtube is not None:
+        opr.youtube.oauth_flow.refresh()
+    elif source == "twitch" and opr.twitch is not None:
+        opr.twitch.oauth_flow.refresh()
     return redirect("notifpy:manage_endpoints")
 
 
 @login_required
 def revoke_token(_, source):
     """Request an endpoint token to be revoked"""
-    if source == "youtube":
-        OPERATOR.youtube.oauth_flow.revoke()
-    elif source == "twitch":
-        OPERATOR.twitch.oauth_flow.revoke()
+    opr = operator.Operator()
+    if source == "youtube" and opr.youtube is not None:
+        opr.youtube.oauth_flow.revoke()
+    elif source == "twitch" and opr.twitch is not None:
+        opr.twitch.oauth_flow.revoke()
     return redirect("notifpy:manage_endpoints")
 
 
@@ -117,7 +116,7 @@ def clear_old_videos(request):
 def create_channel(request):
     """Subscribe to a YouTube channel"""
     if request.method == "POST" and "query" in request.POST:
-        result = OPERATOR.subscribe_to_channels(request.POST["query"])
+        result = operator.Operator().subscribe_to_channels(request.POST["query"])
         return inform(
             request,
             "create YouTube channel",
@@ -197,7 +196,7 @@ def update_channel(_, slug):
     if not models.YoutubeChannel.objects.filter(slug=slug).exists():
         return redirect("notifpy:home")
     channel = models.YoutubeChannel.objects.get(slug=slug)
-    OPERATOR.update_channel(channel)
+    operator.Operator().update_channel(channel)
     return redirect("notifpy:channel", slug=channel.slug)
 
 
@@ -205,7 +204,7 @@ def update_channel(_, slug):
 def update_channels(request):
     """Update all YouTube channel videos"""
     if request.method == "POST":
-        OPERATOR.update_channels(list(map(int, request.POST["priority"])))
+        operator.Operator().update_channels(list(map(int, request.POST["priority"])))
     return redirect("notifpy:home")
 
 
@@ -254,7 +253,7 @@ def add_playlist(request, slug):
         return redirect("notifpy:youtube")
     playlist = models.Playlist.objects.get(slug=slug)
     if request.method == "POST":
-        OPERATOR.add_video_to_playlist(playlist, request.POST.get("video", ""))
+        operator.Operator().add_video_to_playlist(playlist, request.POST.get("video", ""))
     return redirect("notifpy:edit_playlist", slug=slug)
 
 
@@ -340,7 +339,7 @@ def twitch(request):
         .all()\
         .extra(select={'lower_name': 'lower(display_name)'})\
         .order_by("lower_name")
-    streams = OPERATOR.get_streams()
+    streams = operator.Operator().get_streams()
     return render(request, "notifpy/twitch.html", {
         "users": users,
         "streams": streams,
@@ -351,7 +350,7 @@ def twitch(request):
 def create_twitch_user(request):
     """Follow a Twitch user"""
     if request.method == "POST" and "query" in request.POST:
-        result = OPERATOR.follow_users(request.POST["query"])
+        result = operator.Operator().follow_users(request.POST["query"])
         return inform(
             request,
             "create Twitch user",

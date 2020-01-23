@@ -9,11 +9,11 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-notifpy',
-    version='0.6',
+    version='0.7',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
-    description='A Django app that mimics YouTube account features.',
+    description='A Django app that mimics YouTube and Twitch account features.',
     long_description=README,
     url='https://yohan.chalier.fr/',
     author='Yohan Chalier',
@@ -21,14 +21,17 @@ setup(
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
-        'Framework :: Django :: 2.2.3',
+        'Framework :: Django :: 3.0.2',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
+    install_requires=[
+        "Django",
+        "requests"
+    ]
 )

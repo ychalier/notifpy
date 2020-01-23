@@ -7,62 +7,61 @@ requires an API key and therefore you still need an account. The good
 thing is that it wont be able to see what or when you are watching
 anything. Now it also includes Twitch streams.
 
-1. Setup
---------
+Getting Started
+---------------
 
-1.1. Install
+Prerequisites
+~~~~~~~~~~~~~
+
+You'll need a version of Python that runs Django 3.0.2, ie. 3.6 or above.
+
+Installation
 ~~~~~~~~~~~~
+
+Install the module from its custom package repository:
 
 .. code:: bash
 
-    git clone https://github.com/ychalier/notifpy.git
-    cd notifpy/
-    pip3 install -r requirements.txt
+    pip install --extra-index-url="https://packages.chalier.fr" django-notifpy
 
-1.2. Youtube API
-~~~~~~~~~~~~~~~~
+Add it to your Django ``INSTALLED_APPS``, use the ``migrate``
+and ``collectstatic`` options, and that's it!
+
+API Secrets
+~~~~~~~~~~~
 
 In order to use YouTube Data API v3, you need an `API
 key <https://console.developers.google.com/apis/credentials>`__. For
 more information you can check the
 `documentation <https://developers.google.com/youtube/registering_an_application>`__.
-Save your API key in a JSON file ``secret.json`` with the following
-schema:
+Create a dummy ``notifpy.models.Settings`` object and set its ``youtube`` field to:
 
 .. code:: json
 
     {
-        "youtube": {
-            "client_id": "...",
-            "redirect_uri": "...",
-            "client_secret": "...",
-            "scope": "https://www.googleapis.com/auth/youtube.force-ssl"
-        }
+        "client_id": "...",
+        "redirect_uri": "...",
+        "client_secret": "...",
+        "scope": "https://www.googleapis.com/auth/youtube.force-ssl"
     }
-
-1.3. Twitch API
-~~~~~~~~~~~~~~~
 
 The use of Twitch API requires an app key that you may create
 `here <https://dev.twitch.tv/dashboard/apps/create>`__. You may find the
 documentation `here <https://dev.twitch.tv/docs/authentication#registration>`__.
-Save your API key in the JSON file ``secret.json`` with the following
-schema:
+In the same ``notifpy.models.Settings`` object, set the ``twitch`` field to:
 
 .. code:: json
 
     {
-        "twitch": {
-            "client_id": "...",
-            "client_secret": "...",
-            "redirect_uri": "...",
-            "scope": "openid"
-        }
+        "client_id": "...",
+        "client_secret": "...",
+        "redirect_uri": "...",
+        "scope": "openid"
     }
 
 
-1.4. Redirect URIs
-~~~~~~~~~~~~~~~~~~
+Redirect URIs
+~~~~~~~~~~~~~
 
 Please note that the ``redirect_uri`` in both cases should be of the form:
 
@@ -73,18 +72,6 @@ Please note that the ``redirect_uri`` in both cases should be of the form:
 
 OAuth authentication flow uses those routes to catch the redirection when
 the app is granted an authorization code.
-
-1.5. Django settings
-~~~~~~~~~~~~~~~~~~~~
-
-Add the following variables in your project ``settings.py`` file, and make sure
-to provide absolute paths to avoid any issue:
-
-.. code:: python
-
-    NOTIFPY_SECRET = "/path/to/secret.json"
-    NOTIFPY_TOKEN_YOUTUBE = "/path/to/token-youtube.json"
-    NOTIFPY_TOKEN_TWITCH = "/path/to/token-twitch.json"
 
 2. Usage
 --------
@@ -101,8 +88,3 @@ Here are some notes about the use of Notifpy:
     0 * * * * cd /PATH/TO/SERVER && source venv/bin/activate && python manage.py update
 
 Change ``PATH`` to your actual path.
-
-3. Packaging
-------------
-
-Follow this `documentation <https://docs.djangoproject.com/en/3.0/intro/reusable-apps/>`__.

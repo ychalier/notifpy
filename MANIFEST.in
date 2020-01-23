@@ -3,4 +3,3 @@ include README.rst
 recursive-include notifpy/static *
 recursive-include notifpy/templates *
 recursive-include notifpy/management/commands *
-recursive-include docs *

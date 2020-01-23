@@ -7,6 +7,49 @@ from django.utils.text import slugify
 from django.db import models
 
 
+class SingletonModel(models.Model):
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(SingletonModel, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def load(cls):
+        """Return singleton and creates it if needed"""
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+
+class Settings(SingletonModel):
+
+    youtube = models.TextField(default="{}")
+    twitch = models.TextField(default="{}")
+
+    def get_youtube(self):
+        return json.loads(self.youtube)
+
+    def get_twitch(self):
+        return json.loads(self.twitch)
+
+
+class Token(SingletonModel):
+
+    youtube = models.TextField(default="{}")
+    twitch = models.TextField(default="{}")
+
+    def get_youtube(self):
+        return json.loads(self.youtube)
+
+    def get_twitch(self):
+        return json.loads(self.twitch)
+
+
 class YoutubeVideo(models.Model):
 
     """Represent a YouTube video"""

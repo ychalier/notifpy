@@ -8,12 +8,13 @@ import random
 import logging
 import datetime
 import requests
-from django.conf import settings
+from . import models
 
 
 def generate_random_state(length=24):
     """Return a random string of letters and figures of specified length"""
     chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    random.seed(datetime.datetime.now().strftime("%D"))
     return "".join(random.choice(chars) for _ in range(length))
 
 
@@ -32,14 +33,13 @@ class Token:
 
     """Token for OAuth authentication"""
 
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self, field):
+        self.field = field
         self.access_token = None
         self.refresh_token = None
         self.expires_in = None
         self.delivery_time = None
-        if os.path.isfile(self.filename):
-            self.load()
+        self.load()
 
     def has_expired(self):
         """Check if current access token has expired"""
@@ -76,24 +76,24 @@ class Token:
 
     def save(self):
         """Export current token"""
-        logging.info("Saving token to %s", self.filename)
-        with open(self.filename, "w") as file:
-            json.dump({
-                "access_token": self.access_token,
-                "refresh_token": self.refresh_token,
-                "expires_in": self.expires_in,
-                "delivery_time": self.delivery_time,
-            }, file)
+        obj = models.Token.load()
+        setattr(obj, self.field, json.dumps({
+            "access_token": self.access_token,
+            "refresh_token": self.refresh_token,
+            "expires_in": self.expires_in,
+            "delivery_time": self.delivery_time,
+        }))
+        obj.save()
 
     def load(self):
         """Load token from a file"""
-        logging.info("Loading token from %s", self.filename)
-        with open(self.filename, "r") as file:
-            dictionnary = json.load(file)
-        self.access_token = dictionnary["access_token"]
-        self.refresh_token = dictionnary["refresh_token"]
-        self.expires_in = dictionnary["expires_in"]
-        self.delivery_time = dictionnary["delivery_time"]
+        obj = models.Token.load()
+        dictionnary = json.loads(getattr(obj, self.field))
+        if len(dictionnary) > 0:
+            self.access_token = dictionnary["access_token"]
+            self.refresh_token = dictionnary["refresh_token"]
+            self.expires_in = dictionnary["expires_in"]
+            self.delivery_time = dictionnary["delivery_time"]
 
     def delivery_datetime(self):
         """Format delivery time as a datetime object"""
@@ -112,13 +112,13 @@ class OAuthFlow:
 
     """Implement OAuth authentication flow for API endpoints"""
 
-    def __init__(self, credentials, uris, token_filename):
+    def __init__(self, credentials, uris, token_field):
         self.credentials = Credentials(credentials)
         self.authorize_uri = uris["authorize"]
         self.token_uri = uris["token"]
         self.revoke_uri = uris["revoke"]
         self.state = generate_random_state()
-        self.token = Token(token_filename)
+        self.token = Token(token_field)
 
     def get_authorize_url(self):
         """Return the authorization URL the user should be redirected too"""
@@ -269,13 +269,13 @@ class YoutubeEndpoint(Endpoint):
         Endpoint.__init__(
             self,
             OAuthFlow(
-                credentials["youtube"],
+                credentials,
                 {
                     "authorize": "https://accounts.google.com/o/oauth2/auth",
                     "token": "https://www.googleapis.com/oauth2/v4/token",
                     "revoke": "https://accounts.google.com/o/oauth2/revoke",
                 },
-                settings.NOTIFPY_TOKEN_YOUTUBE,
+                "youtube",
             ),
             QuotaBucket(
                 10000,
@@ -355,13 +355,13 @@ class TwitchEndpoint(Endpoint):
         Endpoint.__init__(
             self,
             OAuthFlow(
-                credentials["twitch"],
+                credentials,
                 {
                     "authorize": "https://id.twitch.tv/oauth2/authorize",
                     "token": "https://id.twitch.tv/oauth2/token",
                     "revoke": "https://id.twitch.tv/oauth2/revoke",
                 },
-                settings.NOTIFPY_TOKEN_TWITCH,
+                "twitch",
             ),
             QuotaBucket(
                 800,
