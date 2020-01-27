@@ -33,6 +33,16 @@ def extract_video_id(string):
     return None
 
 
+def extract_video_ids(string):
+    """Extract potentially several video ids within a string"""
+    matches = re.search(r"watch_videos\?video_ids=([a-zA-Z0-9_-]{11}(,[a-zA-Z0-9_-]{11})*)", string)
+    if matches is not None:
+        for video_id in matches.group(1).split(","):
+            yield video_id
+    else:
+        yield extract_video_id(string)
+
+
 class Operator:
     """Operator that uses API endpoints to edit the database."""
 
@@ -234,42 +244,42 @@ class Operator:
         if self.youtube is None:
             return
         for line in query.strip().split("\n"):
-            video_id = extract_video_id(line.strip())
-            if video_id is None:
-                return
-            if models.YoutubeVideo.objects.filter(id=video_id).exists():
-                video = models.YoutubeVideo.objects.get(id=video_id)
-            else:
-                response = self.youtube.videos_list(video_id)
-                if response is None or response["pageInfo"]["totalResults"] == 0:
-                    return
-                video_item = response["items"][0]
-                channel_id = video_item["snippet"]["channelId"]
-                if models.YoutubeChannel.objects.filter(id=channel_id).exists():
-                    channel = models.YoutubeChannel.objects.get(id=channel_id)
+            for video_id in extract_video_ids(line.strip()):
+                if video_id is None:
+                    continue
+                if models.YoutubeVideo.objects.filter(id=video_id).exists():
+                    video = models.YoutubeVideo.objects.get(id=video_id)
                 else:
-                    channel_item = self.youtube.channels_list(
-                        channel_id=channel_id)["items"][0]
-                    channel = models.YoutubeChannel.objects.create(
-                        id=channel_item["id"],
-                        title=channel_item["snippet"]["title"],
-                        thumbnail=channel_item["snippet"]["thumbnails"]["medium"]["url"],
-                        priority=models.YoutubeChannel.PRIORITY_NONE,
+                    response = self.youtube.videos_list(video_id)
+                    if response is None or response["pageInfo"]["totalResults"] == 0:
+                        continue
+                    video_item = response["items"][0]
+                    channel_id = video_item["snippet"]["channelId"]
+                    if models.YoutubeChannel.objects.filter(id=channel_id).exists():
+                        channel = models.YoutubeChannel.objects.get(id=channel_id)
+                    else:
+                        channel_item = self.youtube.channels_list(
+                            channel_id=channel_id)["items"][0]
+                        channel = models.YoutubeChannel.objects.create(
+                            id=channel_item["id"],
+                            title=channel_item["snippet"]["title"],
+                            thumbnail=channel_item["snippet"]["thumbnails"]["medium"]["url"],
+                            priority=models.YoutubeChannel.PRIORITY_NONE,
+                        )
+                        channel.save()
+                    video = models.YoutubeVideo.objects.create(
+                        id=video_item["id"],
+                        channel=channel,
+                        title=video_item["snippet"]["title"],
+                        publication=video_item["snippet"]["publishedAt"],
+                        thumbnail=select_thumbnail(video_item),
                     )
-                    channel.save()
-                video = models.YoutubeVideo.objects.create(
-                    id=video_item["id"],
-                    channel=channel,
-                    title=video_item["snippet"]["title"],
-                    publication=video_item["snippet"]["publishedAt"],
-                    thumbnail=select_thumbnail(video_item),
+                    video.save()
+                playlist_membership = models.PlaylistMembership.objects.create(
+                    playlist=playlist,
+                    video=video,
                 )
-                video.save()
-            playlist_membership = models.PlaylistMembership.objects.create(
-                playlist=playlist,
-                video=video,
-            )
-            playlist_membership.save()
+                playlist_membership.save()
 
 
 def clear_old_videos(older_than=2592000):
