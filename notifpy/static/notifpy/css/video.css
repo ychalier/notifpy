@@ -24,6 +24,10 @@
     justify-content: space-around;
 }
 
+.gallery--list .video img {
+    max-width: 261px;
+}
+
 .gallery--list .video>*:nth-child(2) {
     width: 100%;
 }
