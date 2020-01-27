@@ -124,6 +124,7 @@ class Operator:
             )
             stream["game"] = self.get_twitch_game(stream["game_id"])
             results.append(stream)
+        results.sort(key=lambda x: -x["viewer_count"])
         return results
 
     def subscribe_to_channels(self, main_query):
