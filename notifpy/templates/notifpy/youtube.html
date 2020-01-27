@@ -15,9 +15,7 @@
 {% for playlist in playlists %}
 <div class="playlist">
     <div class="playlist__header">
-        <a href="{% url 'notifpy:playlist' slug=playlist.slug %}">
-            <h3>{{ playlist.title }}</h3>
-        </a>
+        <a href="{% url 'notifpy:playlist' slug=playlist.slug %}"><h3>{{ playlist.title }}</h3></a>
         <a href="{% url 'notifpy:edit_playlist' slug=playlist.slug %}"><img class="playlist__icon" src="{% static 'notifpy/icons/gear.svg' %}" /></a>
         <a href="{{playlist.url_ranked}}"><img class="playlist__icon" src="{% static 'notifpy/icons/play.svg' %}" /></a>
         <a href="{{playlist.url_shuffled}}"><img class="playlist__icon" src="{% static 'notifpy/icons/random.svg' %}" /></a>
@@ -26,9 +24,7 @@
         {% if playlist.videos.all %}
         {% for video in playlist.videos.all %}
         <div class="video">
-            <a href="https://www.youtube.com/watch?v={{ video.id }}">
-                <img class="video__thumbnail" src="{{ video.thumbnail }}" />
-            </a>
+            <a href="https://www.youtube.com/watch?v={{ video.id }}"><img class="video__thumbnail" src="{{ video.thumbnail }}" /></a>
             <p class="video__title">
                 <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title | safe }}</a>
             </p>

@@ -18,20 +18,14 @@
             <img class="stream__game" src="{{stream.game.thumbnail}}" alt={{stream.game.name}} />
         </a>
         <p class="video__title">
-            <a href="{{stream.user.link}}">
-                {{ stream.user_name | safe }}
-            </a>
+            <a href="{{stream.user.link}}">{{ stream.user_name | safe }}</a>
             {% if stream.game %}
             &middot;
-            <a href="https://www.twitch.tv/directory/game/{{stream.game.name}}">
-                {{ stream.game.name | safe }}
-            </a>
+            <a href="https://www.twitch.tv/directory/game/{{stream.game.name}}">{{ stream.game.name | safe }}</a>
             {% endif %}
         </p>
         <p class="video__description">
-            <a href="{{stream.user.link}}">
-                {{ stream.title | safe }}
-            </a>
+            <a href="{{stream.user.link}}">{{ stream.title | safe }}</a>
             &middot;
             {{ stream.viewer_count }}
         </p>
