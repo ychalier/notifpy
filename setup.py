@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-notifpy',
-    version='0.7',
+    version='0.8',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
@@ -31,7 +31,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
     install_requires=[
-        "Django",
-        "requests"
+        "Django==3.0.2",
+        "requests==2.21.0"
     ]
 )
