@@ -32,6 +32,10 @@ setup(
     ],
     install_requires=[
         "Django==3.0.2",
-        "requests==2.21.0"
+        "requests==2.21.0",
+        "django-visitors"
+    ],
+    dependency_links=[
+        "https://packages.chalier.fr/"
     ]
 )

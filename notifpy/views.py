@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.urls import reverse
+from visitors.monitor_visitors import monitor_visitors
 from . import operator
 from . import models
 from . import forms
@@ -22,6 +23,7 @@ def inform(request, title=None, input_msg=None, output_msg=None, next_page=None)
     })
 
 
+@monitor_visitors
 def abstract(request):
     """View with abstract of the application"""
     return render(request, "notifpy/abstract.html", {})
