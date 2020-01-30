@@ -1,18 +1,22 @@
 let images = document.querySelectorAll("img.video__thumbnail");
-for (let i = 0; i < images.length; i++) {
-    images[i].onload = function() {
-        if (images[i].naturalWidth == 120) {
-            images[i].src = images[i].src.replace("maxresdefault", "mqdefault");
-        } else if (images[i].naturalWidth == 320) {
-            let target = images[i];
-            let maxres = target.src.replace("mqdefault", "maxresdefault");
-            let dummy = new Image;
-            dummy.onload = function() {
-                if (dummy.width != 120) {
-                    target.src = dummy.src;
+
+function set_thumbnail_source(target) {
+    let dummy = new Image;
+    dummy.onload = function() {
+        if (dummy.width != 120) {
+            target.src = dummy.src;
+        } else {
+            let alt_dummy = new Image;
+            alt_dummy.onload = function() {
+                if (alt_dummy.width != 120) {
+                    target.src = alt_dummy.src;
                 }
             }
-            dummy.src = maxres;
+            alt_dummy.src = target.getAttribute("true_src").replace("maxresdefault", "mqdefault");
         }
     }
+    dummy.src = target.getAttribute("true_src").replace("mqdefault", "maxresdefault");
+}
+for (let i = 0; i < images.length; i++) {
+    set_thumbnail_source(images[i]);
 }

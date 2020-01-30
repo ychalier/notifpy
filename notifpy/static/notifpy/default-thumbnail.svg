@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="160" height="90">
+    <rect width="160" height="90" style="fill: #202020" />
+    <rect x="48" y="25" width="64" height="40" rx="4" ry="4" style="fill: #333" />
+    <circle cx="80" cy="45" r="4" style="fill: #202020" />
+    <circle cx="68" cy="45" r="4" style="fill: #202020" />
+    <circle cx="92" cy="45" r="4" style="fill: #202020" />
+</svg>

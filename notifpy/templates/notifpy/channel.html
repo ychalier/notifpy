@@ -49,7 +49,7 @@
     {% for video in videos %}
     <div class="video">
         <a href="https://www.youtube.com/watch?v={{ video.id }}">
-            <img class="video__thumbnail" src="{{ video.thumbnail }}" />
+            <img class="video__thumbnail" src="{% static 'notifpy/default-thumbnail.svg' %}" true_src="{{ video.thumbnail }}" />
         </a>
         <p class="video__title">
             <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title | safe }}</a>
