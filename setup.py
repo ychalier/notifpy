@@ -31,7 +31,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
     install_requires=[
-        "Django==3.0.2",
+        "Django==3.0.3",
         "requests==2.21.0",
         "django-visitors"
     ],
