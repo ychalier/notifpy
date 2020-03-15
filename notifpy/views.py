@@ -59,7 +59,8 @@ def twitch_streams_api(_):
                 "thumb": user.thumbnail(),
                 "name": stream["user_name"],
                 "game": stream["game"].name,
-                "title": stream["title"]
+                "title": stream["title"],
+                "screen": stream["thumbnail"],
             })
     return HttpResponse(json.dumps(body), content_type="application/json")
 

@@ -13,10 +13,13 @@ request.onload = function() {
         streamList.innerHTML = "";
         for (let i = 0; i < data.length; i++) {
             let clone = document.importNode(template.content, true);
-            clone.querySelector(".image-link").href = data[i].link;
+            clone.querySelector(".image-link").href = data[i].lnk;
             clone.querySelector(".channel__thumbnail").src = data[i].thumb;
             clone.querySelector(".channel__thumbnail").alt = data[i].name;
-            clone.querySelector(".tooltip__text").textContent = data[i].game + " • " + data[i].title;
+            clone.querySelector(".tooltip__user").textContent = data[i].name;
+            clone.querySelector(".tooltip__game").textContent = data[i].game;
+            clone.querySelector(".tooltip__title").textContent = data[i].title;
+            clone.querySelector(".tooltip__screen").src = data[i].screen;
             streamList.appendChild(clone);
         }
     }

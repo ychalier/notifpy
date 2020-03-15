@@ -129,8 +129,8 @@ class Operator:
             stream["user"] = models.TwitchUser.objects.get(
                 id=stream["user_id"])
             stream["thumbnail"] = stream["thumbnail_url"].format(
-                width=800,
-                height=450
+                width=320,  # width=800,
+                height=180  # height=450
             )
             stream["game"] = self.get_twitch_game(stream["game_id"])
             results.append(stream)
