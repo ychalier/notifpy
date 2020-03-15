@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="{% static 'notifpy/css/forms.css' %}" />
     <link rel="stylesheet" href="{% static 'notifpy/css/playlist.css' %}" />
     <link rel="stylesheet" href="{% static 'notifpy/css/responsive.css' %}" />
+    {% block head %}
+    {% endblock head %}
 </head>
 
 <body>
@@ -28,14 +30,11 @@
             <nav class="header__nav navbar">
                 <a href="{% url 'notifpy:abstract' %}" class="header__title">Notifpy</a>
                 {% if request.user.is_authenticated %}
+                <span class="hide_on_small">&middot;</span>
                 <a href="{% url 'notifpy:home' %}">Home</a>
-                <a href="{% url 'notifpy:youtube' %}">YouTube</a>
-                <a href="{% url 'notifpy:twitch' %}">Twitch</a>
+                <a href="{% url 'notifpy:home' %}">Playlists</a>
                 <span class="hide_on_small">&middot;</span>
                 <a href="{% url 'notifpy:settings' %}">Settings</a>
-                <a class="hide_on_small" href="{% url 'notifpy:manage_endpoints' %}">Endpoints</a>
-                <span class="hide_on_small">&middot;</span>
-                <a class="hide_on_small" href="{% url 'admin:index' %}">Admin</a>
                 {% endif %}
             </nav>
         </header>

@@ -113,8 +113,18 @@ def settings(request):
         "medium": " ".join(map(str, schedule["1"])),
         "high": " ".join(map(str, schedule["2"]))
     }
+    channels = models.YoutubeChannel.objects\
+        .exclude(priority=models.YoutubeChannel.PRIORITY_NONE)\
+        .order_by("slug")
+    users = models.TwitchUser.objects\
+        .all()\
+        .extra(select={'lower_name': 'lower(display_name)'})\
+        .order_by("lower_name")
     return render(request, "notifpy/settings.html", {
-        "current_schedule": current_schedule
+        "current_schedule": current_schedule,
+        "operator": operator.Operator(),
+        "channels": channels,
+        "users": users,
     })
 
 
