@@ -32,4 +32,5 @@ urlpatterns = [
     path("settings", views.settings, name="settings"),
     path("edit-schedule", views.edit_schedule, name="edit_schedule"),
     path("clear", views.clear_old_videos, name="clear_old_videos"),
+    path("twitch-api", views.twitch_streams_api, name="twitch_streams_api"),
 ]

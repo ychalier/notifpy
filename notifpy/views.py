@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.urls import reverse
+from django.http import HttpResponse
 from visitors.monitor_visitors import monitor_visitors
 from . import operator
 from . import models
@@ -40,16 +41,27 @@ def home(request):
         .order_by("-" + order)
     paginator = Paginator(video_list, page_size)
     videos = paginator.get_page(page)
+    return render(request, "notifpy/home.html", {
+        "videos": videos,
+    })
+
+
+def twitch_streams_api(_):
+    """View that simply returns a JSON from Twitch endpoint"""
+    body = list()
     twitch_users = models.TwitchUser.objects.all()
     streams = operator.Operator().get_streams()
     if streams is not None:
         for stream in streams:
             user = twitch_users.get(id=stream["user_id"])
-            stream["user"] = user
-    return render(request, "notifpy/home.html", {
-        "videos": videos,
-        "streams": streams,
-    })
+            body.append({
+                "lnk": user.link(),
+                "thumb": user.thumbnail(),
+                "name": stream["user_name"],
+                "game": stream["game"].name,
+                "title": stream["title"]
+            })
+    return HttpResponse(json.dumps(body), content_type="application/json")
 
 
 @login_required

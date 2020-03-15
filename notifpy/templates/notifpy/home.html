@@ -2,20 +2,15 @@
 {% load static %}
 
 {% block body %}
-<div class="channel-banner">
-    {% if streams %}
-    {% for stream in streams %}
-    <a class="image-link tooltip" href="{{stream.user.link}}">
-        <img class="channel__thumbnail" src="{{stream.user.thumbnail}}" alt={{stream.user_name}} />
-        {% if stream.game %}
-        <span class="tooltip__text">{{stream.game.name}}</span>
-        {% endif %}
+
+<template id="template--stream">
+    <a class="image-link tooltip">
+        <img class="channel__thumbnail" />
+        <span class="tooltip__text"></span>
     </a>
-    {% endfor %}
-    {% else %}
-    <p>No Twitch live on.</p>
-    {% endif %}
-</div>
+</template>
+
+<div id="stream_list" class="channel-banner"></div>
 
 {% if videos %}
 <div class="gallery">
@@ -53,5 +48,13 @@
 {% else %}
 <p>No videos to show.</p>
 {% endif %}
+
+<script type="text/javascript">
+    var STREAMS_ROUTE = "{% url 'notifpy:twitch_streams_api' %}";
+</script>
+
+<script type="text/javascript" src="{% static 'notifpy/js/streams.js' %}">
+
+</script>
 
 {% endblock %}
