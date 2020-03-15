@@ -32,7 +32,7 @@
                 {% if request.user.is_authenticated %}
                 <span class="hide_on_small">&middot;</span>
                 <a href="{% url 'notifpy:home' %}">Home</a>
-                <a href="{% url 'notifpy:home' %}">Playlists</a>
+                <a href="{% url 'notifpy:playlists' %}">Playlists</a>
                 <span class="hide_on_small">&middot;</span>
                 <a href="{% url 'notifpy:settings' %}">Settings</a>
                 {% endif %}

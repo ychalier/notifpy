@@ -340,6 +340,15 @@ def youtube(request):
 
 
 @login_required
+def view_playlists(request):
+    """View playlists"""
+    playlists = models.Playlist.objects.all()
+    return render(request, "notifpy/playlists.html", {
+        "playlists": playlists,
+    })
+
+
+@login_required
 def edit_schedule(request):
     """Edit automatic updates schedule"""
     if request.method == "POST":
