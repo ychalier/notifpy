@@ -76,13 +76,14 @@
                 <label for="input--low">Low</label>
                 <input class="setting__el__border--first" id="input--low" type="text" name="low" value="{{current_schedule.low}}" />
             </div>
+            {% csrf_token %}
             <div class="setting__el--inline__item labeled_input">
                 <label for="input--medium">Medium</label>
                 <input id="input--medium" type="text" name="medium" value="{{current_schedule.medium}}" />
             </div>
             <div class="setting__el--inline__item labeled_input">
                 <label for="input--high">High</label>
-                <input id="input--high" type="text" name="low" value="{{current_schedule.high}}" />
+                <input id="input--high" type="text" name="high" value="{{current_schedule.high}}" />
             </div>
             <div class="setting__el--inline__item labeled_input setting__el--inline__item--submit">
                 <label></label>
