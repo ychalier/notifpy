@@ -1,4 +1,4 @@
-.gallery {
+.gallery--grid {
     max-width: 100%;
     display: flex;
     flex-direction: row;
@@ -6,34 +6,79 @@
     flex-wrap: wrap;
 }
 
-.gallery--list {}
+.gallery--list {
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.gallery--grid .video {
+    margin-bottom: 16px;
+}
 
 .gallery--list .video {
     width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: flex-start;
+    margin-bottom: 8px;
 }
 
-.gallery--list .video img {
-    max-width: 261px;
-}
-
-.gallery--list .video>*:nth-child(2) {
+.gallery--edit .video {
     width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
 }
 
-.gallery--list .video>* {
-    margin-right: 8px;
+.gallery--list .video__thumbnail, .gallery--edit .video__thumbnail, .gallery--list .video__thumbnail img, .gallery--edit .video__thumbnail img {
+    margin-right: 16px;
+    width: 160px;
+    height: 90px;
 }
 
-.gallery--list .video>*:last-child {
-    margin-right: 0;
+.gallery--edit__elt {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 8px;
 }
 
 .video {
     width: 392px;
-    padding-bottom: 16px;
+}
+
+.video__thumbnail {
+    display: block;
+    position: relative;
+}
+
+.video__thumbnail__background, .video__thumbnail__foreground {
+    width: 100%;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, .2);
+}
+
+.video__thumbnail__foreground {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: .2s ease;
+}
+
+.video__link {
+    display: block;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.video__thumbnail__foreground--shown {
+    opacity: 1;
 }
 
 .video__title {
@@ -51,29 +96,6 @@
     margin-bottom: 8px;
     font-size: 14px;
     color: lightgrey;
-}
-
-.video__thumbnail {
-    width: 100%;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, .2);
-}
-
-.video__thumbnail__wrapper {
-    display: block;
-    position: relative;
-}
-
-.video__thumbnail__overlay {
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    transition: .2s ease;
-}
-
-.video__thumbnail__overlay--shown {
-    opacity: 1;
 }
 
 .stream {

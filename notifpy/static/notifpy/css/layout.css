@@ -150,14 +150,22 @@ a:hover {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    font-size: 14px;
+    margin-right: 8px;
 }
 
-.vertical_command_pannel>* {
-    margin-bottom: 4px;
+.vertical_command_pannel > form > input {
+    margin: 0;
+    border-radius: 0;
+    padding: 4px;
 }
 
-.vertical_command_pannel>*:last-child {
-    margin-bottom: 0;
+.vertical_command_pannel > form:first-child > input {
+    border-radius: 4px 4px 0 0;
+}
+
+.vertical_command_pannel > form:last-child > input {
+    border-radius: 0 0 4px 4px;
 }
 
 .vertical_command_pannel input {

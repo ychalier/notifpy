@@ -9,11 +9,10 @@
     <a class="command__button" href="{% url 'notifpy:delete_playlist' slug=playlist.slug %}">Delete</a>
 </div>
 <h2>Edit videos</h2>
-<div class="gallery--list">
+<div class="gallery--edit">
     {% if playlist.videos.all %}
     {% for entry in playlist.get_videos %}
-    <div class="relative">
-        {% include "notifpy/video.html" with video=entry.video %}
+    <div class="gallery--edit__elt">
         <div class="vertical_command_pannel">
             {% if not forloop.first %}
             <form method="get" action="{% url 'notifpy:move_playlist' slug=playlist.slug order=entry.order direction="up"%}">
@@ -24,7 +23,7 @@
             <form method="post" action="{% url 'notifpy:remove_playlist' slug=playlist.slug %}">
                 <input hidden name="id" value="{{entry.video.id}}" />
                 {% csrf_token %}
-                <input class="command__button" type="submit" value="Delete" />
+                <input class="command__button" type="submit" value="Remove" />
             </form>
             {% if not forloop.last %}
             <form method="get" action="{% url 'notifpy:move_playlist' slug=playlist.slug order=entry.order direction="down"%}">
@@ -33,6 +32,7 @@
             </form>
             {% endif %}
         </div>
+        {% include "notifpy/video.html" with video=entry.video %}
     </div>
     {% endfor %}
     {% else %}

@@ -21,7 +21,7 @@
 
 <h2>Last videos</h2>
 {% if videos %}
-<div class="gallery">
+<div class="gallery--grid">
     {% for video in videos %}
     {% include "notifpy/video.html" %}
     {% endfor %}

@@ -8,8 +8,8 @@
 <div class="command-panel">
     <a class="command__button" href="{% url 'notifpy:edit_playlist' slug=playlist.slug %}">Edit</a>
     <a class="command__button" href="{% url 'notifpy:delete_playlist' slug=playlist.slug %}">Delete</a>
-    <a href="{{playlist.url_ranked}}"><img class="playlist__icon" src="{% static 'notifpy/icons/play.svg' %}" /></a>
-    <a href="{{playlist.url_shuffled}}"><img class="playlist__icon" src="{% static 'notifpy/icons/random.svg' %}" /></a>
+    <a class="command__button" href="{{playlist.url_ranked}}">Ordered Play</a>
+    <a class="command__button" href="{{playlist.url_shuffled}}">Shuffled Play</a>
 </div>
 <br>
 <div class="gallery--list">

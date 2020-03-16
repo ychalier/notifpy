@@ -1,6 +1,6 @@
 console.log("Echo from thumbnail.js");
 
-let images = document.querySelectorAll("img.video__thumbnail");
+let images = document.querySelectorAll("img.video__thumbnail__background");
 
 function set_thumbnail_source(target) {
     let dummy = new Image;
@@ -10,10 +10,10 @@ function set_thumbnail_source(target) {
             // console.log(parent);
             let newNode = document.createElement("img");
             newNode.src = dummy.src;
-            newNode.className = "video__thumbnail__overlay";
+            newNode.className = "video__thumbnail__foreground";
             parent.appendChild(newNode);
             setTimeout(() => {
-                newNode.classList.add("video__thumbnail__overlay--shown");
+                newNode.classList.add("video__thumbnail__foreground--shown");
             }, 100);
         } else {
             let alt_dummy = new Image;
