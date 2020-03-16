@@ -13,7 +13,9 @@
     {% if playlist.videos.all %}
     {% for entry in playlist.get_videos %}
     <div class="video relative">
-        <img class="video__thumbnail" src="{% static 'notifpy/default-thumbnail.svg' %}" true_src="{{ video.thumbnail }}" />
+        <div class="video__thumbnail__wrapper">
+            <img class="video__thumbnail" src="{% static 'notifpy/default-thumbnail.svg' %}" true_src="{{ entry.video.thumbnail }}" />
+        </div>
         <div class="video__info">
             <p class="video__title">{{ entry.video.title | safe }}</p>
             <p class="video__description">
