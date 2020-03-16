@@ -14,7 +14,6 @@
 <div class="playlist">
     <div class="playlist__header">
         <a href="{% url 'notifpy:playlist' slug=playlist.slug %}"><h3>{{ playlist.title }}</h3></a>
-        <a href="{% url 'notifpy:edit_playlist' slug=playlist.slug %}"><img class="playlist__icon" src="{% static 'notifpy/icons/gear.svg' %}" /></a>
         <a href="{{playlist.url_ranked}}"><img class="playlist__icon" src="{% static 'notifpy/icons/play.svg' %}" /></a>
         <a href="{{playlist.url_shuffled}}"><img class="playlist__icon" src="{% static 'notifpy/icons/random.svg' %}" /></a>
     </div>

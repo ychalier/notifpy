@@ -5,20 +5,76 @@
 
 {% block body %}
 <h1>{{playlist.title}}</h1>
-<div class="command-panel">
-    <a class="command__button" href="{% url 'notifpy:edit_playlist' slug=playlist.slug %}">Edit</a>
-    <a class="command__button" href="{% url 'notifpy:delete_playlist' slug=playlist.slug %}">Delete</a>
+
+<p class="command-panel">
+    <!--<a class="command__button" href="{% url 'notifpy:edit_playlist' slug=playlist.slug %}">Edit</a>
+    <a class="command__button" href="{% url 'notifpy:delete_playlist' slug=playlist.slug %}">Delete</a>-->
     <a class="command__button" href="{{playlist.url_ranked}}">Ordered Play</a>
     <a class="command__button" href="{{playlist.url_shuffled}}">Shuffled Play</a>
-</div>
-<br>
-<div class="gallery--list">
+</p>
+
+<div class="gallery--edit">
     {% if playlist.videos.all %}
     {% for entry in playlist.get_videos %}
-    {% include "notifpy/video.html" with video=entry.video %}
+    <div class="gallery--edit__elt">
+        <div class="vertical_command_pannel">
+            {% if not forloop.first %}
+            <form method="get" action="{% url 'notifpy:move_playlist' slug=playlist.slug order=entry.order direction="up"%}">
+                {% csrf_token %}
+                <input class="command__button" type="submit" value="&uarr;" />
+            </form>
+            {% endif %}
+            <form method="post" action="{% url 'notifpy:remove_playlist' slug=playlist.slug %}">
+                <input hidden name="id" value="{{entry.video.id}}" />
+                {% csrf_token %}
+                <input class="command__button" type="submit" value="&#10005;" />
+            </form>
+            {% if not forloop.last %}
+            <form method="get" action="{% url 'notifpy:move_playlist' slug=playlist.slug order=entry.order direction="down"%}">
+                {% csrf_token %}
+                <input class="command__button" type="submit" value="&darr;" />
+            </form>
+            {% endif %}
+        </div>
+        {% include "notifpy/video.html" with video=entry.video %}
+    </div>
     {% endfor %}
     {% else %}
     <p>No video in this playlist.</p>
     {% endif %}
 </div>
+
+<h2>Settings</h2>
+
+<p class="command-panel">
+    <a class="command__button" href="{% url 'notifpy:delete_playlist' slug=playlist.slug %}">Delete the playlist</a>
+</p>
+
+<div class="setting">
+    <div class="setting__title">Title</div>
+    <div class="setting__body">
+        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:edit_playlist' slug=playlist.slug %}" method="POST">
+            <input class="setting__el--inline__item setting__el__border--first" type="text" name="title" value="{{playlist.title}}" placeholder="Title" />
+            {% csrf_token %}
+            <input class="setting__el--inline__item setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Save" />
+        </form>
+    </div>
+</div>
+
+<div class="setting">
+    <div class="setting__title">Add a video</div>
+    <div class="setting__body">
+        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:add_playlist' slug=playlist.slug %}" method="POST">
+            <textarea class="setting__el--inline__item setting__el__border--first" name="video" rows="8" ></textarea>
+            {% csrf_token %}
+            <input class="setting__el--inline__item setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Add" />
+        </form>
+        <p class="setting__el--hint">
+            Write one entry, either a full link or a sole video id, per line.
+        </p>
+    </div>
+</div>
+
+<br>
+
 {% endblock %}

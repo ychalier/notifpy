@@ -10,7 +10,11 @@
 </div>
 
 <div>
+    {% if channel.last_update %}
     Last update on {{channel.last_update}}
+    {% else %}
+    This channel has never been updated.
+    {% endif %}
 </div>
 
 <h2>Last videos</h2>
@@ -70,7 +74,7 @@
             If a channel has at least one filter, then its filters form a set
             of rules to whitelist a video for future channel updates.
         </p>
-        <form class="setting__el--inline setting__el--inline--fixed_height" method="post" action="{% url 'notifpy:create_filter' %}" class="form--table">
+        <form class="setting__el--inline setting__el--inline--fixed_height" method="post" action="{% url 'notifpy:create_filter' %}">
             <textarea class="setting__el__border--first setting__el--inline__item" name="regexes" rows="8" placeholder="Filters"></textarea>
             {% csrf_token %}
             <input hidden name="channel" value={{channel.id}} />
@@ -93,7 +97,7 @@
             <label>{{filter.regex}}</label>
             {% csrf_token %}
             <input hidden name="id" value="{{filter.id}}" />
-            <input type="submit" value="X" />
+            <input type="submit" value="&#10005;" />
         </form>
         <div class="vspace"></div>
         {% endfor %}

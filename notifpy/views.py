@@ -244,7 +244,7 @@ def view_playlist(request, slug):
         return redirect("notifpy:playlists")
     playlist = models.Playlist.objects.get(slug=slug)
     return render(request, "notifpy/playlist.html", {
-        "playlist": playlist
+        "playlist": playlist,
     })
 
 
@@ -255,12 +255,10 @@ def edit_playlist(request, slug):
         return redirect("notifpy:playlists")
     playlist = models.Playlist.objects.get(slug=slug)
     if request.method == "POST":
-        form = forms.PlaylistForm(request.POST, instance=playlist)
-        if form.is_valid():
-            playlist = form.save()
-            return redirect("notifpy:playlists")
-    form = forms.PlaylistForm(instance=playlist)
-    return render(request, "notifpy/edit_playlist.html", locals())
+        title = request.POST["title"]
+        playlist.title = title
+        playlist.save()
+    return redirect("notifpy:playlist", slug=playlist.slug)
 
 
 @login_required
@@ -271,7 +269,7 @@ def add_playlist(request, slug):
     playlist = models.Playlist.objects.get(slug=slug)
     if request.method == "POST":
         operator.Operator().add_video_to_playlist(playlist, request.POST.get("video", ""))
-    return redirect("notifpy:edit_playlist", slug=slug)
+    return redirect("notifpy:playlist", slug=playlist.slug)
 
 
 @login_required
@@ -285,7 +283,7 @@ def remove_playlist(request, slug):
         playlist.videos.remove(video)
         playlist.save()
         playlist.shift_orders()
-    return redirect("notifpy:edit_playlist", slug=slug)
+    return redirect("notifpy:playlist", slug=playlist.slug)
 
 
 @login_required
@@ -316,7 +314,7 @@ def move_playlist(_, slug, order, direction):
     ref.save()
     new.order = int(order)
     new.save()
-    return redirect("notifpy:edit_playlist", slug=slug)
+    return redirect("notifpy:playlist", slug=playlist.slug)
 
 
 @login_required
