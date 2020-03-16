@@ -172,12 +172,12 @@ def edit_channel(request, slug):
         return redirect("notifpy:home")
     channel = models.YoutubeChannel.objects.get(slug=slug)
     if request.method == "POST":
-        form = forms.YoutubeChannelForm(request.POST, instance=channel)
-        if form.is_valid():
-            channel = form.save()
-            return redirect("notifpy:channel", slug=slug)
-    form = forms.YoutubeChannelForm(instance=channel)
-    return render(request, "notifpy/edit_channel.html", locals())
+        if "thumbnail" in request.POST:
+            channel.thumbnail = request.POST["thumbnail"]
+        if "priority" in request.POST:
+            channel.priority = request.POST["priority"]
+        channel.save()
+    return redirect("notifpy:channel", slug=slug)
 
 
 @login_required
@@ -200,7 +200,7 @@ def create_filter(request):
                 regex=re.sub("\r", "", regex)
             )
             filters.save()
-        return redirect("notifpy:edit_channel", slug=channel.slug)
+        return redirect("notifpy:channel", slug=channel.slug)
     return redirect("notifpy:home")
 
 
@@ -211,7 +211,7 @@ def delete_filter(request):
         filters = models.Filter.objects.get(id=request.POST["id"])
         slug = filters.channel.slug
         filters.delete()
-        return redirect("notifpy:edit_channel", slug=slug)
+        return redirect("notifpy:channel", slug=slug)
     return redirect("notifpy:home")
 
 

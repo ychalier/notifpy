@@ -13,13 +13,8 @@
     Last update on {{channel.last_update}}
 </div>
 
-<div class="command-panel">
-    <a class="command__button" href="{% url 'notifpy:edit_channel' slug=channel.slug %}">Edit</a>
-    <a class="command__button" href="{% url 'notifpy:delete_channel' slug=channel.slug %}">Delete</a>
-    <a class="command__button" href="{% url 'notifpy:update_channel' slug=channel.slug %}">Update</a>
-</div>
-
 <h2>Last videos</h2>
+
 {% if videos %}
 <div class="gallery--grid">
     {% for video in videos %}
@@ -29,4 +24,87 @@
 {% else %}
 <p>No video found for this channel.</p>
 {% endif %}
+
+<h2>Settings</h2>
+
+
+<p class="command-panel">
+    <a class="command__button" href="{% url 'notifpy:delete_channel' slug=channel.slug %}">Delete</a>
+    <a class="command__button" href="{% url 'notifpy:update_channel' slug=channel.slug %}">Update</a>
+</p>
+
+
+<div class="setting">
+    <div class="setting__title">
+        Channel properties
+    </div>
+    <form class="setting__el--inline" action="{% url 'notifpy:edit_channel' slug=channel.slug %}" method="post">
+        <div class="setting__el--inline__item labeled_input">
+            <label for="">Thumbnail</label>
+            <input  class="setting__el__border--first" type="text" name="thumbnail" value="{{channel.thumbnail}}" placeholder="URL to image file">
+        </div>
+        {% csrf_token %}
+        <div class="setting__el--inline__item labeled_input" style="flex: 0 0 120px">
+            <label for="">Priority</label>
+            <select name="priority">
+                <option value="-1" {% if channel.priority == -1 %}selected=""{%endif%}>None</option>
+                <option value="0" {% if channel.priority == 0 %}selected=""{%endif%}>Low</option>
+                <option value="1" {% if channel.priority == 1 %}selected=""{%endif%}>Medium</option>
+                <option value="2" {% if channel.priority == 2 %}selected=""{%endif%}>High</option>
+            </select>
+        </div>
+        <div class="setting__el--inline__item labeled_input setting__el--inline__item--submit">
+            <label></label>
+            <input class="setting__el__border--last" type="submit" value="Save" />
+        </div>
+    </form>
+</div>
+
+<div class="setting">
+    <div class="setting__title">
+        Add a filter
+    </div>
+    <div class="setting__body">
+        <p class="setting__el--hint">
+            Filters are regular expressions that are matched to video titles.
+            If a channel has at least one filter, then its filters form a set
+            of rules to whitelist a video for future channel updates.
+        </p>
+        <form class="setting__el--inline setting__el--inline--fixed_height" method="post" action="{% url 'notifpy:create_filter' %}" class="form--table">
+            <textarea class="setting__el__border--first setting__el--inline__item" name="regexes" rows="8" placeholder="Filters"></textarea>
+            {% csrf_token %}
+            <input hidden name="channel" value={{channel.id}} />
+            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Add" />
+        </form>
+        <p class="setting__el--hint">
+            Write one filter per line.
+        </p>
+    </div>
+</div>
+
+<div class="setting">
+    <div class="setting__title">
+        Current filters
+    </div>
+    <div class="setting__body grid">
+        {% if channel.filter_set.all %}
+        {% for filter in channel.filter_set.all %}
+        <form method="post" action="{% url 'notifpy:delete_filter' %}" class="form--filter">
+            <label>{{filter.regex}}</label>
+            {% csrf_token %}
+            <input hidden name="id" value="{{filter.id}}" />
+            <input type="submit" value="X" />
+        </form>
+        <div class="vspace"></div>
+        {% endfor %}
+        {% else %}
+        <p class="setting__el--hint">
+            No filter found for this channel.
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+
+
 {% endblock %}

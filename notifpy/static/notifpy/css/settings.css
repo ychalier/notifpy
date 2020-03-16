@@ -71,6 +71,7 @@
     display: block;
 }
 
-.labeled_input input {
+.labeled_input input, .labeled_input select {
     display: block;
+    height: 37px;
 }
