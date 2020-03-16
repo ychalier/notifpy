@@ -16,7 +16,7 @@ function appendStream(data, i) {
     icon.onload = function () {
         loaded++;
         if (loaded === data.length) {
-            streamList.classList.add("channel-banner--expanded");
+            streamList.classList.add("stream_banner--expanded");
         }
     }
     clone.querySelector(".image-link").href = data[i].lnk;
@@ -35,6 +35,9 @@ request.onload = function() {
         for (let i = 0; i < data.length; i++) {
             appendStream(data, i);
         }
+        setTimeout(() => {
+            streamList.classList.add("stream_banner--expanded");
+        }, 1000);
     }
 }
 

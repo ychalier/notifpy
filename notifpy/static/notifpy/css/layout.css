@@ -204,28 +204,29 @@ a:hover {
     background-color: white;
 }
 
-.channel-banner {
+.stream_banner {
     margin: 8px 0 8px 0;
     flex-wrap: wrap;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     transition: .2s ease;
-    height: 0;
+    max-height: 0;
     opacity: 0;
 }
 
-.channel-banner--expanded {
-    height: auto;
+
+.stream_banner--expanded {
+    max-height: 150px;
     margin: 20px 0 20px 0;
     opacity: 1;
 }
 
-.channel-banner>* {
+.stream_banner>* {
     margin-right: 9px;
 }
 
-.channel-banner>*:last-child {
+.stream_banner>*:last-child {
     margin-right: 0;
 }
 
