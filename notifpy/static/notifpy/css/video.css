@@ -6,15 +6,6 @@
     flex-wrap: wrap;
 }
 
-/*
-.gallery > * {
-    margin-right: 8px;
-}
-
-.gallery > *:last-child {
-    margin-right: 0;
-}
-*/
 .gallery--list {}
 
 .gallery--list .video {
@@ -65,6 +56,24 @@
 .video__thumbnail {
     width: 100%;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, .2);
+}
+
+.video__thumbnail__wrapper {
+    display: block;
+    position: relative;
+}
+
+.video__thumbnail__overlay {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    transition: .2s ease;
+}
+
+.video__thumbnail__overlay--shown {
+    opacity: 1;
 }
 
 .stream {

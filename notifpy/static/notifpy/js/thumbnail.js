@@ -1,10 +1,20 @@
+console.log("Echo from thumbnail.js");
+
 let images = document.querySelectorAll("img.video__thumbnail");
 
 function set_thumbnail_source(target) {
     let dummy = new Image;
     dummy.onload = function() {
         if (dummy.width != 120) {
-            target.src = dummy.src;
+            let parent = target.parentNode;
+            // console.log(parent);
+            let newNode = document.createElement("img");
+            newNode.src = dummy.src;
+            newNode.className = "video__thumbnail__overlay";
+            parent.appendChild(newNode);
+            setTimeout(() => {
+                newNode.classList.add("video__thumbnail__overlay--shown");
+            }, 100);
         } else {
             let alt_dummy = new Image;
             alt_dummy.onload = function() {
