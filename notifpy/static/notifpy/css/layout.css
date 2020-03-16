@@ -192,11 +192,20 @@ a:hover {
 }
 
 .channel-banner {
-    margin: 20px 0 20px 0;
+    margin: 8px 0 8px 0;
     flex-wrap: wrap;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    transition: .2s ease;
+    height: 0;
+    opacity: 0;
+}
+
+.channel-banner--expanded {
+    height: 46px;
+    margin: 20px 0 20px 0;
+    opacity: 1;
 }
 
 .channel-banner>* {
