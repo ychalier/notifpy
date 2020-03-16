@@ -19,6 +19,7 @@ function appendStream(data, i) {
             streamList.classList.add("channel-banner--expanded");
         }
     }
+    clone.querySelector(".image-link").href = data[i].lnk;
     clone.querySelector(".tooltip__user").textContent = data[i].name;
     clone.querySelector(".tooltip__game").textContent = data[i].game;
     clone.querySelector(".tooltip__title").textContent = data[i].title;
