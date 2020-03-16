@@ -13,37 +13,6 @@
     Last update on {{channel.last_update}}
 </div>
 
-<!--<table>
-    <tr>
-        <td><b>Channel ID</b></td>
-        <td><a href="https://www.youtube.com/channel/{{channel.id}}/videos">{{channel.id}}</a></td>
-    </tr>
-    <tr>
-        <td><b>Playlist</b></td>
-        <td><a href="https://www.youtube.com/playlist?list={{channel.playlist_id}}">{{channel.playlist_id}}</a></td>
-    </tr>
-    <tr>
-        <td><b>Priority</b></td>
-        <td>{{channel.priority_label}}</td>
-    </tr>
-    <tr>
-        <td><b>Filters</b></td>
-        <td>
-            {% if channel.filter_set.all %}
-            {% for filter in channel.filter_set.all %}
-            <span class="monospace">{{filter.regex}}</span>
-            {% endfor %}
-            {% else %}
-            None
-            {% endif %}
-        </td>
-    </tr>
-    <tr>
-        <td><b>Last update</b></td>
-        <td>{{channel.last_update}}</td>
-    </tr>
-</table>
--->
 <div class="command-panel">
     <a class="command__button" href="{% url 'notifpy:edit_channel' slug=channel.slug %}">Edit</a>
     <a class="command__button" href="{% url 'notifpy:delete_channel' slug=channel.slug %}">Delete</a>
