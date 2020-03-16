@@ -8,7 +8,12 @@
     <img class="channel__thumbnail" src="{{channel.thumbnail}}" />
     <h1>{{channel.title}}</h1>
 </div>
-<table>
+
+<div>
+    Last update on {{channel.last_update}}
+</div>
+
+<!--<table>
     <tr>
         <td><b>Channel ID</b></td>
         <td><a href="https://www.youtube.com/channel/{{channel.id}}/videos">{{channel.id}}</a></td>
@@ -38,11 +43,13 @@
         <td>{{channel.last_update}}</td>
     </tr>
 </table>
+-->
 <div class="command-panel">
     <a class="command__button" href="{% url 'notifpy:edit_channel' slug=channel.slug %}">Edit</a>
     <a class="command__button" href="{% url 'notifpy:delete_channel' slug=channel.slug %}">Delete</a>
     <a class="command__button" href="{% url 'notifpy:update_channel' slug=channel.slug %}">Update</a>
 </div>
+
 <h2>Last videos</h2>
 {% if videos %}
 <div class="gallery">

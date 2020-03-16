@@ -172,17 +172,22 @@ a:hover {
     margin-top: 16px;
 }
 
+.command-panel >* {
+    width: 100%;
+    margin-right: 16px;
+}
+
 .command-panel>*:last-child {
     margin-right: 0;
 }
 
 .command__button {
-    background-color: #3F3F3F;
+    background-color: #202020;
     border-radius: 4px;
     color: white;
     padding: 8px;
-    margin-right: 8px;
-    transition: .2s ease;
+    transition: .1s ease;
+    text-align: center;
 }
 
 .command__button:hover {
@@ -276,19 +281,7 @@ a:hover {
     padding: 0;
 }
 
-.tooltip .tooltip__image {
-    visibility: hidden;
-    width: 144px;
-    padding: 5px 0;
-    border-radius: 6px;
-    position: absolute;
-    z-index: 1;
-    top: 102%;
-    left: 50%;
-    margin-left: -72px;
-}
-
-.tooltip:hover .tooltip__image, .tooltip:hover .tooltip__div {
+.tooltip:hover .tooltip__div {
     visibility: visible;
 }
 

@@ -1,163 +1,163 @@
 {% extends 'notifpy/base.html' %}
 {% load static %}
 
-{% block head %}
-    <link rel="stylesheet" href="{% static 'notifpy/css/settings.css' %}">
-{% endblock head %}
-
 {% block title %}Settings | Notifpy{% endblock%}
 
 {% block body %}
 
 <h1>Settings</h1>
 
-Shortcuts: <a href="#youtube">YouTube</a> or <a href="#twitch">Twitch</a>.
-
-<h2 id="youtube">YouTube</h2>
-
 <div class="setting">
-    <h3>Subscribe to a YouTube channel</h3>
-    <form action="{% url 'notifpy:create_channel' %}" method="POST">
-        {% csrf_token %}
-        <textarea rows="5" name="query" placeholder="Channel entries"></textarea>
-        <input type="submit" value="Subscribe" />
-    </form>
-    <p class="hint">
-        Write one entry, either "channel/*" or "user/*", per line.
-    </p>
-</div>
-
-<div class="setting">
-    <h3>Edit update schedule</h3>
-    <form action="{% url 'notifpy:edit_schedule' %}" method="post">
-        <div class="titled-input">
-            <label class="hint" for="input--low">Low</label>
-            <input id="input--low" type="text" name="low" value="{{current_schedule.low}}" />
-        </div>
-        <div class="titled-input">
-            <label class="hint" for="input--medium">Medium</label>
-            <input id="input--medium" type="text" name="medium" value="{{current_schedule.medium}}" />
-        </div>
-        <div class="titled-input">
-            <label class="hint" for="input--high">High</label>
-            <input id="input--high" type="text" name="low" value="{{current_schedule.high}}" />
-        </div>
-        <div class="titled-input">
-            <label class="hint"> </label>
-            <input type="submit" value="Submit" />
-        </div>
-    </form>
-    <p class="hint">
-        Write space separated update hours for each priority level.
-    </p>
-</div>
-
-<div class="setting">
-    <h3>Force update</h3>
-    <form action="{% url 'notifpy:update' %}" method="POST">
-        {%csrf_token%}
-        <select name="priority" >
-            <option value="0">Low</option>
-            <option value="1" selected="">Medium</option>
-            <option value="2">High</option>
-        </select>
-        <input type="submit" value="Update" />
-    </form>
-</div>
-
-<div class="setting">
-    <h3>Clear old videos</h3>
-    <p class="hint">Delete videos older than:</p>
-    <form action="{% url 'notifpy:clear_old_videos' %}" method="post">
-        {%csrf_token%}
-        <select name="older">
-            <option value="3600">1 hour</option>
-            <option value="86400">1 day</option>
-            <option value="604800">1 week</option>
-            <option value="2592000" selected="">1 month</option>
-            <option value="15552000">6 months</option>
-        </select>
-        <input type="submit" value="Delete" />
-    </form>
-
-</div>
-
-<div class="setting">
-    <h3>Endpoint</h3>
-    <p class="hint">
-        Delivered at
-        {{operator.youtube.oauth_flow.token.delivery_datetime|date:"Y-m-d H:i:s"}}
-        and expires at
-        {{operator.youtube.oauth_flow.token.expiration_datetime|date:"Y-m-d H:i:s"}}.
-    </p>
-    <div class="command__panel">
-        <a class="command__button" href="{{operator.youtube.oauth_flow.get_authorize_url}}">Retrieve Token</a>
-        <a class="command__button" href="{% url 'notifpy:refresh_token' source='youtube' %}">Refresh Token</a>
-        <a class="command__button" href="{% url 'notifpy:revoke_token' source='youtube' %}">Revoke Token</a>
+    <div class="setting__title">Subscribe to a YouTube channel</div>
+    <div class="setting__body">
+        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:create_channel' %}" method="POST">
+            <textarea class="setting__el__border--first setting__el--inline__item" rows="5" name="query" placeholder="Channel entries"></textarea>
+            {% csrf_token %}
+            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Subscribe" />
+        </form>
+        <p class="setting__el--hint">
+            Write one entry, either "channel/*" or "user/*", per line.
+        </p>
     </div>
 </div>
 
 <div class="setting">
-    <h3>Current subscriptions</h3>
-    {% if channels %}
-    <div class="channel_list">
-        {% for channel in channels %}
-        <div class="icon-item">
-            <img class="channel__thumbnail" src="{{channel.thumbnail}}" alt={{channel.title}} />
-            <a href="{% url 'notifpy:channel' slug=channel.slug %}">{{channel.title}}</a>
-            <a href="{% url 'notifpy:delete_channel' slug=channel.slug %}">✕</a>
+    <div class="setting__title">Follow a Twitch user</div>
+    <div class="setting__body">
+        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:create_twitch_user' %}" method="POST">
+            <textarea class="setting__el__border--first setting__el--inline__item" rows="5" name="query" placeholder="User logins"></textarea>
+            {% csrf_token %}
+            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Follow" />
+        </form>
+        <p class="setting__el--hint">
+            Write one user login per line.
+        </p>
+    </div>
+</div>
+
+<div class="setting">
+    <div class="setting__title">Force update</div>
+    <div class="setting__body">
+        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:update' %}" method="POST">
+            <select class="setting__el__border--first setting__el--inline__item" name="priority" >
+                <option value="0">Low</option>
+                <option value="1" selected="">Medium</option>
+                <option value="2">High</option>
+            </select>
+            {%csrf_token%}
+            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Update" />
+        </form>
+    </div>
+</div>
+
+<div class="setting">
+    <div class="setting__title">Clear old videos</div>
+    <div class="setting__body">
+        <p class="setting__el--hint">Delete videos older than:</p>
+        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:clear_old_videos' %}" method="post">
+            <select class="setting__el__border--first setting__el--inline__item" name="older">
+                <option value="3600">1 hour</option>
+                <option value="86400">1 day</option>
+                <option value="604800">1 week</option>
+                <option value="2592000" selected="">1 month</option>
+                <option value="15552000">6 months</option>
+            </select>
+            {%csrf_token%}
+            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Delete" />
+        </form>
+    </div>
+</div>
+
+<div class="setting">
+    <div class="setting__title">Edit update schedule</div>
+    <div class="setting__body">
+        <form class="setting__el--inline" action="{% url 'notifpy:edit_schedule' %}" method="post">
+            <div class="setting__el--inline__item labeled_input">
+                <label for="input--low">Low</label>
+                <input class="setting__el__border--first" id="input--low" type="text" name="low" value="{{current_schedule.low}}" />
+            </div>
+            <div class="setting__el--inline__item labeled_input">
+                <label for="input--medium">Medium</label>
+                <input id="input--medium" type="text" name="medium" value="{{current_schedule.medium}}" />
+            </div>
+            <div class="setting__el--inline__item labeled_input">
+                <label for="input--high">High</label>
+                <input id="input--high" type="text" name="low" value="{{current_schedule.high}}" />
+            </div>
+            <div class="setting__el--inline__item labeled_input setting__el--inline__item--submit">
+                <label></label>
+                <input class="setting__el__border--last" type="submit" value="Save" />
+            </div>
+        </form>
+        <p class="setting__el--hint">
+            Write space separated update hours for each priority level.
+        </p>
+    </div>
+</div>
+
+<div class="setting">
+    <div class="setting__title">YouTube token</div>
+    <div class="setting__body">
+        <p class="setting__el--hint">
+            Delivered at
+            {{operator.youtube.oauth_flow.token.delivery_datetime|date:"Y-m-d H:i:s"}}
+            and expires at
+            {{operator.youtube.oauth_flow.token.expiration_datetime|date:"Y-m-d H:i:s"}}.
+        </p>
+        <div class="setting__el--inline setting__el--inline--fixed_height">
+            <a class="setting__el__border--first setting__el--inline__item command__button" href="{{operator.youtube.oauth_flow.get_authorize_url}}">Retrieve Token</a>
+            <a class="setting__el--inline__item command__button" href="{% url 'notifpy:refresh_token' source='youtube' %}">Refresh Token</a>
+            <a class="setting__el__border--last setting__el--inline__item command__button" href="{% url 'notifpy:revoke_token' source='youtube' %}">Revoke Token</a>
         </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <p>You are not subscribed to any channel.</p>
-    {% endif %}
-</div>
-
-<h2 id="twitch">Twitch</h2>
-
-<div class="setting">
-    <h3>Follow a Twitch user</h3>
-    <form action="{% url 'notifpy:create_twitch_user' %}" method="POST">
-        {% csrf_token %}
-        <textarea rows="5" name="query" placeholder="User logins"></textarea>
-        <input type="submit" value="Follow" />
-    </form>
-    <p class="hint">
-        Write one user login per line.
-    </p>
-</div>
-
-<div class="setting">
-    <h3>Endpoint</h3>
-    <p class="hint">
-        Delivered at
-        {{operator.twitch.oauth_flow.token.delivery_datetime|date:"Y-m-d H:i:s"}}
-        and expires at
-        {{operator.twitch.oauth_flow.token.expiration_datetime|date:"Y-m-d H:i:s"}}.
-    </p>
-    <div class="command__panel">
-        <a class="command__button" href="{{operator.twitch.oauth_flow.get_authorize_url}}">Retrieve Token</a>
-        <a class="command__button" href="{% url 'notifpy:refresh_token' source='twitch' %}">Refresh Token</a>
-        <a class="command__button" href="{% url 'notifpy:revoke_token' source='twitch' %}">Revoke Token</a>
     </div>
 </div>
 
 <div class="setting">
-    <h3>Current follows</h3>
-    {% if users %}
-    <div class="channel_list">
-        {% for user in users %}
-        <div class="icon-item">
-            <img class="channel__thumbnail" src="{{user.thumbnail}}" alt={{user.display_name}} />
-            <a href="{{user.link}}">{{user.display_name}}</a>
-            <a href="{% url 'notifpy:delete_twitch_user' login=user.login%}">✕</a>
+    <div class="setting__title">Twitch token</div>
+    <div class="setting__body">
+        <p class="setting__el--hint">
+            Delivered at
+            {{operator.twitch.oauth_flow.token.delivery_datetime|date:"Y-m-d H:i:s"}}
+            and expires at
+            {{operator.twitch.oauth_flow.token.expiration_datetime|date:"Y-m-d H:i:s"}}.
+        </p>
+        <div class="setting__el--inline setting__el--inline--fixed_height">
+            <a class="setting__el__border--first setting__el--inline__item command__button" href="{{operator.twitch.oauth_flow.get_authorize_url}}">Retrieve Token</a>
+            <a class="setting__el--inline__item command__button" href="{% url 'notifpy:refresh_token' source='twitch' %}">Refresh Token</a>
+            <a class="setting__el__border--last setting__el--inline__item command__button" href="{% url 'notifpy:revoke_token' source='twitch' %}">Revoke Token</a>
         </div>
-        {% endfor %}
     </div>
-    {% else %}
-    <p>You are not following any user.</p>
-    {% endif %}
 </div>
+
+<h3>YouTube subscriptions</h3>
+{% if channels %}
+<div class="channel_list">
+    {% for channel in channels %}
+    <div class="icon-item">
+        <img class="channel__thumbnail" src="{{channel.thumbnail}}" alt={{channel.title}} />
+        <a href="{% url 'notifpy:channel' slug=channel.slug %}">{{channel.title}}</a>
+        <a href="{% url 'notifpy:delete_channel' slug=channel.slug %}">✕</a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>You are not subscribed to any channel.</p>
+{% endif %}
+
+<h3>Twitch follows</h3>
+{% if users %}
+<div class="channel_list">
+    {% for user in users %}
+    <div class="icon-item">
+        <img class="channel__thumbnail" src="{{user.thumbnail}}" alt={{user.display_name}} />
+        <a href="{{user.link}}">{{user.display_name}}</a>
+        <a href="{% url 'notifpy:delete_twitch_user' login=user.login%}">✕</a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>You are not following any user.</p>
+{% endif %}
+
 
 {% endblock body %}
