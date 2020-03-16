@@ -15,19 +15,7 @@
 <div class="gallery--list">
     {% if playlist.videos.all %}
     {% for entry in playlist.get_videos %}
-    <div class="video">
-        <a class="video__thumbnail__wrapper" href="https://www.youtube.com/watch?v={{ entry.video.id }}"><img class="video__thumbnail" src="{% static 'notifpy/default-thumbnail.svg' %}" true_src="{{ entry.video.thumbnail }}" /></a>
-        <div class="video__info">
-            <p class="video__title">
-                <a href="https://www.youtube.com/watch?v={{ entry.video.id }}">{{ entry.video.title | safe }}</a>
-            </p>
-            <p class="video__description">
-                <a href="{% url 'notifpy:channel' slug=entry.video.channel.slug %}">{{ entry.video.channel.title | safe }}</a>
-                &middot;
-                {{ entry.video.time }}
-            </p>
-        </div>
-    </div>
+    {% include "notifpy/video.html" with video=entry.video %}
     {% endfor %}
     {% else %}
     <p>No video in this playlist.</p>
