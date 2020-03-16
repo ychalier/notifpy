@@ -26,7 +26,6 @@ urlpatterns = [
     path("playlists/<slug>/move/<order>/<direction>", views.move_playlist, name="move_playlist"),
     path("create-twitch-user", views.create_twitch_user, name="create_twitch_user"),
     path("twitch-user/<login>/delete", views.delete_twitch_user, name="delete_twitch_user"),
-    path("manage-endpoints", views.manage_endpoints, name="manage_endpoints"),
     path("settings", views.settings, name="settings"),
     path("edit-schedule", views.edit_schedule, name="edit_schedule"),
     path("clear", views.clear_old_videos, name="clear_old_videos"),

@@ -65,14 +65,6 @@ def twitch_streams_api(_):
     return HttpResponse(json.dumps(body), content_type="application/json")
 
 
-@login_required
-def manage_endpoints(request):
-    """View to show information about endpoints"""
-    return render(request, "notifpy/manage_endpoints.html", {
-        "operator": operator.Operator()
-    })
-
-
 def oauth_redirect(request, source):
     """Redirection handling during OAuth flow"""
     opr = operator.Operator()
@@ -80,7 +72,7 @@ def oauth_redirect(request, source):
         opr.youtube.oauth_flow.handle_redirect(request)
     elif source == "twitch" and opr.twitch is not None:
         opr.twitch.oauth_flow.handle_redirect(request)
-    return redirect("notifpy:manage_endpoints")
+    return redirect("notifpy:settings")
 
 
 @login_required
@@ -91,7 +83,7 @@ def refresh_token(_, source):
         opr.youtube.oauth_flow.refresh()
     elif source == "twitch" and opr.twitch is not None:
         opr.twitch.oauth_flow.refresh()
-    return redirect("notifpy:manage_endpoints")
+    return redirect("notifpy:settings")
 
 
 @login_required
@@ -102,7 +94,7 @@ def revoke_token(_, source):
         opr.youtube.oauth_flow.revoke()
     elif source == "twitch" and opr.twitch is not None:
         opr.twitch.oauth_flow.revoke()
-    return redirect("notifpy:manage_endpoints")
+    return redirect("notifpy:settings")
 
 
 @login_required
