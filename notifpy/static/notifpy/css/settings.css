@@ -62,6 +62,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    min-width: 0;
 }
 
 .labeled_input label {
