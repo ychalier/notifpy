@@ -19,8 +19,8 @@
     </div>
     <div class="playlist__gallery">
         {% if playlist.videos.all %}
-        {% for video in playlist.videos.all %}
-        {% include "notifpy/video.html" %}
+        {% for entry in playlist.get_videos %}
+        {% include "notifpy/video.html" with video=entry.video %}
         {% endfor %}
         {% else %}
         <p>No video in this playlist.</p>
