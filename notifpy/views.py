@@ -36,9 +36,16 @@ def home(request):
     page_size = 16
     page = int(request.GET.get("page", 1))
     order = request.GET.get("order", "publication")
-    video_list = models.YoutubeVideo.objects\
-        .exclude(channel__priority=models.YoutubeChannel.PRIORITY_NONE)\
-        .order_by("-" + order)
+    channels = [
+        subscription.channel.youtubevideo_set.all()
+        for subscription in models.YoutubeSubscription.objects.filter(user=request.user)
+    ]
+    if len(channels) == 0:
+        video_list = list()
+    elif len(channels) == 1:
+        video_list = channels[0].order_by("-" + order)
+    else:
+        video_list = channels[0].union(*channels[1:]).order_by("-" + order)
     paginator = Paginator(video_list, page_size)
     videos = paginator.get_page(page)
     return render(request, "notifpy/home.html", {
