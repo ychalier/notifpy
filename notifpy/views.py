@@ -152,9 +152,9 @@ def create_channel(request):
             "create YouTube channel",
             request.POST["query"],
             result,
-            "notifpy:home"
+            "notifpy:subscriptions"
         )
-    return redirect("notifpy:home")
+    return redirect("notifpy:subscriptions")
 
 
 @login_required
@@ -383,9 +383,9 @@ def create_twitch_user(request):
             "create Twitch user",
             request.POST["query"],
             result,
-            "notifpy:home"
+            "notifpy:subscriptions"
         )
-    return redirect("notifpy:home")
+    return redirect("notifpy:subscriptions")
 
 
 @login_required

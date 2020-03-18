@@ -25,6 +25,21 @@
     <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='youtube' target='all' %}">Select All</a>
 </p>
 
+
+<div class="setting">
+    <div class="setting__title">Add a YouTube channel</div>
+    <div class="setting__body">
+        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:create_channel' %}" method="POST">
+            <textarea class="setting__el__border--first setting__el--inline__item" rows="5" name="query" placeholder="Channel entries"></textarea>
+            {% csrf_token %}
+            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Add" />
+        </form>
+        <p class="setting__el--hint">
+            Write one entry, either "channel/*" or "user/*", per line.
+        </p>
+    </div>
+</div>
+
 <h2 id="twitch">Twitch</h2>
 
 <div class="subscription_list">
@@ -44,5 +59,19 @@
     <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='twitch' target='none' %}">Reset</a>
     <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='twitch' target='all' %}">Select All</a>
 </p>
+
+<div class="setting">
+    <div class="setting__title">Add a Twitch user</div>
+    <div class="setting__body">
+        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:create_twitch_user' %}" method="POST">
+            <textarea class="setting__el__border--first setting__el--inline__item" rows="5" name="query" placeholder="User logins"></textarea>
+            {% csrf_token %}
+            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Add" />
+        </form>
+        <p class="setting__el--hint">
+            Write one user login per line.
+        </p>
+    </div>
+</div>
 
 {% endblock %}

@@ -8,34 +8,6 @@
 <h1>Settings</h1>
 
 <div class="setting">
-    <div class="setting__title">Subscribe to a YouTube channel</div>
-    <div class="setting__body">
-        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:create_channel' %}" method="POST">
-            <textarea class="setting__el__border--first setting__el--inline__item" rows="5" name="query" placeholder="Channel entries"></textarea>
-            {% csrf_token %}
-            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Subscribe" />
-        </form>
-        <p class="setting__el--hint">
-            Write one entry, either "channel/*" or "user/*", per line.
-        </p>
-    </div>
-</div>
-
-<div class="setting">
-    <div class="setting__title">Follow a Twitch user</div>
-    <div class="setting__body">
-        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:create_twitch_user' %}" method="POST">
-            <textarea class="setting__el__border--first setting__el--inline__item" rows="5" name="query" placeholder="User logins"></textarea>
-            {% csrf_token %}
-            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Follow" />
-        </form>
-        <p class="setting__el--hint">
-            Write one user login per line.
-        </p>
-    </div>
-</div>
-
-<div class="setting">
     <div class="setting__title">Force update</div>
     <div class="setting__body">
         <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:update' %}" method="POST">
@@ -129,36 +101,6 @@
         </div>
     </div>
 </div>
-
-<h3>YouTube subscriptions</h3>
-{% if channels %}
-<div class="channel_list">
-    {% for channel in channels %}
-    <div class="icon-item">
-        <img class="channel__thumbnail" src="{{channel.thumbnail}}" alt={{channel.title}} />
-        <a href="{% url 'notifpy:channel' slug=channel.slug %}">{{channel.title}}</a>
-        <a href="{% url 'notifpy:delete_channel' slug=channel.slug %}">✕</a>
-    </div>
-    {% endfor %}
-</div>
-{% else %}
-<p>You are not subscribed to any channel.</p>
-{% endif %}
-
-<h3>Twitch follows</h3>
-{% if users %}
-<div class="channel_list">
-    {% for user in users %}
-    <div class="icon-item">
-        <img class="channel__thumbnail" src="{{user.thumbnail}}" alt={{user.display_name}} />
-        <a href="{{user.link}}">{{user.display_name}}</a>
-        <a href="{% url 'notifpy:delete_twitch_user' login=user.login%}">✕</a>
-    </div>
-    {% endfor %}
-</div>
-{% else %}
-<p>You are not following any user.</p>
-{% endif %}
 
 
 {% endblock body %}
