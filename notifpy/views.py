@@ -58,10 +58,12 @@ def twitch_streams_api(_):
                 "lnk": user.link(),
                 "thumb": user.thumbnail(),
                 "name": stream["user_name"],
-                "game": stream["game"].name,
+                "game": "Uncategorized",
                 "title": stream["title"],
                 "screen": stream["thumbnail"],
             })
+            if stream["game"] is not None:
+                body[-1]["game"] = stream["game"].name
     return HttpResponse(json.dumps(body), content_type="application/json")
 
 
