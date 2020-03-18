@@ -5,6 +5,7 @@ import json
 import re
 from django.utils.text import slugify
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class SingletonModel(models.Model):
@@ -248,3 +249,15 @@ class TwitchGame(models.Model):
 
     def thumbnail(self):
         return self.box_art_url.format(width=144, height=192)
+
+
+class YoutubeSubscription(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    channel = models.ForeignKey(YoutubeChannel, on_delete=models.CASCADE)
+
+
+class TwitchSubscription(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    channel = models.ForeignKey(TwitchUser, on_delete=models.CASCADE)
