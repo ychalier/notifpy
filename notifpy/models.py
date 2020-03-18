@@ -179,6 +179,9 @@ class Playlist(models.Model):
         random.shuffle(ids)
         return "https://www.youtube.com/watch_videos?video_ids=" + ",".join(ids[:50])
 
+    def size(self):
+        return self.videos.count()
+
 
 class PlaylistMembership(models.Model):
 

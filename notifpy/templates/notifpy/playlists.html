@@ -13,13 +13,14 @@
 {% for playlist in playlists %}
 <div class="playlist">
     <div class="playlist__header">
-        <a href="{% url 'notifpy:playlist' slug=playlist.slug %}"><h3>{{ playlist.title }}</h3></a>
+        <a href="{% url 'notifpy:playlist' slug=playlist.slug %}"><h3>{{ playlist.title }} ({{ playlist.size }})</h3> </a> 
         <a href="{{playlist.url_ranked}}"><img class="playlist__icon" src="{% static 'notifpy/icons/play.svg' %}" /></a>
         <a href="{{playlist.url_shuffled}}"><img class="playlist__icon" src="{% static 'notifpy/icons/random.svg' %}" /></a>
+
     </div>
     <div class="playlist__gallery">
         {% if playlist.videos.all %}
-        {% for entry in playlist.get_videos %}
+        {% for entry in playlist.get_videos|slice:":3" %}
         {% include "notifpy/video.html" with video=entry.video %}
         {% endfor %}
         {% else %}
