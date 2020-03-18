@@ -329,3 +329,7 @@ a:hover {
 .icon-item>*:last-child {
     margin-right: 0;
 }
+
+.inline_icon {
+    height: 20px;
+}

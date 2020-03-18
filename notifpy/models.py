@@ -149,6 +149,7 @@ class Playlist(models.Model):
         through="PlaylistMembership"
     )
     rules = models.ManyToManyField("YoutubeChannel", blank=True)
+    public = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

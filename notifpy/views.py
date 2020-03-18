@@ -320,6 +320,20 @@ def move_playlist(_, slug, order, direction):
 
 
 @login_required
+def publish_playlist(_, slug, state):
+    """Change the public attribute of a given playlist"""
+    if not models.Playlist.objects.filter(slug=slug).exists():
+        return redirect("notifpy:playlists")
+    playlist = models.Playlist.objects.get(slug=slug)
+    if state == "public":
+        playlist.public = True
+    elif state == "private":
+        playlist.public = False
+    playlist.save()
+    return redirect("notifpy:playlist", slug=playlist.slug)
+
+
+@login_required
 def view_playlists(request):
     """View playlists"""
     playlists = models.Playlist.objects.all()

@@ -24,6 +24,7 @@ urlpatterns = [
     path("playlists/<slug>/delete", views.delete_playlist, name="delete_playlist"),
     path("playlists/<slug>/remove", views.remove_playlist, name="remove_playlist"),
     path("playlists/<slug>/move/<order>/<direction>", views.move_playlist, name="move_playlist"),
+    path("playlists/<slug>/publish/<state>", views.publish_playlist, name="publish_playlist"),
     path("create-twitch-user", views.create_twitch_user, name="create_twitch_user"),
     path("twitch-user/<login>/delete", views.delete_twitch_user, name="delete_twitch_user"),
     path("settings", views.settings, name="settings"),

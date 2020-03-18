@@ -7,8 +7,6 @@
 <h1>{{playlist.title}}</h1>
 
 <p class="command-panel">
-    <!--<a class="command__button" href="{% url 'notifpy:edit_playlist' slug=playlist.slug %}">Edit</a>
-    <a class="command__button" href="{% url 'notifpy:delete_playlist' slug=playlist.slug %}">Delete</a>-->
     <a class="command__button" href="{{playlist.url_ranked}}">Ordered Play</a>
     <a class="command__button" href="{{playlist.url_shuffled}}">Shuffled Play</a>
 </p>
@@ -45,9 +43,23 @@
 </div>
 
 <h2>Settings</h2>
+{% if playlist.public %}
+<p>
+    <img class="inline_icon" src="{% static 'notifpy/icons/unlock.svg' %}" /> The playlist is currently public.
+</p>
+{% else %}
+<p>
+    <img class="inline_icon" src="{% static 'notifpy/icons/lock.svg' %}" /> The playlist is currently private.
+</p>
+{% endif %}
 
 <p class="command-panel">
-    <a class="command__button" href="{% url 'notifpy:delete_playlist' slug=playlist.slug %}">Delete the playlist</a>
+    {% if playlist.public %}
+    <a class="command__button" href="{% url 'notifpy:publish_playlist' slug=playlist.slug state='private' %}">Make private</a>
+    {% else %}
+    <a class="command__button" href="{% url 'notifpy:publish_playlist' slug=playlist.slug state='public' %}">Make public</a>
+    {% endif %}
+    <a class="command__button" href="{% url 'notifpy:delete_playlist' slug=playlist.slug %}">Delete</a>
 </p>
 
 <div class="setting">
