@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.http import HttpResponse
 from visitors.monitor_visitors import monitor_visitors
+from django.db.models.functions import Lower
 from . import operator
 from . import models
 from . import forms
@@ -394,3 +395,85 @@ def delete_twitch_user(_, login):
         user = models.TwitchUser.objects.get(login=login)
         user.delete()
     return redirect("notifpy:home")
+
+
+@login_required
+def subscriptions(request):
+    channels = models.YoutubeChannel.objects\
+        .exclude(priority=models.YoutubeChannel.PRIORITY_NONE)\
+        .order_by(Lower("title"))
+    subs = dict()
+    for sub in models.YoutubeSubscription.objects.filter(user=request.user):
+        subs[sub.channel.id] = True
+    for channel in channels:
+        channel.subscribed = subs.get(channel.id, False)
+        channel.thumbnail_link = channel.thumbnail.replace("=s800", "=s32")
+    users = models.TwitchUser.objects.all().order_by(Lower("login"))
+    subs = dict()
+    for sub in models.TwitchSubscription.objects.filter(user=request.user):
+        subs[sub.channel.id] = True
+    for user in users:
+        user.subscribed = subs.get(user.id, False)
+    return render(request, "notifpy/subscriptions.html", {
+        "channels": channels,
+        "users": users,
+    })
+
+
+@login_required
+def subscribe(request):
+    if request.method == "POST":
+        if request.POST["media"] == "youtube":
+            channel_id = request.POST["channel"]
+            if models.YoutubeChannel.objects.filter(id=channel_id).exists():
+                channel = models.YoutubeChannel.objects.get(id=request.POST["channel"])
+                exists = models.YoutubeSubscription.objects\
+                    .filter(user=request.user, channel=channel).exists()
+                if request.POST["state"] == "True" and exists:
+                    for entry in models.YoutubeSubscription.objects\
+                        .filter(user=request.user, channel=channel):
+                        entry.delete()
+                elif request.POST["state"] == "False" and not exists:
+                    models.YoutubeSubscription.objects.create(user=request.user, channel=channel)
+        if request.POST["media"] == "twitch":
+            user_id = request.POST["channel"]
+            if models.TwitchUser.objects.filter(id=user_id).exists():
+                user = models.TwitchUser.objects.get(id=request.POST["channel"])
+                exists = models.TwitchSubscription.objects\
+                    .filter(user=request.user, channel=user).exists()
+                if request.POST["state"] == "True" and exists:
+                    for entry in models.TwitchSubscription.objects\
+                        .filter(user=request.user, channel=user):
+                        entry.delete()
+                elif request.POST["state"] == "False" and not exists:
+                    models.TwitchSubscription.objects.create(user=request.user, channel=user)
+    return redirect(reverse("notifpy:subscriptions") + "#" + request.POST.get("media", ""))
+
+@login_required
+def subscribe_batch(request, media, target):
+    if media == "youtube":
+        if target == "none":
+            for sub in models.YoutubeSubscription.objects.filter(user=request.user):
+                sub.delete()
+        elif target == "all":
+            for channel in models.YoutubeChannel.objects\
+                .exclude(priority=models.YoutubeChannel.PRIORITY_NONE):
+                if not models.YoutubeSubscription.objects\
+                    .filter(user=request.user, channel=channel).exists():
+                    models.YoutubeSubscription.objects.create(
+                        user=request.user,
+                        channel=channel
+                    )
+    elif media == "twitch":
+        if target == "none":
+            for sub in models.TwitchSubscription.objects.filter(user=request.user):
+                sub.delete()
+        elif target == "all":
+            for user in models.TwitchUser.objects.all():
+                if not models.TwitchSubscription.objects\
+                    .filter(user=request.user, channel=user).exists():
+                    models.TwitchSubscription.objects.create(
+                        user=request.user,
+                        channel=user
+                    )
+    return redirect(reverse("notifpy:subscriptions") + "#" + media)

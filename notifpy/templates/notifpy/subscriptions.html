@@ -1,0 +1,48 @@
+{% extends 'notifpy/base.html' %}
+{% load static %}
+
+{% block body %}
+
+<h1>Subscriptions</h1>
+
+<h2 id="youtube">YouTube</h2>
+
+<div class="subscription_list">
+    {% for channel in channels %}
+    <form class="subscription{% if channel.subscribed %} subscribed{% endif %}" action="{% url 'notifpy:subscribe' %}" method="post">
+        <img class="subscription__thumbnail" src="{{channel.thumbnail_link}}" alt={{channel.title}} />
+        {% csrf_token %}
+        <input type="hidden" name="media" value="youtube">
+        <input type="hidden" name="channel" value="{{ channel.id }}">
+        <input type="hidden" name="state" value="{{ channel.subscribed }}">
+        <input class="subscription__input" type="submit" name="submit" value="{{channel.title}}">
+    </form>
+    {% endfor %}
+</div>
+
+<p class="command-panel">
+    <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='youtube' target='none' %}">Reset</a>
+    <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='youtube' target='all' %}">Select All</a>
+</p>
+
+<h2 id="twitch">Twitch</h2>
+
+<div class="subscription_list">
+    {% for user in users %}
+    <form class="subscription{% if user.subscribed %} subscribed{% endif %}" action="{% url 'notifpy:subscribe' %}" method="post">
+        <img class="subscription__thumbnail" src="{{user.thumbnail}}" alt={{user.login}} />
+        {% csrf_token %}
+        <input type="hidden" name="media" value="twitch">
+        <input type="hidden" name="channel" value="{{ user.id }}">
+        <input type="hidden" name="state" value="{{ user.subscribed }}">
+        <input class="subscription__input" type="submit" name="submit" value="{{user.display_name}}">
+    </form>
+    {% endfor %}
+</div>
+
+<p class="command-panel">
+    <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='twitch' target='none' %}">Reset</a>
+    <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='twitch' target='all' %}">Select All</a>
+</p>
+
+{% endblock %}

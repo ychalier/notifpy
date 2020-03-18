@@ -32,4 +32,7 @@ urlpatterns = [
     path("clear", views.clear_old_videos, name="clear_old_videos"),
     path("twitch-api", views.twitch_streams_api, name="twitch_streams_api"),
     path("playlists", views.view_playlists, name="playlists"),
+    path("subscriptions", views.subscriptions, name="subscriptions"),
+    path("subscribe", views.subscribe, name="subscribe"),
+    path("subscribe/<media>/<target>", views.subscribe_batch, name="subscribe_batch"),
 ]
