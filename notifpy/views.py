@@ -239,12 +239,15 @@ def create_playlist(request):
     return render(request, "notifpy/create_playlist.html", locals())
 
 
-@login_required
 def view_playlist(request, slug):
     """View a playlist"""
     if not models.Playlist.objects.filter(slug=slug).exists():
-        return redirect("notifpy:playlists")
+        if request.user.is_authenticated:
+            return redirect("notifpy:playlists")
+        return redirect("notifpy:abstract")
     playlist = models.Playlist.objects.get(slug=slug)
+    if not playlist.public and not request.user.is_authenticated:
+        return redirect("notifpy:abstract")
     return render(request, "notifpy/playlist.html", {
         "playlist": playlist,
     })
