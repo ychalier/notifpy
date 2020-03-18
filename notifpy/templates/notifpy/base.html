@@ -37,6 +37,8 @@
                 <a href="{% url 'notifpy:subscriptions' %}">Subs</a>
                 <span class="hide_on_small">&middot;</span>
                 <a href="{% url 'notifpy:settings' %}">Settings</a>
+                <div class="separator hide_on_small"></div>
+                <span class="username">{{request.user.username|upper}}</span>
                 {% endif %}
             </nav>
         </header>

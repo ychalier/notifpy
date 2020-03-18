@@ -30,13 +30,14 @@ html, body {
 }
 
 .header__nav {
-    flex-wrap: wrap;
+
 }
 
 .navbar {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: flex-start;
+    width: 100%;
 }
 
 .navbar>* {
@@ -387,4 +388,12 @@ a:hover {
 input[type="submit"].subscription__input:hover {
     background: none;
     color: white;
+}
+
+.separator {
+    width: 100%;
+}
+
+.username {
+    font-family: Consolas, monospace;
 }
