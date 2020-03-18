@@ -151,6 +151,7 @@ class Playlist(models.Model):
     )
     rules = models.ManyToManyField("YoutubeChannel", blank=True)
     public = models.BooleanField(default=False)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -224,7 +225,7 @@ class TwitchUser(models.Model):
         return "https://www.twitch.tv/%s" % self.login
 
     def thumbnail(self):
-        return self.profile_image_url.replace("300x300", "70x70")
+        return self.profile_image_url.replace("300x300", "50x50")
 
 
 class UpdateSchedule(models.Model):

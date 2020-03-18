@@ -257,8 +257,11 @@ def view_playlist(request, slug):
             return redirect("notifpy:playlists")
         return redirect("notifpy:abstract")
     playlist = models.Playlist.objects.get(slug=slug)
-    if not playlist.public and not request.user.is_authenticated:
+    if not playlist.public and (
+            not request.user.is_authenticated
+            or playlist.owner != request.user):
         return redirect("notifpy:abstract")
+    playlist.owned = playlist.owner == request.user
     return render(request, "notifpy/playlist.html", {
         "playlist": playlist,
     })
@@ -350,7 +353,7 @@ def publish_playlist(_, slug, state):
 @login_required
 def view_playlists(request):
     """View playlists"""
-    playlists = models.Playlist.objects.all()
+    playlists = models.Playlist.objects.filter(owner=request.user)
     return render(request, "notifpy/playlists.html", {
         "playlists": playlists,
     })

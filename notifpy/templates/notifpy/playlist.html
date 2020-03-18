@@ -15,7 +15,7 @@
     {% if playlist.videos.all %}
     {% for entry in playlist.get_videos %}
     <div class="gallery--edit__elt">
-        {% if request.user.is_authenticated %}
+        {% if playlist.owned %}
         <div class="vertical_command_pannel">
             {% if not forloop.first %}
             <form method="get" action="{% url 'notifpy:move_playlist' slug=playlist.slug order=entry.order direction="up"%}">
@@ -44,7 +44,7 @@
     {% endif %}
 </div>
 
-{% if request.user.is_authenticated %}
+{% if playlist.owned %}
 <h2>Settings</h2>
 {% if playlist.public %}
 <p>
