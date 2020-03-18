@@ -111,11 +111,11 @@ class Operator:
         )
         return game
 
-    def get_streams(self):
+    def get_streams(self, users):
         """Get currently live streams"""
-        if len(models.TwitchUser.objects.all()) == 0 or self.twitch is None:
+        if len(users) == 0 or self.twitch is None:
             return []
-        logins = [user.login for user in models.TwitchUser.objects.all()]
+        logins = [user.login for user in users]
         batch_size = 99
         aggregated = list()
         for i in range(0, len(logins), batch_size):

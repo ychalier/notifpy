@@ -53,17 +53,20 @@ def home(request):
     })
 
 
-def twitch_streams_api(_):
+@login_required
+def twitch_streams_api(request):
     """View that simply returns a JSON from Twitch endpoint"""
     body = list()
-    twitch_users = models.TwitchUser.objects.all()
-    streams = operator.Operator().get_streams()
+    twitch_users = [
+        subscription.channel
+        for subscription in models.TwitchSubscription.objects.filter(user=request.user)
+    ]
+    streams = operator.Operator().get_streams(twitch_users)
     if streams is not None:
         for stream in streams:
-            user = twitch_users.get(id=stream["user_id"])
             body.append({
-                "lnk": user.link(),
-                "thumb": user.thumbnail(),
+                "lnk": stream["user"].link(),
+                "thumb": stream["user"].thumbnail(),
                 "name": stream["user_name"],
                 "game": "Uncategorized",
                 "title": stream["title"],
