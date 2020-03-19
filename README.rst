@@ -13,7 +13,7 @@ Getting Started
 Prerequisites
 ~~~~~~~~~~~~~
 
-You'll need a version of Python that runs Django 3.0.2, ie. 3.6 or above.
+You'll need a version of Python that runs Django 3.0.3, ie. 3.6 or above.
 
 Installation
 ~~~~~~~~~~~~
@@ -73,8 +73,8 @@ Please note that the ``redirect_uri`` in both cases should be of the form:
 OAuth authentication flow uses those routes to catch the redirection when
 the app is granted an authorization code.
 
-2. Usage
---------
+Usage
+-----
 
 Here are some notes about the use of Notifpy:
 
@@ -88,3 +88,9 @@ Here are some notes about the use of Notifpy:
     0 * * * * cd /PATH/TO/SERVER && source venv/bin/activate && python manage.py update
 
 Change ``PATH`` to your actual path.
+
+
+Built With
+----------
+
+Some icons are imported from the `Bytesize Icons <https://github.com/danklammer/bytesize-icons>`__ library.

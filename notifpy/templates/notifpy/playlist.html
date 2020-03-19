@@ -80,7 +80,7 @@
     <div class="setting__title">Add a video</div>
     <div class="setting__body">
         <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:add_playlist' slug=playlist.slug %}" method="POST">
-            <textarea class="setting__el--inline__item setting__el__border--first" name="video" rows="8" ></textarea>
+            <textarea class="setting__el--inline__item setting__el__border--first" name="video" rows="8"></textarea>
             {% csrf_token %}
             <input class="setting__el--inline__item setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Add" />
         </form>

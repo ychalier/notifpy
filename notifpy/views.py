@@ -7,14 +7,15 @@ from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.urls import reverse
 from django.http import HttpResponse
-from visitors.monitor_visitors import monitor_visitors
 from django.db.models.functions import Lower
+from visitors.monitor_visitors import monitor_visitors
 from . import operator
 from . import models
 from . import forms
 
 
 def inform(request, title=None, input_msg=None, output_msg=None, next_page=None):
+    """Display a text/plain message to the user, before a redirection."""
     if next_page is not None:
         next_page = reverse(next_page)
     return render(request, "notifpy/inform.html", {
@@ -148,7 +149,8 @@ def clear_old_videos(request):
 def create_channel(request):
     """Subscribe to a YouTube channel"""
     if request.method == "POST" and "query" in request.POST:
-        result = operator.Operator().subscribe_to_channels(request.POST["query"])
+        result = operator.Operator().subscribe_to_channels(
+            request.POST["query"])
         return inform(
             request,
             "create YouTube channel",
@@ -236,7 +238,8 @@ def update_channel(_, slug):
 def update_channels(request):
     """Update all YouTube channel videos"""
     if request.method == "POST":
-        operator.Operator().update_channels(list(map(int, request.POST["priority"])))
+        operator.Operator().update_channels(
+            list(map(int, request.POST["priority"])))
     return redirect("notifpy:home")
 
 
@@ -244,12 +247,16 @@ def update_channels(request):
 def create_playlist(request):
     """Add a new playlist object"""
     if request.method == "POST":
-        form = forms.PlaylistForm(request.POST)
-        if form.is_valid():
-            playlist = form.save()
-            return redirect("notifpy:playlist", slug=playlist.slug)
-    form = forms.PlaylistForm()
-    return render(request, "notifpy/create_playlist.html", locals())
+        title = request.POST.get("title", "Untitled")
+        if models.Playlist.objects.filter(owner=request.user, title=title).exists():
+            playlist = models.Playlist.objects.get(owner=request.user, title=title)
+        else:
+            playlist = models.Playlist.objects.create(
+                owner=request.user,
+                title=request.POST["title"]
+            )
+        return redirect("notifpy:playlist", slug=playlist.slug)
+    return redirect("notifpy:playlists")
 
 
 def view_playlist(request, slug):
@@ -289,7 +296,8 @@ def add_playlist(request, slug):
         return redirect("notifpy:playlists")
     playlist = models.Playlist.objects.get(slug=slug)
     if request.method == "POST":
-        operator.Operator().add_video_to_playlist(playlist, request.POST.get("video", ""))
+        operator.Operator().add_video_to_playlist(
+            playlist, request.POST.get("video", ""))
     return redirect("notifpy:playlist", slug=playlist.slug)
 
 
@@ -404,6 +412,7 @@ def delete_twitch_user(_, login):
 
 @login_required
 def subscriptions(request):
+    """View to a user current subscriptions"""
     channels = models.YoutubeChannel.objects\
         .exclude(priority=models.YoutubeChannel.PRIORITY_NONE)\
         .order_by(Lower("title"))
@@ -427,44 +436,51 @@ def subscriptions(request):
 
 @login_required
 def subscribe(request):
+    """View to subscribe the logged in user to a channel"""
     if request.method == "POST":
         if request.POST["media"] == "youtube":
             channel_id = request.POST["channel"]
             if models.YoutubeChannel.objects.filter(id=channel_id).exists():
-                channel = models.YoutubeChannel.objects.get(id=request.POST["channel"])
+                channel = models.YoutubeChannel.objects.get(
+                    id=request.POST["channel"])
                 exists = models.YoutubeSubscription.objects\
                     .filter(user=request.user, channel=channel).exists()
                 if request.POST["state"] == "True" and exists:
                     for entry in models.YoutubeSubscription.objects\
-                        .filter(user=request.user, channel=channel):
+                            .filter(user=request.user, channel=channel):
                         entry.delete()
                 elif request.POST["state"] == "False" and not exists:
-                    models.YoutubeSubscription.objects.create(user=request.user, channel=channel)
+                    models.YoutubeSubscription.objects.create(
+                        user=request.user, channel=channel)
         if request.POST["media"] == "twitch":
             user_id = request.POST["channel"]
             if models.TwitchUser.objects.filter(id=user_id).exists():
-                user = models.TwitchUser.objects.get(id=request.POST["channel"])
+                user = models.TwitchUser.objects.get(
+                    id=request.POST["channel"])
                 exists = models.TwitchSubscription.objects\
                     .filter(user=request.user, channel=user).exists()
                 if request.POST["state"] == "True" and exists:
                     for entry in models.TwitchSubscription.objects\
-                        .filter(user=request.user, channel=user):
+                            .filter(user=request.user, channel=user):
                         entry.delete()
                 elif request.POST["state"] == "False" and not exists:
-                    models.TwitchSubscription.objects.create(user=request.user, channel=user)
+                    models.TwitchSubscription.objects.create(
+                        user=request.user, channel=user)
     return redirect(reverse("notifpy:subscriptions") + "#" + request.POST.get("media", ""))
+
 
 @login_required
 def subscribe_batch(request, media, target):
+    """Path to subscribe to / unsubscribe from all of a media channels"""
     if media == "youtube":
         if target == "none":
             for sub in models.YoutubeSubscription.objects.filter(user=request.user):
                 sub.delete()
         elif target == "all":
             for channel in models.YoutubeChannel.objects\
-                .exclude(priority=models.YoutubeChannel.PRIORITY_NONE):
+                    .exclude(priority=models.YoutubeChannel.PRIORITY_NONE):
                 if not models.YoutubeSubscription.objects\
-                    .filter(user=request.user, channel=channel).exists():
+                        .filter(user=request.user, channel=channel).exists():
                     models.YoutubeSubscription.objects.create(
                         user=request.user,
                         channel=channel
@@ -476,7 +492,7 @@ def subscribe_batch(request, media, target):
         elif target == "all":
             for user in models.TwitchUser.objects.all():
                 if not models.TwitchSubscription.objects\
-                    .filter(user=request.user, channel=user).exists():
+                        .filter(user=request.user, channel=user).exists():
                     models.TwitchSubscription.objects.create(
                         user=request.user,
                         channel=user

@@ -7,7 +7,6 @@ function set_thumbnail_source(target) {
     dummy.onload = function() {
         if (dummy.width != 120) {
             let parent = target.parentNode;
-            // console.log(parent);
             let newNode = document.createElement("img");
             newNode.src = dummy.src;
             newNode.className = "video__thumbnail__foreground";

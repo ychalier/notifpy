@@ -20,8 +20,6 @@
     <link rel="stylesheet" href="{% static 'notifpy/css/playlist.css' %}" />
     <link rel="stylesheet" href="{% static 'notifpy/css/responsive.css' %}" />
     <link rel="stylesheet" href="{% static 'notifpy/css/settings.css' %}">
-    {% block head %}
-    {% endblock head %}
 </head>
 
 <body>
@@ -34,16 +32,11 @@
                 <span class="hide_on_small">&middot;</span>
                 <a href="{% url 'notifpy:home' %}">Home</a>
                 <a href="{% url 'notifpy:playlists' %}">Playlists</a>
-                <a href="{% url 'notifpy:subscriptions' %}">Subs</a>
-                <span class="hide_on_small">&middot;</span>
-                <a href="{% url 'notifpy:settings' %}">Settings</a>
-                <div class="separator hide_on_small"></div>
+                <div class="separator"></div>
                 {% if request.user.is_staff %}
-                <svg class="user_badge" id="i-bookmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                    <path d="M6 2 L26 2 26 30 16 20 6 30 Z" />
-                </svg>
+                <a href="{% url 'notifpy:settings' %}"><img class="user_badge" src="{% static 'notifpy/icons/settings.svg' %}" alt="*"></a>
                 {% endif %}
-                <span class="username">{{request.user.username|upper}}</span>
+                <span class="username"><a href="{% url 'notifpy:subscriptions' %}">{{request.user.username|upper}}</a></span>
                 {% endif %}
             </nav>
         </header>

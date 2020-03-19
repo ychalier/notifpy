@@ -1,6 +1,8 @@
 {% extends 'notifpy/base.html' %}
 {% load static %}
 
+{% block title %}Subscriptions | Notifpy{% endblock%}
+
 {% block body %}
 
 <h1>Subscriptions</h1>
@@ -25,6 +27,7 @@
     <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='youtube' target='all' %}">Select All</a>
 </p>
 
+{% if request.user.is_staff %}
 
 <div class="setting">
     <div class="setting__title">Add a YouTube channel</div>
@@ -39,6 +42,8 @@
         </p>
     </div>
 </div>
+
+{% endif %}
 
 <h2 id="twitch">Twitch</h2>
 
@@ -60,6 +65,8 @@
     <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='twitch' target='all' %}">Select All</a>
 </p>
 
+{% if request.user.is_staff %}
+
 <div class="setting">
     <div class="setting__title">Add a Twitch user</div>
     <div class="setting__body">
@@ -73,5 +80,7 @@
         </p>
     </div>
 </div>
+
+{% endif %}
 
 {% endblock %}

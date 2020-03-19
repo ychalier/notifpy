@@ -157,7 +157,7 @@ class Playlist(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
+        self.slug = slugify(self.owner.username + " " + self.title)
         models.Model.save(self, *args, **kwargs)
 
     def get_videos(self):

@@ -29,9 +29,7 @@ html, body {
     font-weight: bold;
 }
 
-.header__nav {
-
-}
+.header__nav {}
 
 .navbar {
     display: flex;
@@ -157,24 +155,24 @@ a:hover {
     justify-content: space-between;
 }
 
-.vertical_command_pannel > form {
+.vertical_command_pannel>form {
     display: flex;
     flex-direction: row;
     flex-grow: 1;
 }
 
-.vertical_command_pannel > form > input[type="submit"] {
+.vertical_command_pannel>form>input[type="submit"] {
     margin: 0;
     border-radius: 0;
     padding: 0 8px 0 8px;
     flex-grow: 1;
 }
 
-.vertical_command_pannel > form:first-child > input {
+.vertical_command_pannel>form:first-child>input {
     border-radius: 4px 0 0 0;
 }
 
-.vertical_command_pannel > form:last-child > input {
+.vertical_command_pannel>form:last-child>input {
     border-radius: 0 0 0 4px;
 }
 
@@ -186,7 +184,7 @@ a:hover {
     margin-top: 16px;
 }
 
-.command-panel >* {
+.command-panel>* {
     width: 100%;
     margin-right: 16px;
 }
@@ -221,7 +219,6 @@ a:hover {
     opacity: 0;
 }
 
-
 .stream_banner--expanded {
     max-height: 150px;
     margin: 20px 0 20px 0;
@@ -253,7 +250,7 @@ a:hover {
     display: inline-block;
 }
 
-.tooltip .tooltip__div  {
+.tooltip .tooltip__div {
     visibility: hidden;
     width: 160px;
     text-align: center;
@@ -267,7 +264,7 @@ a:hover {
     border-radius: 4px;
 }
 
-.tooltip__div > * {
+.tooltip__div>* {
     display: block;
     padding: 8px;
     color: #fff;
@@ -401,5 +398,9 @@ input[type="submit"].subscription__input:hover {
 .user_badge {
     height: 19px;
     padding: 1px 0;
-    margin-right: 0;
+    margin: 0;
+}
+
+.nav_icon {
+    height: 12px;
 }

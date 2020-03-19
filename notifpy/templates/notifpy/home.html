@@ -26,17 +26,17 @@
 <div class="pagination">
     <span class="step-links">
         {% if videos.has_previous %}
-        <a href="?page=1">&laquo; first</a>
-        <a href="?page={{ videos.previous_page_number }}">previous</a>
+        <a href="?page=1"><img class="nav_icon" src="{% static 'notifpy/icons/start.svg' %}" alt="&laquo; first"></a>
+        <a href="?page={{ videos.previous_page_number }}"><img class="nav_icon" src="{% static 'notifpy/icons/chevron_left.svg' %}" alt="previous"></a>
         {% endif %}
 
         <span class="current">
-            Page {{ videos.number }} of {{ videos.paginator.num_pages }}.
+            {{ videos.number }} / {{ videos.paginator.num_pages }}
         </span>
 
         {% if videos.has_next %}
-        <a href="?page={{ videos.next_page_number }}">next</a>
-        <a href="?page={{ videos.paginator.num_pages }}">last &raquo;</a>
+        <a href="?page={{ videos.next_page_number }}"><img class="nav_icon" src="{% static 'notifpy/icons/chevron_right.svg' %}" alt="next"></a>
+        <a href="?page={{ videos.paginator.num_pages }}"><img class="nav_icon" src="{% static 'notifpy/icons/end.svg' %}" alt="last &raquo;"></a>
         {% endif %}
     </span>
 </div>

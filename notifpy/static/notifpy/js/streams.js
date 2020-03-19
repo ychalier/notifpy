@@ -13,7 +13,7 @@ function appendStream(data, i) {
     let clone = document.importNode(template.content, true);
     let icon = clone.querySelector(".channel__thumbnail");
     icon.alt = data[i].name;
-    icon.onload = function () {
+    icon.onload = function() {
         loaded++;
         if (loaded === data.length) {
             streamList.classList.add("stream_banner--expanded");
@@ -32,12 +32,14 @@ request.onload = function() {
     if (request.readyState === 4 && request.status == 200) {
         let data = JSON.parse(request.response);
         console.log("Found " + data.length + " stream(s)");
-        for (let i = 0; i < data.length; i++) {
-            appendStream(data, i);
+        if (data.length > 0) {
+            for (let i = 0; i < data.length; i++) {
+                appendStream(data, i);
+            }
+            setTimeout(() => {
+                streamList.classList.add("stream_banner--expanded");
+            }, 1000);
         }
-        setTimeout(() => {
-            streamList.classList.add("stream_banner--expanded");
-        }, 1000);
     }
 }
 

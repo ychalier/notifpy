@@ -6,14 +6,24 @@
 {% block body %}
 <h1>Playlists</h1>
 
-<div class="command-panel">
-    <a class="command__button" href="{% url 'notifpy:create_playlist' %}">Add Playlist</a>
+<div class="setting">
+    <div class="setting__title">Add a Playlist</div>
+    <div class="setting__body">
+        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:create_playlist' %}" method="POST">
+            <input class="setting__el__border--first setting__el--inline__item" type="text" name="title" value="" placeholder="Title">
+            {%csrf_token%}
+            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Create" />
+        </form>
+    </div>
 </div>
+
 {% if playlists %}
 {% for playlist in playlists %}
 <div class="playlist">
     <div class="playlist__header">
-        <a href="{% url 'notifpy:playlist' slug=playlist.slug %}"><h3>{{ playlist.title }} ({{ playlist.size }})</h3> </a>
+        <a href="{% url 'notifpy:playlist' slug=playlist.slug %}">
+            <h3>{{ playlist.title }} ({{ playlist.size }})</h3>
+        </a>
         <a href="{{playlist.url_ranked}}"><img class="playlist__icon" src="{% static 'notifpy/icons/play.svg' %}" /></a>
         <a href="{{playlist.url_shuffled}}"><img class="playlist__icon" src="{% static 'notifpy/icons/random.svg' %}" /></a>
     </div>
