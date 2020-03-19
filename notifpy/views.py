@@ -11,7 +11,6 @@ from django.db.models.functions import Lower
 from visitors.monitor_visitors import monitor_visitors
 from . import operator
 from . import models
-from . import forms
 
 
 def inform(request, title=None, input_msg=None, output_msg=None, next_page=None):
