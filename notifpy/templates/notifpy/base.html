@@ -38,6 +38,11 @@
                 <span class="hide_on_small">&middot;</span>
                 <a href="{% url 'notifpy:settings' %}">Settings</a>
                 <div class="separator hide_on_small"></div>
+                {% if request.user.is_staff %}
+                <svg class="user_badge" id="i-bookmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                    <path d="M6 2 L26 2 26 30 16 20 6 30 Z" />
+                </svg>
+                {% endif %}
                 <span class="username">{{request.user.username|upper}}</span>
                 {% endif %}
             </nav>

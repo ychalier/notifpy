@@ -397,3 +397,9 @@ input[type="submit"].subscription__input:hover {
 .username {
     font-family: Consolas, monospace;
 }
+
+.user_badge {
+    height: 19px;
+    padding: 1px 0;
+    margin-right: 0;
+}

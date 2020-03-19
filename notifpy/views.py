@@ -113,6 +113,8 @@ def revoke_token(_, source):
 @login_required
 def settings(request):
     """View to show general information and forms"""
+    if not request.user.is_staff:
+        return redirect("notifpy:home")
     schedule = models.UpdateSchedule.objects.get().to_json()
     current_schedule = {
         "low": " ".join(map(str, schedule["0"])),
@@ -173,7 +175,7 @@ def view_channel(request, slug):
 @login_required
 def edit_channel(request, slug):
     """Edit a YouTube channel information"""
-    if not models.YoutubeChannel.objects.filter(slug=slug).exists():
+    if not request.user.is_staff or not models.YoutubeChannel.objects.filter(slug=slug).exists():
         return redirect("notifpy:home")
     channel = models.YoutubeChannel.objects.get(slug=slug)
     if request.method == "POST":

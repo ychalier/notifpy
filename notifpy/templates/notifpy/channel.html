@@ -29,6 +29,8 @@
 <p>No video found for this channel.</p>
 {% endif %}
 
+{% if request.user.is_staff %}
+
 <h2>Settings</h2>
 
 
@@ -109,6 +111,7 @@
     </div>
 </div>
 
+{% endif %}
 
 
 {% endblock %}
