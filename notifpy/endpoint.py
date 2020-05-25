@@ -72,7 +72,7 @@ class Token:
         self.refresh_token = None
         self.expires_in = None
         self.delivery_time = None
-        os.remove(self.filename)
+        # os.remove(self.filename)
 
     def save(self):
         """Export current token"""
@@ -243,6 +243,7 @@ class Endpoint:
         if self.oauth_flow.token.has_expired():
             self.oauth_flow.refresh()
         return {
+            "client-id": self.oauth_flow.credentials.client_id,
             "Authorization": "Bearer %s" % self.oauth_flow.token.access_token
         }
 
