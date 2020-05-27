@@ -1,11 +1,71 @@
+/*
 html, body {
     height: 100%;
 }
+*/
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Lato", sans-serif;
+    background-color: #202020;
+    background-image: url("../imagedoc-darknoise.png");
+    background-repeat: repeat;
+    background-attachment: fixed;
+    color: #EEE;
+}
+
+.body_wrapper {
+    max-width: 800px;
+    padding: 0;
+    margin: 0 auto 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main_section {
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+p, ul, ol, table {
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+p, ul, ol, td {
+    color: rgb(190, 190, 190);
+    font-size: 15px;
+    line-height: 24px;
+}
+
+h1 {
+    font-size: 34px;
+}
+
+code, pre {
+    font-family: "Fira Code", monospace;
+    font-size: 15px;
+}
+
+pre {
+    padding: 8px 15px;
+    background: #272822;
+    border-radius: 5px;
+    border: 1px solid #1A1A1A;
+    overflow-x: auto;
+    box-sizing: border-box;
+}
+
 
 .fullheight_padding {
     height: 16px;
 }
-
+/*
 .body_wrapper {
     display: flex;
     flex-direction: column;
@@ -16,7 +76,7 @@ html, body {
     min-height: 100vh;
     box-shadow: 0 0 20px 10px rgba(0, 0, 0, .1);
 }
-
+*/
 .header {}
 
 .header--inline {
@@ -56,7 +116,7 @@ html, body {
     min-width: 100px;
     transition: .1s ease;
     background-color: white;
-    color: #2F2F2F;
+    color: #1A1A1A;
     padding: 8px;
     text-align: center;
 }
@@ -65,7 +125,7 @@ html, body {
     background-color: #F0F0F0;
     text-decoration: none;
 }
-
+/*
 body {
     color: #EEE;
     background-color: #202020;
@@ -75,7 +135,8 @@ body {
     padding: 0;
     font-family: "Segoe UI";
 }
-
+*/
+/*
 h1 {
     font-size: 32px;
 }
@@ -111,6 +172,7 @@ h5, h6 {
 h6 {
     font-size: 12px;
 }
+*/
 
 header a {
     color: white;
@@ -194,7 +256,7 @@ a:hover {
 }
 
 .command__button {
-    background-color: #202020;
+    background-color: #1A1A1A;
     border-radius: 4px;
     color: white;
     padding: 8px;
@@ -357,13 +419,13 @@ a:hover {
 }
 
 .subscription:hover {
-    background: #202020;
+    background: #1A1A1A;
     opacity: 1;
 }
 
 .subscribed {
     opacity: 1;
-    background: #202020;
+    background: #1A1A1A;
 }
 
 .subscribed:hover {
@@ -403,4 +465,10 @@ input[type="submit"].subscription__input:hover {
 
 .nav_icon {
     height: 12px;
+}
+
+.external_link {
+    margin-left: 8px;
+    width: 16px;
+    height: 16px;
 }

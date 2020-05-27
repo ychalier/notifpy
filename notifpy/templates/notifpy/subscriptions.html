@@ -18,6 +18,7 @@
         <input type="hidden" name="channel" value="{{ channel.id }}">
         <input type="hidden" name="state" value="{{ channel.subscribed }}">
         <input class="subscription__input" type="submit" name="submit" value="{{channel.title}}">
+        <a href="{% url 'notifpy:channel' slug=channel.slug %}" ><img class="external_link" src="{% static 'notifpy/icons/external.svg' %}"/></a>
     </form>
     {% endfor %}
 </div>
@@ -56,6 +57,7 @@
         <input type="hidden" name="channel" value="{{ user.id }}">
         <input type="hidden" name="state" value="{{ user.subscribed }}">
         <input class="subscription__input" type="submit" name="submit" value="{{user.display_name}}">
+        <a href="{{ user.link }}/videos" ><img class="external_link" src="{% static 'notifpy/icons/external.svg' %}"/></a>
     </form>
     {% endfor %}
 </div>

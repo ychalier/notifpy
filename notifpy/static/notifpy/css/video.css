@@ -73,6 +73,7 @@
 
 .video__title a {
     color: white;
+    line-height: 24px;
 }
 
 .video__description, .video__description * {
