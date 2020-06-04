@@ -92,6 +92,20 @@ class Operator:
             statistics["created"] += 1
         return statistics
 
+    def update_user_thumbnail(self, user_login):
+        """Fetch the thumbnail from the API"""
+        if not models.TwitchUser.objects.filter(login=user_login).exists():
+            return
+        twitch_user = models.TwitchUser.objects.get(login=user_login)
+        if self.twitch is None:
+            return
+        response = self.twitch.users(logins=[twitch_user.login])
+        if response is None:
+            return
+        twitch_user_item = response["data"][0]
+        twitch_user.profile_image_url = twitch_user_item["profile_image_url"]
+        twitch_user.save()
+
     def get_twitch_game(self, game_id):
         """Return a Twitch game from database or fetch it if necessary"""
         if game_id == "":

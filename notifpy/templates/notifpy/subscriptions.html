@@ -58,6 +58,7 @@
         <input type="hidden" name="state" value="{{ user.subscribed }}">
         <input class="subscription__input" type="submit" name="submit" value="{{user.display_name}}">
         <a href="{{ user.link }}/videos" ><img class="external_link" src="{% static 'notifpy/icons/external.svg' %}"/></a>
+        <a href="{% url 'notifpy:update_profile_picture_login' login=user.login %}"><img class="external_link" src="{% static 'notifpy/icons/reload.svg' %}"/></a>
     </form>
     {% endfor %}
 </div>

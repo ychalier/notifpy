@@ -69,6 +69,23 @@
 </div>
 
 <div class="setting">
+    <div class="setting__title">Update Twitch Profile Picture</div>
+    <div class="setting__body">
+        <form class="setting__el--inline" action="{% url 'notifpy:update_profile_picture' %}" method="POST">
+            <div class="setting__el--inline__item labeled_input">
+                <label for="input--login">Twitch user login to update the profile picture of:</label>
+                <input class="setting__el__border--first" id="input--login" type="text" name="login" placeholder="Login" />
+            </div>
+            {%csrf_token%}
+            <div class="setting__el--inline__item labeled_input setting__el--inline__item--submit">
+                <label></label>
+                <input class="setting__el__border--last" type="submit" value="Update" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="setting">
     <div class="setting__title">YouTube token</div>
     <div class="setting__body">
         <p class="setting__el--hint">

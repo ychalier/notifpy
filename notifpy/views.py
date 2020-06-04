@@ -497,3 +497,13 @@ def subscribe_batch(request, media, target):
                         channel=user
                     )
     return redirect(reverse("notifpy:subscriptions") + "#" + media)
+
+
+@login_required
+def update_profile_picture(request, login=None):
+    """Force update the profile picture of a given Twitch user"""
+    if request.method == "POST":
+        login = request.POST.get("login").strip()
+    if login is not None:
+        operator.Operator().update_user_thumbnail(login)
+    return redirect("notifpy:subscriptions")

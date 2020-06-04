@@ -35,4 +35,6 @@ urlpatterns = [
     path("subscriptions", views.subscriptions, name="subscriptions"),
     path("subscribe", views.subscribe, name="subscribe"),
     path("subscribe/<media>/<target>", views.subscribe_batch, name="subscribe_batch"),
+    path("update-profile-picture", views.update_profile_picture, name="update_profile_picture"),
+    path("update-profile-picture/<login>", views.update_profile_picture, name="update_profile_picture_login"),
 ]
