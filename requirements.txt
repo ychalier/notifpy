@@ -1,4 +1,4 @@
 --extra-index-url https://packages.chalier.fr
 requests==2.21.0
-Django==3.0.3
+Django==3.0.7
 django-visitors
