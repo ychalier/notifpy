@@ -116,23 +116,20 @@ class YoutubeChannel(models.Model):
 
     def video_is_valid(self, title):
         """Check if a video is valid regarding filters"""
-        if len(self.filter_set.all()) == 0:
-            return True
-        for filters in self.filter_set.all():
-            if re.search(filters.regex, title) is not None:
-                return True
-        return False
+        return True
 
 
 class Filter(models.Model):
 
     """Represent a regex filter for the videos of a channel"""
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     channel = models.ForeignKey("YoutubeChannel", on_delete=models.CASCADE)
     regex = models.CharField(max_length=255, default=".*")
 
     def __str__(self):
-        return "Filter<Channel: %s; Regex: %s>" % (
+        return "Filter<User: %s, Channel: %s; Regex: %s>" % (
+            self.user,
             self.channel,
             self.regex.encode("utf8")
         )
@@ -183,6 +180,18 @@ class Playlist(models.Model):
 
     def size(self):
         return self.videos.count()
+
+    def sample_size(self):
+        return min(4, self.size())
+
+    def sample_range(self):
+        return range(self.sample_size())
+    
+    def sample(self):
+        return random.sample(
+            list(self.playlistmembership_set.all()),
+            self.sample_size(),
+        )
 
 
 class PlaylistMembership(models.Model):
@@ -257,8 +266,24 @@ class YoutubeSubscription(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     channel = models.ForeignKey(YoutubeChannel, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return "YouTube subscription (%s:%s)" % (self.user, self.channel.title)
+
 
 class TwitchSubscription(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     channel = models.ForeignKey(TwitchUser, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "Twitch subscription (%s:%s)" % (self.user, self.channel.display_name)
+    
+
+class SubscriptionHistory(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    youtube = models.ManyToManyField(YoutubeChannel, blank=True)
+    twitch = models.ManyToManyField(TwitchUser, blank=True)
+
+    def __str__(self):
+        return "Subscription history (%s)" % self.user
+    

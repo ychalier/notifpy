@@ -1,0 +1,43 @@
+.youtube_thumbnail {
+    position: relative;
+    display: block;
+}
+
+.youtube_thumbnail_fg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: .2s;
+}
+
+.youtube_thumbnail_fg.show {
+    opacity: 1;
+}
+
+.youtube_video .card .card-image:first-child img {
+    border-radius: 0;
+}
+
+.youtube_video .card {
+    border: none;
+    border-radius: 0;
+}
+
+.youtube_video a {
+    color: inherit;
+}
+
+.remove-video-button {
+    position: absolute;
+    top: .2rem;
+    right: .6rem;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: .2s ease;
+}
+
+.youtube_video:hover~.remove-video-button,
+.remove-video-button:hover {
+    opacity: 1;
+}

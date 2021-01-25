@@ -69,6 +69,7 @@ class Operator:
         statistics = {
             "created": 0,
             "existing": 0,
+            "users": list()
         }
         if self.twitch is None:
             return statistics
@@ -80,6 +81,7 @@ class Operator:
         for twitch_user_item in response["data"]:
             if models.TwitchUser.objects.filter(id=twitch_user_item["id"]).exists():
                 statistics["existing"] += 1
+                statistics["users"].append(models.TwitchUser.objects.get(id=twitch_user_item["id"]))
                 continue
             twitch_user = models.TwitchUser.objects.create(
                 id=twitch_user_item["id"],
@@ -89,6 +91,7 @@ class Operator:
                 offline_image_url=twitch_user_item["offline_image_url"],
             )
             twitch_user.save()
+            statistics["users"].append(twitch_user)
             statistics["created"] += 1
         return statistics
 
@@ -160,6 +163,7 @@ class Operator:
             "created": 0,
             "existing": 0,
             "ignored": 0,
+            "channels": list()
         }
         if self.youtube is None:
             return statistics
@@ -181,6 +185,7 @@ class Operator:
             if snippet is not None:
                 if models.YoutubeChannel.objects.filter(id=snippet["id"]).exists():
                     statistics["existing"] += 1
+                    statistics["channels"].append(models.YoutubeChannel.objects.get(id=snippet["id"]))
                     continue
                 thumbnail = ""
                 if "high" in snippet["snippet"]["thumbnails"]:
@@ -198,6 +203,7 @@ class Operator:
                 )
                 channel.save()
                 statistics["created"] += 1
+                statistics["channels"].append(channel)
             else:
                 statistics["ignored"] += 1
         return statistics

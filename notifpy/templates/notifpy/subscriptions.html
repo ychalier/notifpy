@@ -1,89 +1,79 @@
 {% extends 'notifpy/base.html' %}
 {% load static %}
 
-{% block title %}Subscriptions | Notifpy{% endblock%}
+{% block title %}Subscriptions &mid; {{ block.super }}{% endblock%}
 
-{% block body %}
+{% block main_content %}
 
-<h1>Subscriptions</h1>
-
-<h2 id="youtube">YouTube</h2>
-
-<div class="subscription_list">
-    {% for channel in channels %}
-    <form class="subscription{% if channel.subscribed %} subscribed{% endif %}" action="{% url 'notifpy:subscribe' %}" method="post">
-        <img class="subscription__thumbnail" src="{{channel.thumbnail_link}}" alt={{channel.title}} />
-        {% csrf_token %}
-        <input type="hidden" name="media" value="youtube">
-        <input type="hidden" name="channel" value="{{ channel.id }}">
-        <input type="hidden" name="state" value="{{ channel.subscribed }}">
-        <input class="subscription__input" type="submit" name="submit" value="{{channel.title}}">
-        <a href="{% url 'notifpy:channel' slug=channel.slug %}" ><img class="external_link" src="{% static 'notifpy/icons/external.svg' %}"/></a>
-    </form>
-    {% endfor %}
-</div>
-
-<p class="command-panel">
-    <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='youtube' target='none' %}">Reset</a>
-    <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='youtube' target='all' %}">Select All</a>
-</p>
-
-{% if request.user.is_staff %}
-
-<div class="setting">
-    <div class="setting__title">Add a YouTube channel</div>
-    <div class="setting__body">
-        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:create_channel' %}" method="POST">
-            <textarea class="setting__el__border--first setting__el--inline__item" rows="5" name="query" placeholder="Channel entries"></textarea>
-            {% csrf_token %}
-            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Add" />
-        </form>
-        <p class="setting__el--hint">
-            Write one entry, either "channel/*" or "user/*", per line.
-        </p>
+<form action="{% url 'notifpy:create_channel' %}" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="form-label">Add a YouTube channel</label>
+        <div class="input-group">
+            <input type="text" class="form-input" name="query" placeholder="Channel entries"></textarea>
+            <button class="btn btn-primary input-group-btn">Add</button>
+        </div>
+        <p class="form-input-hint">Write one entry, either <code>channel/*</code> or <code>user/*</code>, per line.</p>
     </div>
-</div>
+</form>
 
-{% endif %}
-
-<h2 id="twitch">Twitch</h2>
-
-<div class="subscription_list">
-    {% for user in users %}
-    <form class="subscription{% if user.subscribed %} subscribed{% endif %}" action="{% url 'notifpy:subscribe' %}" method="post">
-        <img class="subscription__thumbnail" src="{{user.thumbnail}}" alt={{user.login}} />
-        {% csrf_token %}
-        <input type="hidden" name="media" value="twitch">
-        <input type="hidden" name="channel" value="{{ user.id }}">
-        <input type="hidden" name="state" value="{{ user.subscribed }}">
-        <input class="subscription__input" type="submit" name="submit" value="{{user.display_name}}">
-        <a href="{{ user.link }}/videos" ><img class="external_link" src="{% static 'notifpy/icons/external.svg' %}"/></a>
-        <a href="{% url 'notifpy:update_profile_picture_login' login=user.login %}"><img class="external_link" src="{% static 'notifpy/icons/reload.svg' %}"/></a>
-    </form>
-    {% endfor %}
-</div>
-
-<p class="command-panel">
-    <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='twitch' target='none' %}">Reset</a>
-    <a class="command__button" href="{% url 'notifpy:subscribe_batch' media='twitch' target='all' %}">Select All</a>
-</p>
-
-{% if request.user.is_staff %}
-
-<div class="setting">
-    <div class="setting__title">Add a Twitch user</div>
-    <div class="setting__body">
-        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:create_twitch_user' %}" method="POST">
-            <textarea class="setting__el__border--first setting__el--inline__item" rows="5" name="query" placeholder="User logins"></textarea>
-            {% csrf_token %}
-            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Add" />
-        </form>
-        <p class="setting__el--hint">
-            Write one user login per line.
-        </p>
+<form action="{% url 'notifpy:create_twitch_user' %}" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="form-label">Add a Twitch user</label>
+        <div class="input-group">
+            <input type="text" class="form-input" name="query" placeholder="User logins"></textarea>
+            <button class="btn btn-primary input-group-btn">Add</button>
+        </div>
+        <p class="form-input-hint">Write a user login (as displayed in a Twitch URL).</p>
     </div>
-</div>
+</form>
 
-{% endif %}
+<form method="POST" action="{% url 'notifpy:subscribe' %}">
 
-{% endblock %}
+    {% csrf_token %}
+
+    <table class="table table-hover table-condensed">
+        <tr>
+            <th colspan="3">YouTube</th>
+        </tr>
+        {% for channel in channels %}
+        <tr>
+            <td><label class="form-switch"><input type="checkbox" name="youtube-{{ channel.id }}" /><i class="form-icon"></i></label></td>
+            <td>{% if channel.subscribed %}<i class="icon icon-check text-success" title="You are subscribed to {{ channel.title }}"></i>{% endif %}</td>
+            <td class="grow">
+                <img src="{{ channel.thumbnail_link }}" alt="{{ channel.title }}" class="avatar avatar-sm" />
+                &nbsp;
+                <a href="{% url 'notifpy:channel' slug=channel.slug %}" title="View on Notifpy">{{ channel.title }}</a>
+                &nbsp;
+                <a href="https://www.youtube.com/channel/{{ channel.id }}" title="View on YouTube"><i class="icon icon-external"></i></a>
+            </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <th colspan="3">Twitch</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td><label class="form-switch"><input type="checkbox" name="twitch-{{ user.id }}" /><i class="form-icon"></i></label></td>
+            <td>{% if user.subscribed %}<i class="icon icon-check text-success" title="You are following {{ user.display_name }}"></i>{% endif %}</td>
+            <td class="grow">
+                <img src="{{ user.thumbnail }}" alt="{{ user.display_name }}" class="avatar avatar-sm" />
+                &nbsp;
+                <a href="{% url 'notifpy:view_twitch_user' login=user.login %}" title="View on Notifpy">{{ user.display_name }}</a>
+                &nbsp;
+                <a href="{{ user.link }}/videos" title="View on Twitch"><i class="icon icon-external"></i></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <p>
+        <input class="btn btn-primary" type="submit" name="action" value="Subscribe" />
+        <input class="btn btn-primary" type="submit" name="action" value="Unsubscribe" />
+        <input class="btn btn-primary" type="submit" name="action" value="Remove from history" />
+    </p>
+
+</form>
+
+{% endblock main_content %}

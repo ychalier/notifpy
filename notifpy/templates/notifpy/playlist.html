@@ -1,96 +1,116 @@
 {% extends 'notifpy/base.html' %}
 {% load static %}
 
-{% block title %}{{playlist.title}} | Notifpy{% endblock%}
+{% block title %}{{playlist.title}} &mid; {{ block.super }}{% endblock %}
 
-{% block body %}
+{% block main_content %}
+
 <h1>{{playlist.title}}</h1>
 
-<p class="command-panel">
-    <a class="command__button" href="{{playlist.url_ranked}}">Ordered Play</a>
-    <a class="command__button" href="{{playlist.url_shuffled}}">Shuffled Play</a>
+<p id="commands">
+    <a class="btn btn-primary" href="{{playlist.url_ranked}}" title="Play in order"><i class="icon icon-play"></i></a>
+    <a class="btn btn-primary" href="{{playlist.url_shuffled}}" title="Play shuffled"><i class="icon icon-shuffle"></i></a>
+    {% if playlist.owned %}
+    {% if playlist.public %}
+    <a class="btn btn-primary" href="{% url 'notifpy:publish_playlist' slug=playlist.slug state='private' %}" title="Make private"><i class="icon icon-lock"></i></a>
+    {% else %}
+    <a class="btn btn-primary" href="{% url 'notifpy:publish_playlist' slug=playlist.slug state='public' %}" title="Make public"><i class="icon icon-unlock"></i></a>
+    {% endif %}
+    <a class="btn btn-primary" href="{% url 'notifpy:delete_playlist' slug=playlist.slug %}" title="Delete"><i class="icon icon-cross"></i></a>
+    {% endif %}
 </p>
 
-<div class="gallery--edit">
+<div>
     {% if playlist.videos.all %}
-    {% for entry in playlist.get_videos %}
-    <div class="gallery--edit__elt">
-        {% if playlist.owned %}
-        <div class="vertical_command_pannel">
-            {% if not forloop.first %}
-            <form method="get" action="{% url 'notifpy:move_playlist' slug=playlist.slug order=entry.order direction="up"%}">
-                {% csrf_token %}
-                <input class="command__button" type="submit" value="&uarr;" />
-            </form>
-            {% endif %}
-            <form method="post" action="{% url 'notifpy:remove_playlist' slug=playlist.slug %}">
+    <div class="columns" id="video_list">
+        {% for entry in playlist.get_videos %}
+        <div class="column col-4 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 my-2 p-relative" db="{{ entry.id }}">
+            {% include "notifpy/video.html" with video=entry.video %}
+            {% if playlist.owned %}
+            <form class="remove-video-button" method="post" action="{% url 'notifpy:remove_playlist' slug=playlist.slug %}">
                 <input hidden name="id" value="{{entry.video.id}}" />
                 {% csrf_token %}
-                <input class="command__button" type="submit" value="&#10005;" />
-            </form>
-            {% if not forloop.last %}
-            <form method="get" action="{% url 'notifpy:move_playlist' slug=playlist.slug order=entry.order direction="down"%}">
-                {% csrf_token %}
-                <input class="command__button" type="submit" value="&darr;" />
+                <button class="btn" title="Remove video from playlist"><i class="icon icon-cross"></i></button>
             </form>
             {% endif %}
         </div>
-        {% endif %}
-        {% include "notifpy/video.html" with video=entry.video %}
+        {% endfor %}
     </div>
-    {% endfor %}
     {% else %}
     <p>No video in this playlist.</p>
     {% endif %}
 </div>
 
-{% if playlist.owned %}
-<h2>Settings</h2>
+{% if playlist.owned  %}
+
+<p>
 {% if playlist.public %}
-<p>
-    <img class="inline_icon" src="{% static 'notifpy/icons/unlock.svg' %}" /> The playlist is currently public.
-</p>
+<i class="icon icon-unlock" title="The playlist is public."></i> The playlist is public.
 {% else %}
-<p>
-    <img class="inline_icon" src="{% static 'notifpy/icons/lock.svg' %}" /> The playlist is currently private.
+<i class="icon icon-lock" title="The playlist is private."></i> The playlist is private.
+{% endif %}
 </p>
+
+<form action="{% url 'notifpy:edit_playlist' slug=playlist.slug %}" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="form-label" for="input-title">Title</label>
+        <div class="input-group">
+            <input class="form-input" type="text" name="title" id="input-title" placeholder="Title" value="{{ playlist.title }}" />
+            <button class="btn btn-primary input-group-btn">Save</button>
+        </div>
+    </div>
+</form>
+
+<form action="{% url 'notifpy:add_playlist' slug=playlist.slug %}" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="form-label" for="input-add-video">Add a video</label>
+        <div class="input-group">
+            <textarea class="form-input" id="input-add-video" placeholder="Paste video links here" rows="1" name="video"></textarea>
+            <button class="btn btn-primary">Add</button>
+        </div>
+        <p class="form-input-hint">Write one entry, either a full link or a sole video id, per line.</p>
+    </div>
+</form>
+
+<form action="{% url 'notifpy:order_playlist' slug=playlist.slug %}" method="POST" id="form-order">
+    {% csrf_token %}
+    <input type="hidden" name="ordering" />
+</form>
+
 {% endif %}
 
-<p class="command-panel">
-    {% if playlist.public %}
-    <a class="command__button" href="{% url 'notifpy:publish_playlist' slug=playlist.slug state='private' %}">Make private</a>
-    {% else %}
-    <a class="command__button" href="{% url 'notifpy:publish_playlist' slug=playlist.slug state='public' %}">Make public</a>
-    {% endif %}
-    <a class="command__button" href="{% url 'notifpy:delete_playlist' slug=playlist.slug %}">Delete</a>
-</p>
+{% endblock %}
 
-<div class="setting">
-    <div class="setting__title">Title</div>
-    <div class="setting__body">
-        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:edit_playlist' slug=playlist.slug %}" method="POST">
-            <input class="setting__el--inline__item setting__el__border--first" type="text" name="title" value="{{playlist.title}}" placeholder="Title" />
-            {% csrf_token %}
-            <input class="setting__el--inline__item setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Save" />
-        </form>
-    </div>
-</div>
+{% block body_scripts %}
+{{ block.super }}
 
-<div class="setting">
-    <div class="setting__title">Add a video</div>
-    <div class="setting__body">
-        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:add_playlist' slug=playlist.slug %}" method="POST">
-            <textarea class="setting__el--inline__item setting__el__border--first" name="video" rows="8"></textarea>
-            {% csrf_token %}
-            <input class="setting__el--inline__item setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Add" />
-        </form>
-        <p class="setting__el--hint">
-            Write one entry, either a full link or a sole video id, per line.
-        </p>
-    </div>
-</div>
-
-<br>
+{% if playlist.owned %}
+<script type="text/javascript">
+let orderChanged = false;
+bindDraggableOrdering(document.getElementById("video_list"), ".column", (dragged) => {
+    if (!orderChanged) {
+        let button = document.createElement("button");
+        button.className = "btn btn-primary";
+        button.textContent = "Save ordering";
+        document.getElementById("commands").appendChild(button);
+        button.addEventListener("click", (event) => {
+            let form = document.getElementById("form-order");
+            let ordering = "";
+            document.querySelectorAll("#video_list > .column").forEach((item) => {
+                if (ordering) {
+                    ordering += ";";
+                }
+                ordering += item.getAttribute("db");
+            });
+            form.querySelector("input[name='ordering']").value = ordering;
+            form.submit();
+        });
+    }
+    orderChanged = true;
+});
+</script>
 {% endif %}
 
 {% endblock %}

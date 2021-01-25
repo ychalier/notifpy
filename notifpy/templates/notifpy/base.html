@@ -1,52 +1,36 @@
+{% extends 'piweb/single_column.html' %}
+
 {% load static %}
 
-<!DOCTYPE html>
 
-<html>
+{% block title %}Notifpy{% endblock %}
 
-<head>
-    <title>{% block title %}Notifpy{% endblock %}</title>
-    <meta name="viewport" content="width=device-width" />
-    <meta charset="utf-8" />
-    <link rel="icon" href="{% static 'notifpy/logo/32.png' %}" sizes="32x32">
-    <link rel="icon" href="{% static 'notifpy/logo/48.png' %}" sizes="48x48">
-    <link rel="icon" href="{% static 'notifpy/logo/96.png' %}" sizes="96x96">
-    <link rel="icon" href="{% static 'notifpy/logo/144.png' %}" sizes="144x144">
-    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'notifpy/css/layout.css' %}" />
-    <link rel="stylesheet" href="{% static 'notifpy/css/utils.css' %}" />
-    <link rel="stylesheet" href="{% static 'notifpy/css/video.css' %}" />
-    <link rel="stylesheet" href="{% static 'notifpy/css/forms.css' %}" />
-    <link rel="stylesheet" href="{% static 'notifpy/css/playlist.css' %}" />
-    <link rel="stylesheet" href="{% static 'notifpy/css/responsive.css' %}" />
-    <link rel="stylesheet" href="{% static 'notifpy/css/settings.css' %}">
-</head>
+{% block head %}
+{{ block.super }}
+<link rel="icon" href="{% static 'notifpy/logo/32.png' %}" sizes="32x32" />
+<link rel="icon" href="{% static 'notifpy/logo/48.png' %}" sizes="48x48" />
+<link rel="icon" href="{% static 'notifpy/logo/96.png' %}" sizes="96x96" />
+<link rel="icon" href="{% static 'notifpy/logo/144.png' %}" sizes="144x144" />
+<link rel="stylesheet" href="{% static 'notifpy/css/notifpy.css' %}" />
+{% endblock head %}
 
-<body>
-    <div class="body_wrapper">
-        <div class="fullheight_padding"></div>
-        <header class="header header--inline">
-            <nav class="header__nav navbar">
-                <a href="{% url 'notifpy:abstract' %}" class="header__title">Notifpy</a>
-                {% if request.user.is_authenticated %}
-                <span class="hide_on_small">&middot;</span>
-                <a href="{% url 'notifpy:home' %}">Home</a>
-                <a href="{% url 'notifpy:playlists' %}">Playlists</a>
-                <div class="separator"></div>
-                {% if request.user.is_staff %}
-                <a href="{% url 'notifpy:settings' %}"><img class="user_badge" src="{% static 'notifpy/icons/settings.svg' %}" alt="*"></a>
-                {% endif %}
-                <span class="username"><a href="{% url 'notifpy:subscriptions' %}">{{request.user.username|upper}}</a></span>
-                {% endif %}
-            </nav>
-        </header>
-        <section>
-            {% block body %}
-            {% endblock %}
-        </section>
-        <div class="fullheight_padding"></div>
-    </div>
-    <script type="text/javascript" src="{% static 'notifpy/js/thumbnail.js'%}"></script>
-</body>
+{% block body_class %}dark{% endblock body_class %}
 
-</html>
+{% block navbar %}
+<section class="navbar-section">
+    <a href="{% url 'notifpy:abstract' %}" class="navbar-brand mr-2">Notifpy</a>
+    <a href="{% url 'notifpy:home' %}" class="btn btn-link">Home</a>
+    <a href="{% url 'notifpy:playlists' %}" class="btn btn-link">Playlists</a>
+</section>
+<section class="navbar-section">
+    {% if request.user.is_superuser %}
+    <a href="{% url 'notifpy:settings' %}" class="btn btn-link" title="Settings"><i class="icon icon-gear"></i></a>
+    {% endif %}
+    <a href="{% url 'notifpy:subscriptions' %}" class="btn btn-link" title="Subscriptions"><i class="icon icon-subscriptions"></i></a>
+    {% include 'piweb/user_icon.html' %}
+</section>
+{% endblock navbar %}
+
+{% block body_scripts %}
+<script type="text/javascript" src="{% static 'notifpy/js/thumbnail.js'%}"></script>
+{% endblock body_scripts %}

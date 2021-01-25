@@ -1,117 +1,112 @@
 {% extends 'notifpy/base.html' %}
 {% load static %}
 
-{% block title %}{{channel.title}} | Notifpy{% endblock%}
+{% block title %}{{channel.title}} &mid; {{ block.super }}{% endblock%}
 
-{% block body %}
-<div class="icon-title">
-    <img class="channel__thumbnail" src="{{channel.thumbnail}}" />
-    <h1>{{channel.title}}</h1>
-</div>
+{% block main_content %}
+<h1>
+    <figure class="avatar avatar-lg">
+        <img src="{{channel.thumbnail}}" alt="{{ channel.title }}" />
+    </figure>
+    {{channel.title}}
+    {% if subscribed %}<i class="icon icon-2x icon-task text-success" title="Subscribed"></i>{% endif %}
+</h1>
 
-<div>
+<p>
     {% if channel.last_update %}
     Last update on {{channel.last_update}}
     {% else %}
     This channel has never been updated.
     {% endif %}
-</div>
+</p>
 
 <h2>Last videos</h2>
 
 {% if videos %}
-<div class="gallery--grid">
+<div class="columns">
     {% for video in videos %}
-    {% include "notifpy/video.html" %}
+    <div class="column col-4 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 my-2">
+        {% include "notifpy/video.html" %}
+    </div>
     {% endfor %}
 </div>
 {% else %}
 <p>No video found for this channel.</p>
 {% endif %}
 
-{% if request.user.is_staff %}
-
-<h2>Settings</h2>
-
-
-<p class="command-panel">
-    <a class="command__button" href="{% url 'notifpy:delete_channel' slug=channel.slug %}">Delete</a>
-    <a class="command__button" href="{% url 'notifpy:update_channel' slug=channel.slug %}">Update</a>
-</p>
-
-
-<div class="setting">
-    <div class="setting__title">
-        Channel properties
-    </div>
-    <form class="setting__el--inline" action="{% url 'notifpy:edit_channel' slug=channel.slug %}" method="post">
-        <div class="setting__el--inline__item labeled_input">
-            <label for="">Thumbnail</label>
-            <input class="setting__el__border--first" type="text" name="thumbnail" value="{{channel.thumbnail}}" placeholder="URL to image file">
+{% if subscribed %}
+    <div class="card my-2">
+        <div class="card-header">
+            <div class="card-title h5">Channel filter</div>
+            <div class="card-subtitle text-gray">Filters are regular expressions that are matched to video titles. If a channel has at least one filter, then its filters form a set of rules to whitelist a video for future channel updates.</div>
         </div>
-        {% csrf_token %}
-        <div class="setting__el--inline__item labeled_input" style="flex: 0 0 120px">
-            <label for="">Priority</label>
-            <select name="priority">
-                <option value="-1" {% if channel.priority == -1 %}selected="" {%endif%}>None</option>
-                <option value="0" {% if channel.priority == 0 %}selected="" {%endif%}>Low</option>
-                <option value="1" {% if channel.priority == 1 %}selected="" {%endif%}>Medium</option>
-                <option value="2" {% if channel.priority == 2 %}selected="" {%endif%}>High</option>
-            </select>
+        <div class="card-body">
+            {% if filters %}
+            <div class="flex-wrap">
+                {% for filter in filters %}
+                <form method="post" action="{% url 'notifpy:delete_filter' %}">
+                    {% csrf_token %}
+                    <input hidden name="id" value="{{filter.id}}" />
+                    <span class="chip">{{ filter.regex }} <button class="btn btn-clear"></button></span>
+                </form>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="label label-primary label-rounded">Currently, there is no filter.</p>
+            {% endif %}
+            <form method="post" action="{% url 'notifpy:create_filter' %}">
+                {% csrf_token %}
+                <input hidden name="channel" value={{ channel.id }} />
+                <div class="form-group">
+                    <label class="form-label" for="form-input-regexes">Add a filter</label>
+                    <div class="input-group">
+                        <input type="text" id="form-input-regexes" class="form-input" name="regexes" placeholder="Filters"></textarea>
+                        <button class="btn btn-primary input-group-btn">Add</button>
+                    </div>
+                    <p class="form-input-hint">Regular expression (Python-friendly) are accepted.</p>
+                </div>
+            </form>
         </div>
-        <div class="setting__el--inline__item labeled_input setting__el--inline__item--submit">
-            <label></label>
-            <input class="setting__el__border--last" type="submit" value="Save" />
-        </div>
-    </form>
-</div>
-
-<div class="setting">
-    <div class="setting__title">
-        Add a filter
     </div>
-    <div class="setting__body">
-        <p class="setting__el--hint">
-            Filters are regular expressions that are matched to video titles.
-            If a channel has at least one filter, then its filters form a set
-            of rules to whitelist a video for future channel updates.
-        </p>
-        <form class="setting__el--inline setting__el--inline--fixed_height" method="post" action="{% url 'notifpy:create_filter' %}">
-            <textarea class="setting__el__border--first setting__el--inline__item" name="regexes" rows="8" placeholder="Filters"></textarea>
-            {% csrf_token %}
-            <input hidden name="channel" value={{channel.id}} />
-            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Add" />
-        </form>
-        <p class="setting__el--hint">
-            Write one filter per line.
-        </p>
-    </div>
-</div>
-
-<div class="setting">
-    <div class="setting__title">
-        Current filters
-    </div>
-    <div class="setting__body grid">
-        {% if channel.filter_set.all %}
-        {% for filter in channel.filter_set.all %}
-        <form method="post" action="{% url 'notifpy:delete_filter' %}" class="form--filter">
-            <label>{{filter.regex}}</label>
-            {% csrf_token %}
-            <input hidden name="id" value="{{filter.id}}" />
-            <input type="submit" value="&#10005;" />
-        </form>
-        <div class="vspace"></div>
-        {% endfor %}
-        {% else %}
-        <p class="setting__el--hint">
-            No filter found for this channel.
-        </p>
-        {% endif %}
-    </div>
-</div>
-
 {% endif %}
 
 
-{% endblock %}
+{% if request.user.is_superuser %}
+
+<h2 class="m-top">Superuser Settings</h2>
+
+<p>
+    <a class="btn btn-primary" href="{% url 'notifpy:delete_channel' slug=channel.slug %}" title="Delete this channel"><i class="icon icon-delete"></i> Delete</a>
+    <a class="btn btn-primary" href="{% url 'notifpy:update_channel' slug=channel.slug %}" title="Force the update"><i class="icon icon-refresh"></i> Update</a>
+</p>
+
+<form action="{% url 'notifpy:edit_channel' slug=channel.slug %}" method="post">
+    {% csrf_token %}
+    <div class="card my-2">
+        <div class="card-header">
+            <div class="card-title h5">Edit channel properties</div>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label class="form-label" for="form-input-thumbnail">Thumbnail</label>
+                <input class="form-input" id="form-input-thumbnail" type="text" name="thumbnail" value="{{channel.thumbnail}}" placeholder="URL to image file" />
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="form-input-priority">Priority</label>
+                <select class="form-select" name="priority">
+                    <option value="-1" {% if channel.priority == -1 %}selected="" {% endif %}>None</option>
+                    <option value="0" {% if channel.priority == 0 %}selected="" {% endif %}>Low</option>
+                    <option value="1" {% if channel.priority == 1 %}selected="" {% endif %}>Medium</option>
+                    <option value="2" {% if channel.priority == 2 %}selected="" {% endif %}>High</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</form>
+
+{% endif %}
+
+{% endblock main_content %}

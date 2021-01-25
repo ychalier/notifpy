@@ -1,45 +1,108 @@
 {% extends 'notifpy/base.html' %}
 {% load static %}
 
-{% block title %}Playlists | Notifpy{% endblock%}
+{% block title %}Playlists &mid; {{ block.super }} {% endblock %}
 
-{% block body %}
-<h1>Playlists</h1>
-
-<div class="setting">
-    <div class="setting__title">Add a Playlist</div>
-    <div class="setting__body">
-        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:create_playlist' %}" method="POST">
-            <input class="setting__el__border--first setting__el--inline__item" type="text" name="title" value="" placeholder="Title">
-            {%csrf_token%}
-            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Create" />
-        </form>
-    </div>
-</div>
+{% block main_content %}
 
 {% if playlists %}
+
+<div class="columns">
+
 {% for playlist in playlists %}
-<div class="playlist">
-    <div class="playlist__header">
-        <a href="{% url 'notifpy:playlist' slug=playlist.slug %}">
-            <h3>{{ playlist.title }} ({{ playlist.size }})</h3>
-        </a>
-        <a href="{{playlist.url_ranked}}"><img class="playlist__icon" src="{% static 'notifpy/icons/play.svg' %}" /></a>
-        <a href="{{playlist.url_shuffled}}"><img class="playlist__icon" src="{% static 'notifpy/icons/random.svg' %}" /></a>
-    </div>
-    <div class="playlist__gallery">
-        {% if playlist.videos.all %}
-        {% for entry in playlist.get_videos|slice:":3" %}
-        {% include "notifpy/video.html" with video=entry.video %}
-        {% endfor %}
-        {% else %}
-        <p>No video in this playlist.</p>
-        {% endif %}
+
+<div class="column col-4 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 my-2">
+    <div class="card my-2">
+        <div class="card-header">
+            <div class="card-title h6">
+                <a class="link-hidden" href="{% url 'notifpy:playlist' slug=playlist.slug %}">{{ playlist.title }}</a>
+            </div>
+            <div class="card-subtitle text-gray">
+                {% if playlist.size %}
+                {{ playlist.size }} video{{ playlist.size|pluralize }}
+                {% else %}
+                No video in this playlist.
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-image">
+            <div class="carousel carousel-auto">
+                {% for i in playlist.sample_range %}
+                    <input class="carousel-locator" id="{{ forloop.parentloop.counter }}-slide-{{ forloop.counter }}" type="radio" name="carousel-radio-{{ forloop.parentloop.counter }}" hidden="" {% if forloop.counter == 1 %}checked=""{% endif %} />
+                {% endfor %}
+                <div class="carousel-container">
+                    {% for playlist_membership in playlist.sample %}
+                        <figure class="carousel-item">
+                            <label class="item-prev btn btn-action btn-lg" for="{{ forloop.parentloop.counter }}-slide-{% if forloop.counter == 1 %}{{ playlist.sample_size }}{% else %}{{ forloop.counter|add:"-1" }}{% endif %}"><i class="icon icon-arrow-left"></i></label>
+                            <label class="item-next btn btn-action btn-lg" for="{{ forloop.parentloop.counter }}-slide-{% if forloop.counter == playlist.sample_size %}1{% else %}{{ forloop.counter|add:"1" }}{% endif %}"><i class="icon icon-arrow-right"></i></label>
+                            <a href="https://www.youtube.com/watch?v={{ playlist_membership.video.id }}" title="{{ playlist_membership.video.title }}"><img class="img-responsive rounded" width="640" height="360" src="{{ playlist_membership.video.thumbnail }}" alt="{{ playlist_membership.video.title }}"></a>
+                        </figure>
+                    {% endfor %}
+                </div>
+                <div class="carousel-nav">
+                    {% for i in playlist.sample_range %}
+                        <label class="nav-item text-hide c-hand" for="{{ forloop.parentloop.counter }}-slide-{{ forloop.counter }}">{{ forloop.counter }}</label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="btn-group btn-group-block">
+                <a class="btn btn-primary" href="{{playlist.url_ranked}}" title="Play in order">Play</a>
+                <a class="btn btn-link" href="{{playlist.url_shuffled}}" title="Play shuffled">Shuffle</a>
+                <a class="btn btn-link" href="{% url 'notifpy:playlist' slug=playlist.slug %}" title="Play shuffled">Edit</a>
+            </div>
+        </div>
     </div>
 </div>
 {% endfor %}
+
+<div class="column col-4 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 my-2">
+    <p class="my-2">
+        <button class="btn btn-primary" onclick="showModal('modal-create-playlist')" title="Add a playlist">Add a playlist</button>
+    </p>
+    
+</div>
+
+</div>
+
 {% else %}
-<p>No playlist found.</p>
+
+<div class="empty">
+    <div class="empty-icon">
+        <i class="icon icon-4x icon-playlist-play"></i>
+    </div>
+    <p class="empty-title h5">You have no playlist</p>
+    <p class="empty-subtitle">Click the button to create a playlist.</p>
+    <div class="empty-action">
+        <button class="btn btn-primary" onclick="showModal('modal-create-playlist')">Create a playlist</button>
+    </div>
+</div>
+
 {% endif %}
+
+<div class="modal" id="modal-create-playlist">
+    <a onclick="closeModal('modal-create-playlist')" class="modal-overlay" aria-label="Close"></a>
+    <div class="modal-container">
+        <div class="modal-header">
+            <a onclick="closeModal('modal-create-playlist')" class="btn btn-clear float-right" aria-label="Close"></a>
+            <div class="modal-title h5">Add a playlist</div>
+        </div>
+        <form action="{% url 'notifpy:create_playlist' %}" method="POST">
+            {%csrf_token%}
+            <div class="modal-body">
+                <div class="content">
+                    <div class="form-group">
+                        <label class="form-label" for="input-title">Title</label>
+                        <input class="form-input" type="text" name="title" id="input-title" placeholder="Title" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 {% endblock %}

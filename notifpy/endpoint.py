@@ -28,6 +28,9 @@ class Credentials:
         self.redirect_uri = source["redirect_uri"]
         self.scope = source["scope"]
 
+    def is_valid(self):
+        return self.client_id and self.client_secret and self.redirect_uri and self.scope
+
 
 class Token:
 
@@ -72,7 +75,6 @@ class Token:
         self.refresh_token = None
         self.expires_in = None
         self.delivery_time = None
-        # os.remove(self.filename)
 
     def save(self):
         """Export current token"""

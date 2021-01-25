@@ -1,17 +1,18 @@
 {% load static %}
 
-<div class="video">
-    <div class="video__thumbnail">
-        <a class="video__link" href="https://www.youtube.com/watch?v={{ video.id }}">
-            <img class="video__thumbnail__background" src="{% static 'notifpy/default-thumbnail.svg' %}" true_src="{{ video.thumbnail }}" />
-        </a>
-    </div>
-    <div class="video__information">
-        <div class="video__title">
-            <a href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title | safe }}</a>
+<div class="youtube_video">
+    <div class="card">
+        <div class="card-image">
+            <a href="https://www.youtube.com/watch?v={{ video.id }}">
+                <span class="youtube_thumbnail">
+                    <img class="img-responsive youtube_thumbnail_bg" width="640" height="360" src="{% static 'notifpy/default-thumbnail.svg' %}" />
+                    <img class="img-responsive youtube_thumbnail_fg" width="640" height="360" lazysrc="{{ video.thumbnail }}" />
+                </span>
+            </a>
         </div>
-        <div class="video__description">
-            <a href="{% url 'notifpy:channel' slug=video.channel.slug %}">{{ video.channel.title | safe }}</a> &middot; {{ video.time }}
+        <div class="card-header">
+            <div class="card-title h6"><a class="link-hidden" href="https://www.youtube.com/watch?v={{ video.id }}">{{ video.title | safe }}</a></div>
+            <div class="card-subtitle text-gray"><a class="link-hidden" href="{% url 'notifpy:channel' slug=video.channel.slug %}" title="Go to channel">{{ video.channel.title | safe }}</a> &middot; {{ video.time }}</div>
         </div>
     </div>
 </div>

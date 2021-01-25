@@ -1,123 +1,142 @@
 {% extends 'notifpy/base.html' %}
 {% load static %}
 
-{% block title %}Settings | Notifpy{% endblock%}
+{% block title %}Settings &mid; {{ block.super }}{% endblock %}
 
-{% block body %}
+{% block main_content %}
 
 <h1>Settings</h1>
 
-<div class="setting">
-    <div class="setting__title">Force update</div>
-    <div class="setting__body">
-        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:update' %}" method="POST">
-            <select class="setting__el__border--first setting__el--inline__item" name="priority">
-                <option value="0">Low</option>
-                <option value="1" selected="">Medium</option>
-                <option value="2">High</option>
-            </select>
-            {%csrf_token%}
-            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Update" />
-        </form>
-    </div>
-</div>
-
-<div class="setting">
-    <div class="setting__title">Clear old videos</div>
-    <div class="setting__body">
-        <p class="setting__el--hint">Delete videos older than:</p>
-        <form class="setting__el--inline setting__el--inline--fixed_height" action="{% url 'notifpy:clear_old_videos' %}" method="post">
-            <select class="setting__el__border--first setting__el--inline__item" name="older">
-                <option value="3600">1 hour</option>
-                <option value="86400">1 day</option>
-                <option value="604800">1 week</option>
-                <option value="2592000" selected="">1 month</option>
-                <option value="15552000">6 months</option>
-            </select>
-            {%csrf_token%}
-            <input class="setting__el__border--last setting__el--inline__item setting__el--inline__item--submit" type="submit" value="Delete" />
-        </form>
-    </div>
-</div>
-
-<div class="setting">
-    <div class="setting__title">Edit update schedule</div>
-    <div class="setting__body">
-        <form class="setting__el--inline" action="{% url 'notifpy:edit_schedule' %}" method="post">
-            <div class="setting__el--inline__item labeled_input">
-                <label for="input--low">Low</label>
-                <input class="setting__el__border--first" id="input--low" type="text" name="low" value="{{current_schedule.low}}" />
+<div class="columns">
+    <div class="column col-6 col-md-12">
+        <div class="card my-2">
+            <div class="card-header">
+                <div class="card-title h5">YouTube token</div>
             </div>
-            {% csrf_token %}
-            <div class="setting__el--inline__item labeled_input">
-                <label for="input--medium">Medium</label>
-                <input id="input--medium" type="text" name="medium" value="{{current_schedule.medium}}" />
+            <div class="card-body">
+                <p >
+                {% if operator.youtube.oauth_flow.credentials.is_valid %}
+                Credentials are valid (client ID <code class="break">{{ operator.youtube.oauth_flow.credentials.client_id }}</code>).
+                {% else %}
+                Credentials are not valid.
+                {% endif %}
+                </p>
+                <p>
+                    {% if operator.youtube.oauth_flow.token %}
+                    Delivered at
+                    {{operator.youtube.oauth_flow.token.delivery_datetime|date:"Y-m-d H:i:s"}}
+                    and expires at
+                    {{operator.youtube.oauth_flow.token.expiration_datetime|date:"Y-m-d H:i:s"}}.
+                    {% else %}
+                    No token found.
+                    {% endif %}
+                </p>
             </div>
-            <div class="setting__el--inline__item labeled_input">
-                <label for="input--high">High</label>
-                <input id="input--high" type="text" name="high" value="{{current_schedule.high}}" />
+            <div class="card-footer">
+                <div class="btn-group btn-group-block">
+                    <a class="btn btn-primary" href="{{operator.youtube.oauth_flow.get_authorize_url}}">Retrieve Token</a>
+                    <a class="btn btn-primary" href="{% url 'notifpy:refresh_token' source='youtube' %}">Refresh Token</a>
+                    <a class="btn btn-primary" href="{% url 'notifpy:revoke_token' source='youtube' %}">Revoke Token</a>
+                </div>
             </div>
-            <div class="setting__el--inline__item labeled_input setting__el--inline__item--submit">
-                <label></label>
-                <input class="setting__el__border--last" type="submit" value="Save" />
+        </div>
+        <div class="card my-2">
+            <div class="card-header">
+                <div class="card-title h5">Channel Updates</div>
             </div>
-        </form>
-        <p class="setting__el--hint">
-            Write space separated update hours for each priority level.
-        </p>
-    </div>
-</div>
-
-<div class="setting">
-    <div class="setting__title">Update Twitch Profile Picture</div>
-    <div class="setting__body">
-        <form class="setting__el--inline" action="{% url 'notifpy:update_profile_picture' %}" method="POST">
-            <div class="setting__el--inline__item labeled_input">
-                <label for="input--login">Twitch user login to update the profile picture of:</label>
-                <input class="setting__el__border--first" id="input--login" type="text" name="login" placeholder="Login" />
+            <div class="card-body">
+                <form action="{% url 'notifpy:update' %}" method="POST">
+                    {%csrf_token%}
+                    <div class="form-group">
+                        <label class="form-label">Force update</label>
+                        <div class="input-group">
+                            <select class="form-select" name="priority">
+                                <option value="0">Low</option>
+                                <option value="1" selected="">Medium</option>
+                                <option value="2">High</option>
+                            </select>
+                            <button class="btn btn-primary input-group-btn">Update</button>
+                        </div>
+                    </div>
+                </form>
+                <form action="{% url 'notifpy:clear_old_videos' %}" method="post">
+                    {%csrf_token%}
+                    <div class="form-group">
+                        <label class="form-label">Delete videos older than</label>
+                        <div class="input-group">
+                            <select class="form-select" name="older">
+                                <option value="3600">1 hour</option>
+                                <option value="86400">1 day</option>
+                                <option value="604800">1 week</option>
+                                <option value="2592000" selected="">1 month</option>
+                                <option value="15552000">6 months</option>
+                            </select>
+                            <button class="btn btn-primary input-group-btn">Delete</button>
+                        </div>
+                        <p class="form-input-hint">Videos belonging to any playlists will not be considered by this.</p>
+                    </div>
+                </form>
+                <form action="{% url 'notifpy:edit_schedule' %}" method="post">
+                    {%csrf_token%}
+                    <div class="columns">
+                        <div class="column col-4 col-sm-12 col-xs-12">
+                            <div class="form-group">
+                                <label class="form-label" for="input--low">Low</label>
+                                <input class="form-input" id="input--low" type="text" name="low" value="{{ current_schedule.low }}" />
+                            </div>
+                        </div>
+                        <div class="column col-4 col-sm-12 col-xs-12">
+                            <div class="form-group">
+                                <label class="form-label" for="input--medium">Medium</label>
+                                <input class="form-input" id="input--medium" type="text" name="medium" value="{{ current_schedule.medium }}" />
+                            </div>
+                        </div>
+                        <div class="column col-4 col-sm-12 col-xs-12">
+                            <div class="form-group">
+                                <label class="form-label" for="input--high">High</label>
+                                <input class="form-input" id="input--high" type="text" name="high" value="{{ current_schedule.high }}" />
+                            </div>
+                        </div>
+                    </div>
+                    <p class="form-input-hint">Write space separated update hours for each priority level.</p>
+                    <button class="btn btn-primary">Save</button>
+                </form>
             </div>
-            {%csrf_token%}
-            <div class="setting__el--inline__item labeled_input setting__el--inline__item--submit">
-                <label></label>
-                <input class="setting__el__border--last" type="submit" value="Update" />
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="setting">
-    <div class="setting__title">YouTube token</div>
-    <div class="setting__body">
-        <p class="setting__el--hint">
-            Delivered at
-            {{operator.youtube.oauth_flow.token.delivery_datetime|date:"Y-m-d H:i:s"}}
-            and expires at
-            {{operator.youtube.oauth_flow.token.expiration_datetime|date:"Y-m-d H:i:s"}}.
-        </p>
-        <div class="setting__el--inline setting__el--inline--fixed_height">
-            <a class="setting__el__border--first setting__el--inline__item command__button" href="{{operator.youtube.oauth_flow.get_authorize_url}}">Retrieve Token</a>
-            <a class="setting__el--inline__item command__button" href="{% url 'notifpy:refresh_token' source='youtube' %}">Refresh Token</a>
-            <a class="setting__el__border--last setting__el--inline__item command__button" href="{% url 'notifpy:revoke_token' source='youtube' %}">Revoke Token</a>
         </div>
     </div>
-</div>
-
-<div class="setting">
-    <div class="setting__title">Twitch token</div>
-    <div class="setting__body">
-        <p class="setting__el--hint">
-            Delivered at
-            {{operator.twitch.oauth_flow.token.delivery_datetime|date:"Y-m-d H:i:s"}}
-            and expires at
-            {{operator.twitch.oauth_flow.token.expiration_datetime|date:"Y-m-d H:i:s"}}.
-        </p>
-        <div class="setting__el--inline setting__el--inline--fixed_height">
-            <a class="setting__el__border--first setting__el--inline__item command__button" href="{{operator.twitch.oauth_flow.get_authorize_url}}">Retrieve Token</a>
-            <a class="setting__el--inline__item command__button" href="{% url 'notifpy:refresh_token' source='twitch' %}">Refresh Token</a>
-            <a class="setting__el__border--last setting__el--inline__item command__button" href="{% url 'notifpy:revoke_token' source='twitch' %}">Revoke Token</a>
+    <div class="column col-6 col-md-12">
+        <div class="card my-2">
+            <div class="card-header">
+                <div class="card-title h5">Twitch token</div>
+            </div>
+            <div class="card-body">
+                <p>
+                    {% if operator.twitch.oauth_flow.credentials.is_valid %}
+                    Credentials are valid (client ID <code class="break">{{ operator.twitch.oauth_flow.credentials.client_id }}</code>).
+                    {% else %}
+                    Credentials are not valid.
+                    {% endif %}
+                </p>
+                <p>
+                    {% if operator.twitch.oauth_flow.token %}
+                    Delivered at
+                    {{operator.twitch.oauth_flow.token.delivery_datetime|date:"Y-m-d H:i:s"}}
+                    and expires at
+                    {{operator.twitch.oauth_flow.token.expiration_datetime|date:"Y-m-d H:i:s"}}.
+                    {% else %}
+                    No token found.
+                    {% endif %}
+                </p>
+            </div>
+            <div class="card-footer">
+                <div class="btn-group btn-group-block">
+                    <a class="btn btn-primary" href="{{operator.twitch.oauth_flow.get_authorize_url}}">Retrieve Token</a>
+                    <a class="btn btn-primary" href="{% url 'notifpy:refresh_token' source='twitch' %}">Refresh Token</a>
+                    <a class="btn btn-primary" href="{% url 'notifpy:revoke_token' source='twitch' %}">Revoke Token</a>
+                </div>
+            </div>
         </div>
-    </div>
+        
 </div>
 
-
-{% endblock body %}
+{% endblock main_content %}

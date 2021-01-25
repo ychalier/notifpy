@@ -1,52 +1,54 @@
 {% extends 'notifpy/base.html' %}
 {% load static %}
 
-{% block body %}
+{% block main_content %}
 
-<h1>Welcome to Notifpy!</h1>
+<h1>Welcome to Notifpy</h1>
 
 <h2>What is it?</h2>
 
 <p>
     It is a <a href="https://www.djangoproject.com/">Django</a> application,
-    whose purpose is to mimic the features of a
-    <a class="emph" href="https://www.youtube.com/">YouTube</a> and a
-    <a class="emph" href="https://www.twitch.tv/">Twitch</a> accounts,
-    in terms of subscriptions, follows, and playlist management. It is
-    open-source, more precisely developped under the MIT License. You can find
-    the source code on GitHub (check out this repository:
-    <a href="https://github.com/ychalier/notifpy">https://github.com/ychalier/notifpy</a>).
+    whose purpose is to mimic the features of a <a href="https://www.youtube.com/">YouTube</a>
+    and a <a href="https://www.twitch.tv/">Twitch</a> accounts, 
+    in terms of subscriptions, follows, and playlist management. 
+    It is open-source, more precisely developped under the MIT License.
+    You can find the source code on <a href="https://github.com/ychalier/notifpy">GitHub</a>.
 </p>
 
 <p>
-    Its purpose is the preservation of privacy without the cost of practicality,
-    by allowing users to still follow content creators without having to rely
-    on YouTube or Twitch recommandation system. <b>This is a way of remaining
-        in control of what one's see.</b>
+    Its purpose is the preservation of privacy without the
+    cost of practicality, by allowing users to still follow
+    content creators without having to rely on YouTube or Twitch
+    recommandation system.
+    This is a way of remaining in control of what one's see.
 </p>
 
 <p>
     On desktop, it combines greatly with incognito navigation. On Android,
     applications such as
-    <a class="emph" href="https://vanced.app/">YoutTube Vanced</a>
+    <a class="emph" href="https://vancedapp.com/">YoutTube Vanced</a>
     are fitted to be used with Notifpy. Similar applications for Twitch exist
     but are not advanced enough for it to be used on a regular basis.
     In both cases, remember to maintain an empty cache to get rid of history and
     recommandations.
 </p>
 
-<h2>Install it for yourself!</h2>
+<h2>Try it yourself</h2>
+
+<h3>Install the application on your Django server</h3>
 
 <p>
-    Simply use:
+    The repository's <a href="https://github.com/ychalier/notifpy/blob/master/README.rst">README</a>
+    contains all the information you need.
 </p>
 
-<pre>pip install --extra-index-url https://packages.chalier.fr django-notifpy</pre>
+<h3>Apply for a demo</h3>
 
 <p>
-    Also, you may check out the <a href="https://github.com/ychalier/notifpy">repository</a>.
-    Add <code>"notifpy"</code> to the <code>INSTALLED_APPS</code> of your
-    Django project, migrate the database, update your URLs, and voilà!
+    Following the APIs guidelines, I can not offer this application as a public service.
+    But if you want to have a quick look at, I can create a temporary demo account.
+    <a href="https://chalier.fr/#contact">Feel free to contact me.</a> 
 </p>
 
-{% endblock %}
+{% endblock main_content %}

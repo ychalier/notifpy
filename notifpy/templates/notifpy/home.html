@@ -1,9 +1,11 @@
 {% extends 'notifpy/base.html' %}
 {% load static %}
 
-{% block body %}
+{% block title %}Home &mid; {{ block.super }}{% endblock %}
 
-<template id="template--stream">
+{% block main_content %}
+
+<template id="template--stream--old">
     <a class="image-link tooltip">
         <img class="channel__thumbnail" />
         <span class="tooltip__div">
@@ -15,41 +17,70 @@
     </a>
 </template>
 
-<div id="stream_list" class="stream_banner"></div>
+<template id="template--stream">
+    <div class="popover popover-bottom">
+        <figure class="avatar avatar-lg m-1">
+            <a><img /></a>
+        </figure>
+        <div class="popover-container">
+            <div class="card">
+                <div class="card-image">
+                    <img class="img-responsive" />
+                </div>
+                <div class="card-header">
+                    <div class="card-title h5"></div>
+                    <div class="card-subtitle text-gray"></div>
+                </div>
+                <div class="card-body"></div>
+                <div class="card-footer text-gray">
+                    <i class="icon icon-people"></i> <span class="viewer-count"></span>
+                    &middot;
+                    <i class="icon icon-time"></i> <span class="started-at"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+
+<div class="card my-2">
+    <div class="card-body">
+        <div id="stream_list"><span class="message">Waiting for Twitch lookup...</span></div>
+    </div>
+</div>
+
+
 
 {% if videos %}
-<div class="gallery--grid">
+<div class="columns">
     {% for video in videos %}
-    {% include "notifpy/video.html" %}
+    <div class="column col-4 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 my-2">
+        {% include "notifpy/video.html" %}
+    </div>
     {% endfor %}
 </div>
-<div class="pagination">
-    <span class="step-links">
-        {% if videos.has_previous %}
-        <a href="?page=1"><img class="nav_icon" src="{% static 'notifpy/icons/start.svg' %}" alt="&laquo; first"></a>
-        <a href="?page={{ videos.previous_page_number }}"><img class="nav_icon" src="{% static 'notifpy/icons/chevron_left.svg' %}" alt="previous"></a>
-        {% endif %}
 
-        <span class="current">
-            {{ videos.number }} / {{ videos.paginator.num_pages }}
-        </span>
+{% include "piweb/pagination.html" with paginator=video_paginator %}
 
-        {% if videos.has_next %}
-        <a href="?page={{ videos.next_page_number }}"><img class="nav_icon" src="{% static 'notifpy/icons/chevron_right.svg' %}" alt="next"></a>
-        <a href="?page={{ videos.paginator.num_pages }}"><img class="nav_icon" src="{% static 'notifpy/icons/end.svg' %}" alt="last &raquo;"></a>
-        {% endif %}
-    </span>
-</div>
 {% else %}
-<p>No videos to show.</p>
+<div class="empty">
+    <div class="empty-icon">
+        <i class="icon icon-4x icon-video-library"></i>
+    </div>
+    <p class="empty-title h5">No videos to show</p>
+    <p class="empty-subtitle">You are probably not subscribed to any channel. Click the button below to add one.</p>
+    <div class="empty-action">
+        <a class="btn btn-primary" href="{% url 'notifpy:subscriptions' %}">Subscriptions</a>
+    </div>
+</div>
 {% endif %}
 
+{% endblock main_content %}
+
+{% block body_scripts %}
+{{ block.super }}
 <script type="text/javascript">
     var STREAMS_ROUTE = "{% url 'notifpy:twitch_streams_api' %}";
 </script>
-
-<script type="text/javascript" src="{% static 'notifpy/js/streams.js' %}">
-
-</script>
-
+<script type="text/javascript" src="{% static 'notifpy/js/streams.js' %}"></script>
 {% endblock %}

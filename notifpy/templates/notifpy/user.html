@@ -1,0 +1,29 @@
+{% extends 'notifpy/base.html' %}
+{% load static %}
+
+{% block title %}{{ user.display_name }} &mid; {{ block.super }}{% endblock%}
+
+{% block main_content %}
+<h1>
+    <figure class="avatar avatar-lg">
+        <img src="{{ user.profile_image_url }}" alt="{{ user.login }}" />
+    </figure>
+    {{ user.display_name }}
+    {% if subscribed %}<i class="icon icon-2x icon-task text-success" title="Subscribed"></i>{% endif %}
+</h1>
+
+<p>
+    <a class="btn btn-primary" href="{% url 'notifpy:update_profile_picture' login=user.login %}" title="Update profile picture"><i class="icon icon-refresh"></i> Update profile picture</a>
+</p>
+
+{% if request.user.is_superuser %}
+
+<h2 class="m-top">Superuser Settings</h2>
+
+<p>
+    <a class="btn btn-primary" href="{% url 'notifpy:delete_twitch_user' login=user.login %}" title="Delete this Twitch user"><i class="icon icon-delete"></i> Delete</a>
+</p>
+
+{% endif %}
+
+{% endblock main_content %}

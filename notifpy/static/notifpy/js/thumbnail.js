@@ -1,31 +1,26 @@
-console.log("Echo from thumbnail.js");
+// console.log("Echo from thumbnail.js");
 
-let images = document.querySelectorAll("img.video__thumbnail__background");
-
-function set_thumbnail_source(target) {
+document.querySelectorAll("img.youtube_thumbnail_fg").forEach((target) => {
     let dummy = new Image;
     dummy.onload = function() {
         if (dummy.width != 120) {
-            let parent = target.parentNode;
-            let newNode = document.createElement("img");
-            newNode.src = dummy.src;
-            newNode.className = "video__thumbnail__foreground";
-            parent.appendChild(newNode);
+            target.src = dummy.src;
             setTimeout(() => {
-                newNode.classList.add("video__thumbnail__foreground--shown");
+                target.classList.add("show");
             }, 100);
         } else {
             let alt_dummy = new Image;
             alt_dummy.onload = function() {
                 if (alt_dummy.width != 120) {
                     target.src = alt_dummy.src;
+                    setTimeout(() => {
+                        target.classList.add("show");
+                    }, 100);
                 }
             }
-            alt_dummy.src = target.getAttribute("true_src").replace("maxresdefault", "mqdefault");
+            alt_dummy.src = target.getAttribute("lazysrc").replace("maxresdefault", "mqdefault");
         }
+
     }
-    dummy.src = target.getAttribute("true_src").replace("mqdefault", "maxresdefault");
-}
-for (let i = 0; i < images.length; i++) {
-    set_thumbnail_source(images[i]);
-}
+    dummy.src = target.getAttribute("lazysrc").replace("mqdefault", "maxresdefault");
+});
